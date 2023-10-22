@@ -1,10 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Provider } from 'react-redux';
 import Route from './src/routes';
 import { useFonts } from 'expo-font';
-import store from './src/redux/store'
-import { Toast_Error, Toast_Sukses, Loading } from './src/component';
-// import './OneSignal'
 
 export default function App() {
   const [loaded] = useFonts({
@@ -24,13 +20,9 @@ export default function App() {
   }
  
   return (
-    // <Text>oke</Text>
-    <Provider store={store}>
-      {/* <Loading /> */}
-      {/* <Toast_Error />
-      <Toast_Sukses/> */}
+    <View style={{flex:1}}>
       <Route />
-    </Provider>
+    </View>
 
   );
 }
