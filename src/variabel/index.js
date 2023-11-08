@@ -4,7 +4,8 @@ const color = {
     grey:'#C4C4C4',
     white: '#FFFFFF',
     yellow:'#B47E3E',
-    green:'#1F4F29'
+    green:'#1F4F29',
+    blue:'007AFF'
 }
 
 // const variables = {

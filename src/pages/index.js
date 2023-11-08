@@ -1,13 +1,18 @@
-// import AddNew from './AddNew'
-// import History from './History'
+import AddNew from './AddNew'
+import Register from './Register'
 import Home from './Home'
-// import Profile from './Profile'
-
-
+import Profile from './Profile'
+import Login from './Login'
+import Report from './Report'
 
 export{
     // AddNew,
-    // History,
+    // Register,
     // Profile
     Home,
+    Login,
+    AddNew,
+    Register,
+    Profile,
+    Report,
 }

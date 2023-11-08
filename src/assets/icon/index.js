@@ -1,26 +1,31 @@
 import Add from './Add.png';
 import Add_Active from './Add_Active.png';
 import delete_icon from './delete_icon.png';
-import History from './History.png';
+import History_Icon from './History.png';
 import Profile_Set from './Profile_set.png';
 import History_Active from './History_Active.png';
-import Report from './Report.png';
+import Report_Icon from './Report.png';
 import Report_Active from './Report_Active.png';
-import Home from './Home.png';
+import Home_Icon from './Home.png';
 import Home_Active from './Home_Active.png';
-
+import Basket from './Basket.png'
+import Lost_Signal from './lost_signal.png'
+import RAPP from './rapp.png'
 
 
 
 export {
     Add_Active,
+    Lost_Signal,
     Add,
+    Basket,
+    RAPP,
     delete_icon,
-    History,
+    History_Icon,
     History_Active,
     Profile_Set,
-    Report,
+    Report_Icon,
     Report_Active,
-    Home,
+    Home_Icon,
     Home_Active
 }
