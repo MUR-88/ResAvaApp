@@ -9,7 +9,7 @@ const Input = ({ onChangeText, editable=true, onFocus, keyboardType='default', i
         <TextInput
             secureTextEntry={secureTextEntry}
             placeholder={item.placeholder}
-            style={[styles.input, {height:100, textAlignVertical: 'top', paddingVertical:8, paddingHorizontal:12}]}
+            style={[styles.input, {height:50, textAlignVertical: 'top', paddingVertical:8, paddingHorizontal:6}]}
             keyboardType={keyboardType}
             value={item.value}
             onChangeText={onChangeText}
@@ -36,22 +36,16 @@ const styles = StyleSheet.create({
         justifyContent:'flex-start',    
         // marginLeft:10,
         fontFamily:'PoppinsSemiBold',
+        justifyContent: 'flex-end',
     },   
     input: {
-        // height: 40
         flex:1,
-        // width:'100%',
         fontSize:16,
-        height:40,
-        borderWidth: 0.5,
+        height:30,
+        // borderWidth: 0.5,
         borderColor: '#DDDDDD',
         marginBottom:5, 
         borderRadius:10,
-        // textcolor:'black',
-        // backgroundColor:'red',
-        // paddingHorizontal:12,
-        // marginVertical:5,
-        // paddingVertical:8
 
                 
     } 

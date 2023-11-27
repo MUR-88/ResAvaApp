@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native'
 import React from 'react'
 import AutoHeightImage from 'react-native-auto-height-image'
-import { PanahKiri } from '../../assets/icon'
+import { Fiber, Logo, Profile_Set, RAPP, PanahKiri } from "../../assets/icon";
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
 import Text from '../Text'
@@ -11,6 +11,7 @@ const Header = ( {title, buttonStyle} ) => {
     return (
     <View>
         <View style={[styles.header, buttonStyle]}>
+            <AutoHeightImage source={PanahKiri} width={20} />
             <Text style={{ fontSize: 16, fontFamily:'PoppinsBold', marginLeft: 12 }}>{ title }</Text>
         </View>
         <View 
