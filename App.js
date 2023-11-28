@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+import { AppRegistry } from 'react-native';
 import Route from "./src/routes";
 import { useFonts } from "expo-font";
 import store from "./src/Redux/store";
@@ -11,7 +12,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import "./src/assets/Model/db";
+// import "./src/assets/Model/db";
 
 export default function App() {
   const queryClient = new QueryClient();

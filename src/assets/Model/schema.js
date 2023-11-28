@@ -1,7 +1,7 @@
 import { appSchema, tableSchema } from "@nozbe/watermelondb";
 
 export default mySchema = appSchema({
-  version: 1,
+  version: 2,
   tables: [
     tableSchema({
       name: "master_companies",

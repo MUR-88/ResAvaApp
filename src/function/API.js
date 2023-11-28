@@ -1,7 +1,7 @@
 //Home IP
-const API_URL = "http://192.168.100.21:8000/api/";
+// const API_URL = "http://192.168.100.21:8000/api/";
 //hostspot IP
-// const API_URL = "http://192.168.194.219:8000/api/";
+const API_URL = "http://192.168.194.219:8000/api/";
 
 
 class Api {

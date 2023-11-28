@@ -11,19 +11,19 @@ export default schemaMigrations({
     {
       toVersion: 2,
       steps: [
-        createTable({
-          name: "master_companies",
-          columns: [
-            { name: "id_master_companies", type: "string", isIndexed: true },
-            { name: "name", type: "string" },
-            { name: "isSync", type: "boolean" },
-            { name: "isConnected", type: "boolean" },
-            { name: "created_at", type: "number" },
-            { name: "deleted_at", type: "number" },
-            { name: "updated_at", type: "number" },
-          ],
-        }),
-        // addColumns({
+        // createTable({
+        //   name: "master_companies",
+        //   columns: [
+        //     { name: "id_master_companies", type: "string", isIndexed: true },
+        //     { name: "name", type: "string" },
+        //     { name: "isSync", type: "boolean" },
+        //     { name: "isConnected", type: "boolean" },
+        //     { name: "created_at", type: "number" },
+        //     { name: "deleted_at", type: "number" },
+        //     { name: "updated_at", type: "number" },
+        //   ],
+        // }),
+        // createTable({
         //   name: "master_estates",
         //   columns: [
         //     { name: "id_master_estates", type: "string", isIndexed: true },
@@ -36,6 +36,7 @@ export default schemaMigrations({
         //     { name: "updated_at", type: "number" },
         //   ],
         // }),
+        // createTable({
         //   name: "master_sectors",
         //   columns: [
         //     { name: "id_master_sectors", type: "string", isIndexed: true },
@@ -46,6 +47,8 @@ export default schemaMigrations({
         //     { name: "deleted_at", type: "number" },
         //     { name: "updated_at", type: "number" },
         //   ],
+        // }),
+        // createTable({
         //   name: "master_log_activities",
         //   columns: [
         //     {
@@ -71,6 +74,8 @@ export default schemaMigrations({
         //     { name: "deleted_at", type: "number" },
         //     { name: "updated_at", type: "number" },
         //   ],
+        // }),
+        // createTable({
         //   name: "master_machine",
         //   columns: [
         //     { name: "id_master_machine", type: "string", isIndexed: true },
@@ -88,6 +93,8 @@ export default schemaMigrations({
         //     { name: "deleted_at", type: "number" },
         //     { name: "updated_at", type: "number" },
         //   ],
+        // }),
+        // createTable({
         //   name: "master_machine_types",
         //   columns: [
         //     {
@@ -102,21 +109,21 @@ export default schemaMigrations({
         //     { name: "deleted_at", type: "number" },
         //     { name: "updated_at", type: "number" },
         //   ],
+        // }),
+        // createTable({
         //   name: "master_main_activities",
         //   columns: [
-        //     {
-        //       name: "id_master_main_activities",
-        //       type: "string",
-        //       isIndexed: true,
-        //     },
+        //     { name: "id_master_main_activities", type: "string", isIndexed: true },
         //     { name: "name", type: "string" },
-        //     { name: "master_machine_types_id" },
+        //     { name: "master_machine_types_id", type:'string'},
         //     { name: "isSync", type: "boolean" },
         //     { name: "isConnected", type: "boolean" },
         //     { name: "created_at", type: "number" },
         //     { name: "deleted_at", type: "number" },
         //     { name: "updated_at", type: "number" },
         //   ],
+        // }),
+        // createTable({
         //   name: "users",
         //   columns: [
         //     { name: "id_users", type: "string", isIndexed: true },
@@ -134,7 +141,7 @@ export default schemaMigrations({
         //   ],
         // }),
         unsafeExecuteSql(
-          'CREATE INDEX IF NOT EXISTS exercises_equipment_list on exercises (equipment_list);',
+          "CREATE INDEX IF NOT EXISTS exercises_equipment_list on exercises (equipment_list);"
         ),
       ],
     },
