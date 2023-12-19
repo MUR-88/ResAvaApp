@@ -7,108 +7,27 @@ import {
   Dimensions,
   Image,
   StatusBar,
+  Switch,
+  Modal,
+  Pressable,
 } from "react-native";
 import Constants from "expo-constants";
 import { Button, Input } from "../../component";
-import { RefreshControl, ScrollView } from "react-native-gesture-handler";
+import {
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
 // import {color} from "../..variabel";
 import dayjs from "dayjs";
 import "dayjs/locale/id";
-import axios from "axios";
 import { Dropdown } from "react-native-element-dropdown";
 import { useEffect } from "react";
-
-const sector = [
-  { label: "Basrah", value: "1" },
-  { label: "Item 2", value: "2" },
-  { label: "Item 3", value: "3" },
-  { label: "Item 4", value: "4" },
-  { label: "Item 5", value: "5" },
-  { label: "Item 6", value: "6" },
-  { label: "Item 7", value: "7" },
-  { label: "Item 8", value: "8" },
-];
-
-const company = [
-  { label: "PTSI", value: "1" },
-  { label: "Item 2", value: "2" },
-  { label: "Item 3", value: "3" },
-  { label: "Item 4", value: "4" },
-  { label: "Item 5", value: "5" },
-  { label: "Item 6", value: "6" },
-  { label: "Item 7", value: "7" },
-  { label: "Item 8", value: "8" },
-];
-const machine_id = [
-  { label: "MCH 1", value: "1" },
-  { label: "MCH 2", value: "2" },
-  { label: "MCH 3", value: "3" },
-  { label: "MCH 4", value: "4" },
-  { label: "MCH 5", value: "5" },
-  { label: "MCH 6", value: "6" },
-  { label: "MCH 7", value: "7" },
-  { label: "MCH 8", value: "8" },
-];
-const estate = [
-  { label: "A", value: "1" },
-  { label: "B", value: "2" },
-  { label: "C", value: "3" },
-  { label: "D", value: "4" },
-  { label: "F", value: "5" },
-  { label: "G", value: "6" },
-  { label: "H", value: "7" },
-  { label: "I", value: "8" },
-];
-const compartement = [
-  { label: "101", value: "1" },
-  { label: "102", value: "2" },
-  { label: "103", value: "3" },
-  { label: "104", value: "4" },
-  { label: "105", value: "5" },
-  { label: "106", value: "6" },
-  { label: "107", value: "7" },
-  { label: "108", value: "8" },
-];
-const type = [
-  { label: "Barging Jumbo", value: "1" },
-  { label: "Barging Semi", value: "2" },
-  { label: "Barging Standard", value: "3" },
-  { label: "Debarker", value: "4" },
-  { label: "bucket", value: "5" },
-  { label: "G", value: "6" },
-  { label: "H", value: "7" },
-  { label: "I", value: "8" },
-];
-const main_activity = [
-  { label: "Grapple", value: "1" },
-  { label: "Barging ", value: "2" },
-  { label: "Felling", value: "3" },
-  // { label: "Debarker", value: "4" },
-  // { label: "bucket", value: "5" },
-  { label: "G", value: "6" },
-  { label: "H", value: "7" },
-  { label: "I", value: "8" },
-];
-const lastUpdate = [
-  { label: "9.8", value: "1" },
-  { label: "9.6", value: "2" },
-  { label: "10.4", value: "3" },
-  { label: "12.1", value: "4" },
-  { label: "bucket", value: "5" },
-  { label: "G", value: "6" },
-  { label: "H", value: "7" },
-  { label: "I", value: "8" },
-];
-const current = [
-  { label: "8.8", value: "1" },
-  { label: "9.76", value: "2" },
-  { label: "9.5", value: "3" },
-  { label: "12.1", value: "4" },
-  { label: "bucket", value: "5" },
-  { label: "G", value: "6" },
-  { label: "H", value: "7" },
-  { label: "I", value: "8" },
-];
+import DatePicker, {
+  getToday,
+  getFormatedDate,
+} from "react-native-modern-datepicker";
+// import { getToday, getFormatedDate } from "react-native-modern-datepicker";
 
 // const dispatch = useDispatch()
 //   const { status_ordered, reservasi }  = useSelector(state => state.invoice)
@@ -128,8 +47,135 @@ const countries = ["Peranap", "Tesso West", "Australia", "Ireland"];
 //   }
 // };
 const AddNew = ({ navigation }) => {
+  const sector = [
+    { label: "Basrah", value: "1" },
+    { label: "Item 2", value: "2" },
+    { label: "Item 3", value: "3" },
+    { label: "Item 4", value: "4" },
+    { label: "Item 5", value: "5" },
+    { label: "Item 6", value: "6" },
+    { label: "Item 7", value: "7" },
+    { label: "Item 8", value: "8" },
+  ];
+
+  const company = [
+    { label: "PTSI", value: "1" },
+    { label: "Item 2", value: "2" },
+    { label: "Item 3", value: "3" },
+    { label: "Item 4", value: "4" },
+    { label: "Item 5", value: "5" },
+    { label: "Item 6", value: "6" },
+    { label: "Item 7", value: "7" },
+    { label: "Item 8", value: "8" },
+  ];
+  const machine_id = [
+    { label: "MCH 1", value: "1" },
+    { label: "MCH 2", value: "2" },
+    { label: "MCH 3", value: "3" },
+    { label: "MCH 4", value: "4" },
+    { label: "MCH 5", value: "5" },
+    { label: "MCH 6", value: "6" },
+    { label: "MCH 7", value: "7" },
+    { label: "MCH 8", value: "8" },
+  ];
+  const estate = [
+    { label: "A", value: "1" },
+    { label: "B", value: "2" },
+    { label: "C", value: "3" },
+    { label: "D", value: "4" },
+    { label: "F", value: "5" },
+    { label: "G", value: "6" },
+    { label: "H", value: "7" },
+    { label: "I", value: "8" },
+  ];
+  const compartement = [
+    { label: "101", value: "1" },
+    { label: "102", value: "2" },
+    { label: "103", value: "3" },
+    { label: "104", value: "4" },
+    { label: "105", value: "5" },
+    { label: "106", value: "6" },
+    { label: "107", value: "7" },
+    { label: "108", value: "8" },
+  ];
+  const type = [
+    { label: "Barging Jumbo", value: "1" },
+    { label: "Barging Semi", value: "2" },
+    { label: "Barging Standard", value: "3" },
+    { label: "Debarker", value: "4" },
+    { label: "bucket", value: "5" },
+    { label: "G", value: "6" },
+    { label: "H", value: "7" },
+    { label: "I", value: "8" },
+  ];
+  const main_activity = [
+    { label: "Grapple", value: "1" },
+    { label: "Barging ", value: "2" },
+    { label: "Felling", value: "3" },
+    // { label: "Debarker", value: "4" },
+    // { label: "bucket", value: "5" },
+    { label: "G", value: "6" },
+    { label: "H", value: "7" },
+    { label: "I", value: "8" },
+  ];
+  const lastUpdate = [
+    { label: "9.8", value: "1" },
+    { label: "9.6", value: "2" },
+    { label: "10.4", value: "3" },
+    { label: "12.1", value: "4" },
+    { label: "bucket", value: "5" },
+    { label: "G", value: "6" },
+    { label: "H", value: "7" },
+    { label: "I", value: "8" },
+  ];
+  const current = [
+    { label: "8.8", value: "1" },
+    { label: "9.76", value: "2" },
+    { label: "9.5", value: "3" },
+    { label: "12.1", value: "4" },
+    { label: "bucket", value: "5" },
+    { label: "G", value: "6" },
+    { label: "H", value: "7" },
+    { label: "I", value: "8" },
+  ];
+
+  const [selectedDate, setSelectedDate] = useState("");
+  const today = new Date();
+
+  const startDate = getFormatedDate(
+    today.setDate(today.getDate() - 1),
+    "YYYY/MM/DD"
+  );
+  const [modalVisible, setModalVisible] = useState(false);
+  const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
+  const [isEnable, setIsEnable] = useState(true);
+  const [text, setText] = useState("Computer On Or Off ?");
+  const [isFocus, setIsFocus] = useState(true);
+  const [date, setDate] = useState(current);
+
+  function handleOnPress() {
+    setOpen(!open);
+  }
+
+  function handleChange(Date) {
+    console.log(Date);
+    setDate(Date);
+  }
+
+  const toggleSwitch = () => {
+    try {
+      if (isEnable) {
+        setText("Active");
+      } else {
+        setText("Inactive");
+      }
+      setIsEnable((previouvsState) => !previouvsState);
+      console.log(isEnable);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     // use if status bar overlaying
@@ -165,16 +211,39 @@ const AddNew = ({ navigation }) => {
             </Text>
             <View style={[styles.Details1]}>
               <View style={[styles.button_waktu]}>
-                <Button
-                  buttonStyle={{ borderRadius: 20 }}
-                  item={{
-                    title: "Pilih Tanggal",
-                    height: 40,
-                    textcolor: "grey",
-                    backgroundcolor: "#white",
-                    alginSelf: "center",
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={modalVisible}
+                  onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setModalVisible(!modalVisible);
                   }}
-                />
+                >
+                  <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                      <DatePicker
+                        onSelectedChange={(date) => setSelectedDate(date)}
+                        mode="calendar"
+                        minimumDate={startDate}
+                        selected={date}
+                        onDateChange={handleChange}
+                      />
+                      <Pressable
+                        style={[styles.button, styles.buttonClose]}
+                        onPress={() => setModalVisible(!modalVisible)}
+                      >
+                        <Text style={styles.textStyle}>{}Simpan</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </Modal>
+                <Pressable
+                  style={[styles.button, styles.buttonOpen]}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Text style={styles.textStyle}>Pilih Tanggal</Text>
+                </Pressable>
               </View>
               <View style={[styles.container, { paddingVertical: 10 }]}>
                 <Dropdown
@@ -299,33 +368,7 @@ const AddNew = ({ navigation }) => {
                   setIsFocus(false);
                 }}
               />
-              <View
-                style={{
-                  flexDirection: "row",
-                  flex: 1,
-                  backgroundColor: "white",
-                  borderRadius: 10,
-                  height: 40,
-                  marginLeft: 10,
-                  borderColor: "black",
-                  marginTop: 10,
-                  shadowColor: "#000",
-                  height: 40,
-                  flex: 1,
-                  backgroundColor: "#D8D8D8",
-                  opacity: 0.4,
-                  marginRight: 10,
-                  marginVertical: 5,
-                  borderRadius: 15,
-                  justifyContent: "center",
-                  alignContent: "center",
-                  // width:'95%',
-                  // borderColor: 'gray',
-                  borderWidth: 0.5,
-                  borderRadius: 8,
-                  paddingHorizontal: 8,
-                }}
-              >
+              <View style={styles.Compartement_input1}>
                 <View
                   style={[
                     styles.container,
@@ -337,13 +380,13 @@ const AddNew = ({ navigation }) => {
                 <View style={[styles.container]}>
                   <View
                     style={[
-                      styles.container,
+                      styles.container1,
                       { justifyContent: "flex-end", alignContent: "flex-end" },
                     ]}
                   >
                     <Input
                       item={{
-                        placeholder: "XX TON",
+                        placeholder: "13 TON",
                         borderWidth: 0.5,
                       }}
                     />
@@ -393,93 +436,136 @@ const AddNew = ({ navigation }) => {
                   setIsFocus(false);
                 }}
               />
-              {/* <View style={styles.Container_bar}>
-              <TouchableOpacity onPress={ () => handleStatusOrdered(2)} style={[styles.Botton_set, { backgroundColor:status_ordered==2?'rgba(191, 205, 219, 1)': null }]}>
-                <View>
-                  <Text style={{ color: 'rgba(0, 18, 113, 1)', fontSize:16 }}>Delivery</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={ () => handleStatusOrdered(1)} style={[styles.Botton_set, { backgroundColor:status_ordered==1?'rgba(191, 205, 219, 1)': null }]}>
-                <View>
-                  <Text style={{fontSize:16 }}>Pickup</Text>
-                </View>
-              </TouchableOpacity>
-            </View> */}
-              <Dropdown
-                style={[
-                  styles.dropdownMech,
-                  isFocus && { borderColor: "#8888D" },
-                ]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                iconStyle={styles.iconStyle}
-                data={lastUpdate}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder={!isFocus ? "HM-Last Update" : ""}
-                value={value}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={(item) => {
-                  setValue(item.value);
-                  setIsFocus(false);
+
+              {isEnable ? (
+                <>
+                  <Dropdown
+                    style={[
+                      styles.dropdownMech,
+                      isFocus && { borderColor: "#8888D" },
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    iconStyle={styles.iconStyle}
+                    data={lastUpdate}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={!isFocus ? "HM-Last Update" : ""}
+                    value={value}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={(item) => {
+                      setValue(item.value);
+                      setIsFocus(false);
+                    }}
+                  />
+                  <Dropdown
+                    style={[
+                      styles.dropdownMech,
+                      { marginBottom: 20 },
+                      isFocus && { borderColor: "#8888D" },
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    iconStyle={styles.iconStyle}
+                    data={current}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={!isFocus ? "HM-Current" : ""}
+                    value={value}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={(item) => {
+                      setValue(item.value);
+                      setIsFocus(false);
+                    }}
+                  />
+                </>
+              ) : null}
+
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  marginHorizontal: 5,
+                  marginVertical: 3,
                 }}
-              />
-              <Dropdown
-                style={[
-                  styles.dropdownMech,
-                  { marginBottom: 20 },
-                  isFocus && { borderColor: "#8888D" },
-                ]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                iconStyle={styles.iconStyle}
-                data={current}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder={!isFocus ? "HM-Current" : ""}
-                value={value}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={(item) => {
-                  setValue(item.value);
-                  setIsFocus(false);
-                }}
-              />
+              >
+                <View
+                  style={[
+                    styles.container,
+                    { justifyContent: "center", flex: 1 },
+                  ]}
+                >
+                  <Text style={{ opacity: 0.4 }}>Computer HM ? </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginHorizontal: 10,
+                    justifyContent: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexDirection: "row ",
+                      alignContent: "center",
+                      marginVertical: 2,
+                    }}
+                  >
+                    <Switch
+                      trackColor={{ false: "#FB9797", true: "#CAE6CA" }}
+                      // tumbColor={isEnable ? "red" : "green"}
+                      onValueChange={toggleSwitch}
+                      value={isEnable}
+                    />
+                    <Text style={{ color: "#AFAFAF" }}>
+                      {isEnable ? "on" : "off"}
+                    </Text>
+                  </View>
+                </View>
+              </View>
             </View>
             <View style={[styles.container, { paddingVertical: 10 }]}></View>
           </View>
           <View
             style={{
-              // backgroundColor:'red',
               flexDirection: "row",
               justifyContent: "center",
-              // borderTopLeftRadius: 36,
-              // borderTopRightRadius: 36,
               borderRadius: 20,
               flex: 1,
             }}
           >
-            <View style={[styles.atas, {  borderRadius: 10 }]}>
+            <View style={[styles.atas, { borderRadius: 10 }]}>
               <View
                 style={[styles.containerInput, { backgroundColor: "#D8D8D8" }]}
               >
                 <Input
                   item={{
                     height: 200,
-                    marginHorizontal:20,
+                    marginHorizontal: 20,
                     label: "Keterangan",
                     placeholder: "Maintainance to Workshop for Repairment",
-                    // textAlignVertical: 'top', paddingVertical:8, paddingHorizontal:12
                   }}
                   input={{ backgroundColor: "black" }}
                 />
               </View>
             </View>
           </View>
-          <View style={{ flex: 1, justifyContent: "center", marginTop:10, marginBottom:20, marginHorizontal:20}}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              marginTop: 10,
+              marginBottom: 20,
+              marginHorizontal: 20,
+            }}
+          >
             <Button
               item={{
                 title: "Submit",
@@ -487,8 +573,6 @@ const AddNew = ({ navigation }) => {
                 textcolor: "#FFFFFF",
                 width: "100%",
                 justifyContent: "center",
-                // height:50,
-                // onPress: () =>(Home),
                 onPress: () => navigation.navigate(""),
               }}
             />
@@ -604,17 +688,53 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    marginHorizontal: 10,
+    // marginHorizontal:,
+    justifyContent: "center",
+    marginHorizontal:8
+  },
+  container1: {
+    // flex: 1,
+    // flexDirection: "column",
+    // marginHorizontal:,
+    justifyContent: "center",
+  },
+  Compartement_input1: {
+    flexDirection: "row",
+    flex: 1,
+    backgroundColor: "white",
+    borderRadius: 10,
+    height: 40,
+    marginLeft: 10,
+    borderColor: "black",
+    marginTop: 10,
+    shadowColor: "#000",
+    height: 40,
+    flex: 1,
+    backgroundColor: "#D8D8D8",
+    opacity: 0.5,
+    marginRight: 10,
+    marginVertical: 5,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignContent: "center",
+    // width:'95%',
+    // borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
   },
   MechInfo: {
     flex: 1,
-    width: "90%",
+    width: "95%",
     borderRadius: 10,
     alignItems: "center",
     backgroundColor: "white",
     // backgroundColor:'red',
     flexDirection: "column",
-    marginHorizontal: 15,
+    // marginHorizontal: 7,
+    // marginRight: 7,
+    marginLeft: 4
+    // marginRight:10
   },
   Details1: {
     flex: 1,
@@ -669,14 +789,14 @@ const styles = StyleSheet.create({
     height: 20,
   },
   atas: {
-    flex:1,
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
     marginTop: 8,
-    // width: "100%",
-    marginHorizontal: 25,
+    width: "100%",
+    marginHorizontal: 12.5,
     paddingVertical: 10,
     backgroundColor: "white",
   },
@@ -687,10 +807,76 @@ const styles = StyleSheet.create({
   containerInput: {
     borderRadius: 10,
     borderWidth: 0.5,
-    width:'95%',
-    height:100,
+    width: "95%",
+    height: 100,
     borderColor: "#8888D",
     alignItems: "center",
     opacity: 0.4,
+  },
+
+  Compartement_input: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    height: 40,
+    marginLeft: 10,
+    borderColor: "black",
+    marginTop: 10,
+    shadowColor: "#000",
+    height: 40,
+    flex: 1,
+    backgroundColor: "#D8D8D8",
+    opacity: 0.5,
+    marginRight: 10,
+    marginVertical: 5,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignContent: "center",
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 35,
+    width: "100%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    // shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: "white",
+  },
+  buttonClose: {
+    backgroundColor: "#007AFF",
+  },
+  textStyle: {
+    color: "#",
+    // fontWeight: "",
+    textAlign: "center",
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
   },
 });

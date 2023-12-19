@@ -1,5 +1,4 @@
 import { StyleSheet, Text, View } from "react-native";
-import { AppRegistry } from 'react-native';
 import Route from "./src/routes";
 import { useFonts } from "expo-font";
 import store from "./src/Redux/store";

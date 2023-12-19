@@ -12,9 +12,10 @@ import { Button, Input } from "../../component";
 import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Dropdown } from "react-native-element-dropdown";
+import API from "../../function/API";
 
-const sector = [
-  { label: "Basrah", value: "1" },
+const master_machine_type = [
+  { label: "Barging Jumbo", value: "1" },
   { label: "Item 2", value: "2" },
   { label: "Item 3", value: "3" },
   { label: "Item 4", value: "4" },
@@ -24,8 +25,8 @@ const sector = [
   { label: "Item 8", value: "8" },
 ];
 
-const estate = [
-  { label: "A", value: "1" },
+const master_main_activity = [
+  { label: "Barge", value: "1" },
   { label: "Item 2", value: "2" },
   { label: "Item 3", value: "3" },
   { label: "Item 4", value: "4" },
@@ -35,26 +36,90 @@ const estate = [
   { label: "Item 8", value: "8" },
 ];
 
-const company = [
-  { label: "PTSI", value: "1" },
-  { label: "Item 2", value: "2" },
-  { label: "Item 3", value: "3" },
-  { label: "Item 4", value: "4" },
-  { label: "Item 5", value: "5" },
-  { label: "Item 6", value: "6" },
-  { label: "Item 7", value: "7" },
-  { label: "Item 8", value: "8" },
-];
+// const company = [
+//   { label: "PTSI", value: "1" },
+//   { label: "Item 2", value: "2" },
+//   { label: "Item 3", value: "3" },
+//   { label: "Item 4", value: "4" },
+//   { label: "Item 5", value: "5" },
+//   { label: "Item 6", value: "6" },
+//   { label: "Item 7", value: "7" },
+//   { label: "Item 8", value: "8" },
+// ];
 
 const Register = () => {
+  // const queryClient = useQueryClient();
+  // // Queries
+  // const postRegisterMachine = () => {
+  //   return API.post("post_master_register_machine");
+  // };
+
+  // const query = useQuery({
+  //   queryKey: ["post_master_register_machine"],
+  //   queryFn: postRegisterMachine,
+  // });
+  // console.log(query);
+
   const queryClient = useQueryClient();
   // Queries
-  const postRegisterMachine = () => {
-    return API.post("post_master_register_machine");
+  const getMasterCompany = () => {
+    return API.get("master_company");
   };
 
-  const query = useQuery({queryKey: ["post_master_register_machine"], queryFn: postRegisterMachine});
-  console.log(query);
+  const query = useQuery({
+    queryKey: ["master_company"],
+    queryFn: getMasterCompany,
+  });
+
+  // const query = useQuery({
+  //   queryKey: ["master_company"],
+  //   queryFn: getMasterRegisterMachine,
+  // });
+  // console.log(query.data);
+
+  // const queryClient = useQueryClient();
+  // // Queries
+  // const getMasterCompany = () => {
+  //   return API.get("master_company");
+  // };
+
+  // const query = useQuery({ queryKey: ["master_company"], queryFn: getMasterCompany });
+  // // alert(query.data.data);
+  // console.log(query?.data?.data);
+
+  // const queryClient = useQueryClient();
+  // // Queries
+  // const getMasterRegisterMachine = () => {
+  //   return API.get("master_machine_type");
+  // };
+  // const query = useQuery({
+  //   queryKey: ["master_machine_type"],
+  //   queryFn: getMasterRegisterMachine,
+  // });
+
+  // console.log(query?.data?.data);
+
+  // const [selectedValueMachineType, setSelectedValueMachineType] = useState(null);
+  // const [selectedValueMainActivity, setSelectedValueMainActivity] = useState(null);
+
+  // const {
+  //   data: masterMachineTypeData,
+  //   isLoading: isLoadingMasterMachineType,
+  // } = useQuery('masterMachineType', async () => {
+  //   const response = await API.get("master_machine_type");
+  //   return response.data;
+  // });
+
+  // const {
+  //   data: masterMainActivityData,
+  //   isLoading: isLoadingMasterMainActivity,
+  // } = useQuery('masterMainActivity', async () => {
+  //   const response = await API.get("master_main_activity");
+  //   return response.data;
+  // });
+
+  // const [masterTypeMachine, setMasterTypeMachine] = useQuery();
+  // const [masterMainActivity, setMasterMainActivity] = useState([]);
 
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
@@ -122,25 +187,30 @@ const Register = () => {
                 <Text style={styles.Abu}>Company </Text>
               </View>
               <View style={[styles.container, { backgroundColor: "white" }]}>
-                <Dropdown
-                  style={[styles.dropdown, isFocus && { borderColor: "" }]}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  iconStyle={styles.iconStyle}
-                  data={estate}
-                  maxHeight={300}
-                  width={40}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocus ? " PTSI" : ""}
-                  value={value}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={(item) => {
-                    setValue(item.value);
-                    setIsFocus(false);
-                  }}
-                />
+                {query?.data?.data?.data.map((item, index) => {
+                  return (
+                    <Dropdown
+                      key={`master_company${index}`}
+                      style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={item.name}
+                      maxHeight={300}
+                      width={40}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={!isFocus ? " PTSI" : ""}
+                      value={value}
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={(item) => {
+                        setValue(item.value);
+                        setIsFocus(false);
+                      }}
+                    />
+                  );
+                })}
               </View>
             </View>
             <View
@@ -167,7 +237,12 @@ const Register = () => {
               >
                 <Text style={styles.Abu}>Equipment Brand </Text>
               </View>
-              <View style={[styles.container, { backgroundColor: "white" }]}>
+              <View
+                style={[
+                  styles.container,
+                  { backgroundColor: "white", marginLeft: -4 },
+                ]}
+              >
                 <View style={styles.containerInput1}>
                   <Input
                     item={{
@@ -201,7 +276,12 @@ const Register = () => {
               >
                 <Text style={styles.Abu}>Equipment Class (Ton) </Text>
               </View>
-              <View style={[styles.container, { backgroundColor: "white" }]}>
+              <View
+                style={[
+                  styles.container,
+                  { backgroundColor: "white", marginLeft: -4 },
+                ]}
+              >
                 <View style={styles.container}>
                   <Input
                     item={{
@@ -233,9 +313,14 @@ const Register = () => {
                   },
                 ]}
               >
-                <Text style={styles.Abu}>Mechine Id </Text>
+                <Text style={styles.Abu}>Machine Id </Text>
               </View>
-              <View style={[styles.container, { backgroundColor: "white" }]}>
+              <View
+                style={[
+                  styles.container,
+                  { marginLeft: -4, backgroundColor: "white" },
+                ]}
+              >
                 <View style={styles.container}>
                   <Input
                     item={{
@@ -276,17 +361,17 @@ const Register = () => {
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
                   iconStyle={styles.iconStyle}
-                  data={estate}
+                  data={master_machine_type}
                   maxHeight={300}
                   width={40}
                   labelField="label"
                   valueField="value"
                   placeholder={!isFocus ? " Fix Grapple" : ""}
-                  value={value}
+                  value={master_machine_type}
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={(item) => {
-                    setValue(item.value);
+                    // setSelectedValueMachineType(item.value);
                     setIsFocus(false);
                   }}
                 />
@@ -321,17 +406,17 @@ const Register = () => {
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
                   iconStyle={styles.iconStyle}
-                  data={estate}
+                  data={master_main_activity || []}
                   maxHeight={300}
                   width={40}
                   labelField="label"
                   valueField="value"
                   placeholder={!isFocus ? " Loading" : ""}
-                  value={value}
+                  value={master_machine_type}
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={(item) => {
-                    setValue(item.value);
+                    // setSelectedValueMainActivity(item.value);
                     setIsFocus(false);
                   }}
                 />
@@ -361,7 +446,13 @@ const Register = () => {
               >
                 <Text style={styles.Abu}>Hour Meter - Current </Text>
               </View>
-              <View style={[styles.container, { backgroundColor: "white" }]}>
+              <View
+                style={[
+                  styles.container,
+                  { marginLeft: 22 },
+                  { backgroundColor: "white" },
+                ]}
+              >
                 <Input
                   item={{
                     placeholder: "XXX.XX",

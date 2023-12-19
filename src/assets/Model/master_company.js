@@ -1,5 +1,3 @@
-// model/Post.js
-// import { Model } from "@nozbe/watermelondb";
 import { Model } from "@nozbe/watermelondb";
 import {
   date,
@@ -12,8 +10,8 @@ import {
   readonly
 } from "@nozbe/watermelondb/decorators";
 
-export default class MasterCompanies extends Model {
-  static table = "master_companies";
+export default class MasterCompany extends Model {
+  static table = "master_company";
   
   static associations = {
     masterLogActivities: {
@@ -37,6 +35,8 @@ export default class MasterCompanies extends Model {
   @date("created_at") createdAt;
   @date("deleted_at") deletedAt;
   @date("deleted_at") updatedAt;
+  @field("last_pull_at") last_pull_at;
+
   // @children("master_log_activities") masterLogActivities;
   // @children("master_machines") masterMachines;
 

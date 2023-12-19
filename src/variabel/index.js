@@ -10,11 +10,11 @@ const color = {
 
 const variables = {
     // localhost
-    baseApi: 'http://127.0.0.1:8000/api/',
+    // baseApi: 'http://127.0.0.1:8000/api/',
     // baseWebview: 'http://127.0.0.1:8000/webview/',
 
     // wifi hp
-    // baseApi: 'http://192.168.246.219:8000/api/',
+    baseApi: 'http://192.168.246.219:8000/api/',
 
     // wifirumah
     // baseApi:'http://192.168.100.21:8000/api/', 

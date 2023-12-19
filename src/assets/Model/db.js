@@ -1,7 +1,9 @@
 import { Database } from "@nozbe/watermelondb";
 import SQLiteAdapter from "@nozbe/watermelondb/adapters/sqlite";
 import schema from "./schema";
-import MasterCompanies from "./master_companies";
+import { AppRegistry, LogBox } from 'react-native';
+import App from "../../../App";
+import MasterCompany from "./master_company";
 import MasterEstate from "./master_estates";
 import MasterSector from "./master_sectors";
 import MasterLogActivity from "./master_log_activity";
@@ -11,28 +13,22 @@ import MasterMainActivities from "./master_main_activity";
 import Migration from "../Migration";
 import { Platform } from "react-native";
 
+LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
+
 const adapter = new SQLiteAdapter({
-  dbName: "res_ava_app_watermelon",
-  schema,
-  // (You might want to comment it out for development purposes -- see Migrations documentation)
-  migrations: Migration,
-  // (optional database name or file system path)
-  // dbName: 'myapp',
-  // (recommended option, should work flawlessly out of the box on iOS. On Android,
-  // additional installation steps have to be taken - disable if you run into issues...)
-  jsi: Platform.OS === 'ios' ,
-  // (optional, but you should implement this method)
-  onSetUpError: (error) => {
-    console.log("onSetUpError", error);
-  },
+  schema: schema,
+  // migrations: Migration,
+  dbName: 'res', // optional database name or file system path
+  // migrations, // optional migrations
+  experimentalUseJSI: false,
 });
 
-const database = new Database({
+export const database = new Database({
   adapter,
   modelClasses: [
-    MasterCompanies,
-    // MasterEstate,
-    // MasterSector,
+    MasterCompany,
+    MasterSector,
+    MasterEstate,
     // MasterLogActivity,
     // MasterMachine,
     // MasterMachineType,
@@ -41,4 +37,4 @@ const database = new Database({
   actionsEnabled: true,
 });
 
-export default database;
+AppRegistry.registerComponent(App, () => App);

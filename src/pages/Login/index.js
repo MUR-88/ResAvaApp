@@ -23,9 +23,10 @@ const Login = ({ navigation }) => {
 
   
   //hook
+ 
   const formik = useFormik({
     validationSchema: schema,
-    initialValues: { SAP: "", password: "" },
+    initialValues: { SAP: "123456", password: "12345678" },
     onSubmit: async (values) => {
       try {
         const response = await API.post("login", values);
@@ -36,8 +37,10 @@ const Login = ({ navigation }) => {
           } catch (err){
             Toast.show({
               type:"error",
-              type1: err.message
+              type1: err.message,
+              text2: "Gagal menyimpan token",
             })
+            console.log(err)
           }
         }
         navigation.replace("Mytabs");
@@ -46,6 +49,8 @@ const Login = ({ navigation }) => {
           type: "error",
           text1: error.message,
         });
+        console.log(error)
+
       }
     },
   });

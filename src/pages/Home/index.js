@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   Image,
+  Touchable,
 } from "react-native";
 import Constants from "expo-constants";
 import { Delete, Profile_Set, delete_icon } from "../../assets/icon";
@@ -21,22 +22,213 @@ import API from "../../function/API";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import NetInfo from "@react-native-community/netinfo";
+import { database } from "../../assets/Model/db";
+import { Q } from "@nozbe/watermelondb";
+import { writer } from "@nozbe/watermelondb/decorators";
+import MasterCompany from "../../assets/Model/master_company";
+import MasterSector from "../../assets/Model/master_sectors";
+import { synchronize } from "@nozbe/watermelondb/sync";
+import { getLastPulledAt } from "@nozbe/watermelondb/sync/impl";
+import { useMasterSector } from "../../hooks/useMasterSector";
 
 const Home = ({ navigation }) => {
-  // { const [posts, setPosts] = useState([]);
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const postsCollection = database.get("MasterCompanies");
-      const allPosts = await postsCollection.query().fetch();
-      setPosts(allPosts);
-    };
-    fetchPosts();
-  }, []);
-  
-      // {" "}
-      // {posts.map((post) => (
-      //   <Text key={post.id}>{post.title}</Text>
-      // ))}{" "}
+  async function mySync() {
+    try {
+      await synchronize({
+        database,
+        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+            JSON.stringify(migration),
+          )}`
+          console.log("URL Params", urlParams);
+          const response = await API.get(`master_sector/sync?${urlParams}`);
+          console.log(response);
+          // Check if the request was successful
+          if (response.status_code !== 200) {
+            throw new Error(`Request failed with status ${response.status}`);
+          }
+            return  { changes: response.data, timestamp: dayjs().unix() };
+        },
+
+      });
+    } catch (error) {
+      console.log("Catch Mysync",error);
+    }
+  }
+
+  const [masterCompany, setMasterCompany] = useState([]);
+  const [masterSector, setMasterSector] = useState([]);
+
+  const handleLogout = async () => {
+    try {
+      const response = await API.post("logout");
+      // API.resetToken(response.token.plainTextToken);
+      navigation.replace("Login"); // Assuming 'Login' is the login screen route name
+      console.log(response);
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+  // const masterCompanies = database.collections.get("master_company");
+  // const database = database(MasterCompany.table);
+  // main.js
+
+  const runExample = async () => {
+    try {
+      // Membuat data baru
+      const newCompany = await database.write(async () => {
+        const masterCompany = await database
+          .get(MasterCompany.table)
+          .create((company) => {
+            company.name = "PT. Rimba";
+            company.isSynced = true;
+            company.isConnected = true;
+          });
+
+        return masterCompany;
+      });
+
+      console.log("Company created:", newCompany);
+
+      // Mendapatkan semua data dari tabel
+      const allCompanies = await database
+        .get(MasterCompany.table)
+        .query()
+        .fetch();
+
+      console.log("All Companies:", allCompanies);
+
+      setMasterCompany(allCompanies.map((masterCompany) => masterCompany._raw));
+
+      // Mengubah data
+      await database.write(async () => {
+        newCompany.update((company) => {
+          company.name = "PT. NewRimba";
+        });
+      });
+
+      console.log("Company after update:", newCompany);
+
+      // Menghapus data
+      // await database.write(async () => {
+      //   await newCompany.destroyPermanently();
+      // });
+
+      // console.log("Company deleted");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // const onDelete = async () => {
+  //   try {
+  //     // Menghapus data
+  //     await database.write(async () => {
+  //       await masterSector.destroyPermanently();
+  //     });
+  //     console.log("Sector deleted");
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   }
+  // };
+
+  const onDelete = async (sectorId) => {
+    try {
+      // Find the specific masterSector object by its ID
+      // const sectorToDelete = masterSector.find(masterSector => masterSector.id === sectorId);
+
+      // if (sectorToDelete) {
+      // Delete the masterSector object permanently
+      await database.write(async () => {
+        await masterSector.destroyAllPermanently();
+      });
+      console.log("Sector deleted");
+      // } else {
+      console.log("Master Sector not found");
+      // }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const runSector = async () => {
+    try {
+      // Membuat data baru
+      const newSector = await database.write(async () => {
+        const masterSector = await database
+          .get(MasterSector.table)
+          .create((sector) => {
+            sector.name = "Bas";
+            // sector.isSynced = true;
+            // sector.isConnected = true;
+          });
+
+        return masterSector;
+      });
+
+      console.log("Company created:", newSector);
+
+      // Mendapatkan semua data dari tabel
+      const allSector = await database.get(MasterCompany.table).query().fetch();
+
+      console.log("All Sector:", allSector);
+
+      setMasterSector(allSector.map((masterSector) => masterSector._raw));
+
+      // Mengubah data
+      // await database.write(async () => {
+      //   newCompany.update((company) => {
+      //     company.name = "PT. NewRimba";
+      //   });
+      // });
+
+      // console.log("Company after update:", newCompany);
+
+      // Menghapus data
+      await database.write(async () => {
+        const allCompanies = await database
+          .get(MasterCompany.table)
+          .query()
+          .fetch();
+        await newCompany.destroyPermanently();
+      });
+
+      // console.log("Company deleted");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // manggil data dari hook
+  const { data: dataSector, isLoading : isLoadingSector, connected: connectedMasterSector } = useMasterSector();
+  console.log("check connection", connectedMasterSector);
+
+  const onRead = async () => {
+    try {
+      const allCompanies = await database
+        .get(MasterSector.table)
+        .query()
+        .fetch();
+
+      console.log("All Sector:", allCompanies);
+
+      // setMasterCompany(allCompanies.map((masterCompany) => masterCompany._raw));
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  const onReadSector = async () => {
+    try {
+      const allSector = await database.get(MasterSector.table).query().fetch();
+
+      console.log("All Sector:", allSector);
+
+      setMasterSector(allSector.map((masterSector) => masterSector._raw));
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
   const [isConnected, setIsConnected] = useState(true);
 
@@ -58,17 +250,20 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     checkInternetConnection();
   }, []);
-  const [posts, setPosts] = useState([]);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const postsCollection = database.get("posts");
-      const allPosts = await postsCollection.query().fetch();
-      setPosts(allPosts);
-    };
+  // const [posts, setPosts] = useState([]);
 
-    fetchPosts();
-  }, []);
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     const postsCollection = database.get("posts");
+  //     const allPosts = await postsCollection.query().fetch();
+  //     setPosts(allPosts);
+  //   };
+
+  //   fetchPosts();
+  // }, []);
+
+  //load data from database
 
   const queryClient = useQueryClient();
   // Queries
@@ -77,7 +272,13 @@ const Home = ({ navigation }) => {
   };
 
   const query = useQuery({ queryKey: ["history"], queryFn: getHistory });
-  console.log(query?.data?.data?.data);
+  // console.log(query?.data?.data?.data);
+
+  // useEffect(() => {
+  //   // Extract _raw data from allCompanies array
+  //   const masterCompany = allCompanies.map((company) => company._raw);
+  //   setRawData(masterCompany);
+  // }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
@@ -94,13 +295,15 @@ const Home = ({ navigation }) => {
             >
               <View style={[styles.Kotak]}>
                 <Text style={[styles.Header1]}>Home</Text>
-                <View style={[styles.Profile_Circle]}>
-                  <AutoHeightImage
-                    source={Profile_Set}
-                    width={35}
-                    style={{ justifyContent: "center" }}
-                  />
-                </View>
+                <TouchableOpacity onPress={handleLogout}>
+                  <View style={[styles.Profile_Circle]}>
+                    <AutoHeightImage
+                      source={Profile_Set}
+                      width={35}
+                      style={{ justifyContent: "center" }}
+                    />
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
             <View style={[styles.Content]}>
@@ -146,92 +349,128 @@ const Home = ({ navigation }) => {
                   }}
                 />
               </View>
-              <View style={[styles.Isi]}>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "#3C3C43",
-                      marginVertical: 5,
-                      marginLeft: 10,
-                      opacity: 0.6,
-                    }}
-                  >
-                    17 OCtober, 2023
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("")}
+              <TouchableOpacity
+                onPress={runExample}
+                style={{ marginVertical: 5 }}
+              >
+                <Text>Create</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
+                <Text>Sync</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={runSector}
+                style={{ marginVertical: 5 }}
+              >
+                <Text>Sector</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={onReadSector}
+                style={{ marginVertical: 5 }}
+              >
+                <Text>onRead</Text>
+              </TouchableOpacity>
+              {masterSector.map((sector, index) => (
+                <View style={[styles.Isi]}>
+                  <View
                     style={{
                       flex: 1,
-                      justifyContent: "center",
-                      marginRight: 5,
-                      opacity: 0.4,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
                     }}
+                    key={`master_sector_${index}`}
                   >
-                    <Image
-                      source={Delete}
-                      style={{
-                        height: 24,
-                        width: 24,
-                        marginHorizontal: 8,
-                      }}
-                    ></Image>
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    marginHorizontal: 10,
-                    borderBottomColor: "#3C3C43",
-                    opacity: 0.3,
-                    borderBottomWidth: 1,
-                  }}
-                />
-                <View style={[styles.IsiContent]}>
-                  <AutoHeightImage
-                    source={Profile_Set}
-                    width={40}
-                    style={{ marginLeft: 10, marginBottom: 5 }}
-                  />
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.IsiText]}>PT.Rimba Sejahtera</Text>
-                    <Text style={[styles.IsiText, { fontWeight: 900 }]}>
-                      Tesso West A-023
-                    </Text>
                     <Text
-                      style={[
-                        styles.IsiText,
-                        { fontSize: 10, marginVertical: 2 },
-                      ]}
+                      style={{
+                        color: "#3C3C43",
+                        marginVertical: 5,
+                        marginLeft: 10,
+                        opacity: 0.6,
+                      }}
                     >
-                      Updated at 17/10/2023, 17:15 Wib
+                      17 OCtober, 2023
                     </Text>
+                    <TouchableOpacity
+                      onPress={onDelete}
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        marginRight: 5,
+                        opacity: 0.4,
+                      }}
+                    >
+                      <Image
+                        source={Delete}
+                        style={{
+                          height: 24,
+                          width: 24,
+                          marginHorizontal: 8,
+                        }}
+                      ></Image>
+                    </TouchableOpacity>
                   </View>
                   <View
                     style={{
-                      width: 80,
-                      marginRight: 20,
-                      justifyContent: "center",
+                      flex: 1,
+                      marginHorizontal: 10,
+                      borderBottomColor: "#3C3C43",
+                      opacity: 0.3,
+                      borderBottomWidth: 1,
                     }}
-                  >
-                    <Button
-                      buttonStyle={{ borderRadius: 20 }}
-                      item={{
-                        title: "Edit",
-                        textcolor: "#007AFF",
-                        backgroundcolor: "#D6E8FD",
-                        alginSelf: "center",
-                        // width:20
-                      }}
+                  />
+                  <View style={[styles.IsiContent]}>
+                    <AutoHeightImage
+                      source={Profile_Set}
+                      width={40}
+                      style={{ marginLeft: 10, marginBottom: 5 }}
                     />
+                    <View style={{ flex: 1 }}>
+                      <View>
+                        <Text>ID: {sector.id}</Text>
+                        <Text>Name: {sector.name}</Text>
+                        <Text>
+                          Create:{" "}
+                          {dayjs(sector.created_at)
+                            .locale("id")
+                            .format("DD/MMM/YYYY HH:mm")}
+                        </Text>
+
+                        {/* Add more fields as needed */}
+                        <Text style={[styles.IsiText, { fontWeight: 900 }]}>
+                          {/* {company.name} */}
+                        </Text>
+                      </View>
+
+                      <Text
+                        style={[
+                          styles.IsiText,
+                          { fontSize: 10, marginVertical: 2 },
+                        ]}
+                      >
+                        Updated at 17/10/2023, 17:15 Wib
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        width: 80,
+                        marginRight: 20,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Button
+                        buttonStyle={{ borderRadius: 20 }}
+                        item={{
+                          title: "Edit",
+                          textcolor: "#007AFF",
+                          backgroundcolor: "#D6E8FD",
+                          alginSelf: "center",
+                          // width:20
+                        }}
+                      />
+                    </View>
                   </View>
                 </View>
-              </View>
+              ))}
             </View>
             <View style={[styles.Content1]}>
               <Text

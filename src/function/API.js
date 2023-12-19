@@ -1,8 +1,14 @@
 //Home IP
 // const API_URL = "http://192.168.100.21:8000/api/";
 //hostspot IP
-const API_URL = "http://192.168.194.219:8000/api/";
+// const API_URL = "http://192.168.94.219:8000/api/";
+// const API_URL = "http://192.168.8.102:8000/api/";
+const API_URL = "http://192.168.245.219:8000/api/";
 
+
+
+
+// const API_URL = "https://api.lapor-mas.id/v1";
 
 class Api {
   token = null;
@@ -24,7 +30,7 @@ class Api {
   getToken() {
     return this.token;
   }
-
+  
   async request(path, options = {}) {
     const headers = new Headers();
     headers.append("Authorization", `Bearer ${this.getToken()}`);
@@ -43,15 +49,17 @@ class Api {
 
     try {
       const response = await fetch(`${API_URL}${path}`, requestOptions);
+      // console.log("API Await.Get", await response.text());
       const res = await response.json();
+      console.log("API .Get",res);
 
       if (!response.ok) {
-        return Promise.reject(res);
+        throw new Error(res.message);
       }
 
       return res;
     } catch (error) {
-      console.error(error.stack);
+      console.error("Error API.js", error.message);
       return Promise.reject({
         ...error,
         message: error.message,
