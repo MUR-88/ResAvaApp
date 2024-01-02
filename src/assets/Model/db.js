@@ -31,7 +31,7 @@ export const database = new Database({
     MasterEstate,
     // MasterLogActivity,
     // MasterMachine,
-    // MasterMachineType,
+    MasterMachineType,
     // MasterMainActivities,
   ],
   actionsEnabled: true,

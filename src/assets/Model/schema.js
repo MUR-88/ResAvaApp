@@ -7,7 +7,7 @@ export default mySchema = appSchema({
     tableSchema({
       name: "master_company",
       columns: [
-        // { name: "id_master_companies", type:"string",isIndexed: true },
+        { name: "id_master_company", type:"number",isIndexed: true },
         { name: "name", type: "string" },
         { name: "isSynced", type: "boolean" },
         { name: "isConnected", type: "boolean" },
@@ -21,7 +21,8 @@ export default mySchema = appSchema({
     tableSchema({
       name: "master_estates",
       columns: [
-        { name: "id_master_sectors", type: "string", isIndexed: true },
+        { name: "id_master_sectors", type: "number", isIndexed: true },
+        { name: "id_master_esate", type: "number", isIndexed: true },
         { name: "name", type: "string" },
         { name: "isSync", type: "boolean" },
         { name: "isConnected", type: "boolean" },
@@ -53,38 +54,37 @@ export default mySchema = appSchema({
     //     { name: "updated_at", type: "number" },
     //   ],
     // }),
-    // tableSchema({
-    //   name: "master_machine_types",
-    //   columns: [
-    //     { name: "id_master_machine_types", type: "string", isIndexed: true },
-    //     { name: "name", type: "string" },
-    //     { name: "isSync", type: "boolean" },
-    //     { name: "isConnected", type: "boolean" },
-    //     { name: "created_at", type: "number" },
-    //     { name: "deleted_at", type: "number" },
-    //     { name: "updated_at", type: "number" },
-    //   ],
-    // }),
-    // tableSchema({
-    //   name: "master_machine",
-    //   columns: [
-    //     { name: "id_master_machine", type: "string", isIndexed: true },
-    //     { name: "master_machine_type_id", type: "string" },
-    //     { name: "master_company_id", type: "string" },
-    //     { name: "class", type: "number" },
-    //     { name: "machine_id", type: "string" },
-    //     { name: "current_hour_meter", type: "number" },
-    //     { name: "last_update_hm", type: "number" },
-    //     { name: "master_main_activity_id", type: "string" },
-    //     { name: "master_machine_type_id", type: "string" },
-    //     { name: "working_hour", type: "string" },
-    //     { name: "isSync", type: "boolean" },
-    //     { name: "isConnected", type: "boolean" },
-    //     { name: "created_at", type: "number" },
-    //     { name: "deleted_at", type: "number" },
-    //     { name: "updated_at", type: "number" },
-    //   ],
-    // }),
+    tableSchema({
+      name: "master_machine_types",
+      columns: [
+        { name: "id_master_machine_types", type: "number", isIndexed: true },
+        { name: "name", type: "string" },
+        { name: "isConnected", type: "boolean" },
+        { name: "created_at", type: "number" },
+        { name: "deleted_at", type: "number" },
+        { name: "updated_at", type: "number" },
+      ],
+    }),
+    tableSchema({
+      name: "master_machine",
+      columns: [
+        { name: "id_master_machine", type: "string", isIndexed: true },
+        { name: "master_machine_type_id", type: "string" },
+        { name: "master_company_id", type: "string" },
+        { name: "class", type: "number" },
+        { name: "machine_id", type: "string" },
+        { name: "current_hour_meter", type: "number" },
+        { name: "last_update_hm", type: "number" },
+        { name: "master_main_activity_id", type: "string" },
+        { name: "master_machine_type_id", type: "string" },
+        { name: "working_hour", type: "string" },
+        { name: "isSync", type: "boolean" },
+        { name: "isConnected", type: "boolean" },
+        { name: "created_at", type: "number" },
+        { name: "deleted_at", type: "number" },
+        { name: "updated_at", type: "number" },
+      ],
+    }),
     // tableSchema({
     //   name: "master_main_activities",
     //   columns: [
@@ -100,7 +100,7 @@ export default mySchema = appSchema({
     tableSchema({
       name: "master_sectors",
       columns: [
-        { name: "id_master_sectors", type: "string", isIndexed: true },
+        { name: "id_master_sectors", type: "number", isIndexed: true },
         { name: "name", type: "string" },
         { name: "isSync", type: "boolean" },
         { name: "isConnected", type: "boolean" },
@@ -110,7 +110,6 @@ export default mySchema = appSchema({
         { name: "updated_at", type: "number" },
       ],
       unsafeSql: sql => sql.replace(/create table [^)]+\)/, '$& without rowid'),
-
     }),
     // tableSchema({
     //   name: "users",
@@ -128,18 +127,5 @@ export default mySchema = appSchema({
     //   ],
     // }),
   ],
-  // unsafeSql: (sql, kind) => {
-    // Note that this function is called not just when first setting up the database
-    // Additionally, when running very large batches, all database indices may be dropped and later
-    // recreated as an optimization. More kinds may be added in the future.
-    // switch (kind) {
-    //   case 'setup':
-    //     return `create master_companies;${sql}`
-    //   case 'create_indices':
-    //   case 'drop_indices':
-    //     return sql
-    //   default:
-    //     throw new Error('unexpected unsafeSql kind')
-    // }
-  // },
+  
 });

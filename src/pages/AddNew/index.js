@@ -27,117 +27,45 @@ import DatePicker, {
   getToday,
   getFormatedDate,
 } from "react-native-modern-datepicker";
-// import { getToday, getFormatedDate } from "react-native-modern-datepicker";
+import {
+  useMasterSector,
+  useMasterCompany,
+  useMasterEstate,
+  useMasterMachineType,
+} from "../../hooks";
+import { useFormik } from "formik";
 
-// const dispatch = useDispatch()
-//   const { status_ordered, reservasi }  = useSelector(state => state.invoice)
-
-// const handleStatusOrdered = (tipe)=>{
-//   dispatch(setStatusOrdered(tipe))
-// }
-
-const countries = ["Peranap", "Tesso West", "Australia", "Ireland"];
-// useEffect = () => {
-//   var config = {
-//     method: 'get',
-//     url: /variabel/baseApi,
-//     header: {
-
-//     }
-//   }
-// };
 const AddNew = ({ navigation }) => {
-  const sector = [
-    { label: "Basrah", value: "1" },
-    { label: "Item 2", value: "2" },
-    { label: "Item 3", value: "3" },
-    { label: "Item 4", value: "4" },
-    { label: "Item 5", value: "5" },
-    { label: "Item 6", value: "6" },
-    { label: "Item 7", value: "7" },
-    { label: "Item 8", value: "8" },
-  ];
+  const {
+    data: dataSector,
+    isLoading: isLoadingSector,
+    connected: connectedMasterSector,
+  } = useMasterSector();
+  console.log("data sector", dataSector.length);
+  const {
+    data: dataCompany,
+    isLoading: isLoadingCompany,
+    connected: connectedMasterCompany,
+  } = useMasterCompany();
+  console.log("data Company", dataCompany.length);
+  const {
+    data: dataEstate,
+    isLoading: isLoadingEstate,
+    connected: connectedMasterEstate,
+  } = useMasterEstate();
+  console.log("data Estate", dataEstate);
+  console.log("data Estate", dataEstate.length);
+  console.log(JSON.stringify(dataEstate, null, 2));
+  // const {
+  //   data: dataMachineType,
+  //   isLoading: isLoadingMachineType,
+  //   connected: connectedMasterMachineType,
+  // } = useMasterMachineType();
 
-  const company = [
-    { label: "PTSI", value: "1" },
-    { label: "Item 2", value: "2" },
-    { label: "Item 3", value: "3" },
-    { label: "Item 4", value: "4" },
-    { label: "Item 5", value: "5" },
-    { label: "Item 6", value: "6" },
-    { label: "Item 7", value: "7" },
-    { label: "Item 8", value: "8" },
-  ];
-  const machine_id = [
-    { label: "MCH 1", value: "1" },
-    { label: "MCH 2", value: "2" },
-    { label: "MCH 3", value: "3" },
-    { label: "MCH 4", value: "4" },
-    { label: "MCH 5", value: "5" },
-    { label: "MCH 6", value: "6" },
-    { label: "MCH 7", value: "7" },
-    { label: "MCH 8", value: "8" },
-  ];
-  const estate = [
-    { label: "A", value: "1" },
-    { label: "B", value: "2" },
-    { label: "C", value: "3" },
-    { label: "D", value: "4" },
-    { label: "F", value: "5" },
-    { label: "G", value: "6" },
-    { label: "H", value: "7" },
-    { label: "I", value: "8" },
-  ];
-  const compartement = [
-    { label: "101", value: "1" },
-    { label: "102", value: "2" },
-    { label: "103", value: "3" },
-    { label: "104", value: "4" },
-    { label: "105", value: "5" },
-    { label: "106", value: "6" },
-    { label: "107", value: "7" },
-    { label: "108", value: "8" },
-  ];
-  const type = [
-    { label: "Barging Jumbo", value: "1" },
-    { label: "Barging Semi", value: "2" },
-    { label: "Barging Standard", value: "3" },
-    { label: "Debarker", value: "4" },
-    { label: "bucket", value: "5" },
-    { label: "G", value: "6" },
-    { label: "H", value: "7" },
-    { label: "I", value: "8" },
-  ];
-  const main_activity = [
-    { label: "Grapple", value: "1" },
-    { label: "Barging ", value: "2" },
-    { label: "Felling", value: "3" },
-    // { label: "Debarker", value: "4" },
-    // { label: "bucket", value: "5" },
-    { label: "G", value: "6" },
-    { label: "H", value: "7" },
-    { label: "I", value: "8" },
-  ];
-  const lastUpdate = [
-    { label: "9.8", value: "1" },
-    { label: "9.6", value: "2" },
-    { label: "10.4", value: "3" },
-    { label: "12.1", value: "4" },
-    { label: "bucket", value: "5" },
-    { label: "G", value: "6" },
-    { label: "H", value: "7" },
-    { label: "I", value: "8" },
-  ];
-  const current = [
-    { label: "8.8", value: "1" },
-    { label: "9.76", value: "2" },
-    { label: "9.5", value: "3" },
-    { label: "12.1", value: "4" },
-    { label: "bucket", value: "5" },
-    { label: "G", value: "6" },
-    { label: "H", value: "7" },
-    { label: "I", value: "8" },
-  ];
+  // console.log(JSON.stringify(dataCompany, null, 2));
+  // console.log("Data Sector", dataSector);
+  // console.log("Loading", isLoadingSector);
+  // console.log("Connected", connectedMasterSector);
 
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date();
@@ -146,20 +74,21 @@ const AddNew = ({ navigation }) => {
     today.setDate(today.getDate() - 1),
     "YYYY/MM/DD"
   );
+
   const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [isEnable, setIsEnable] = useState(true);
   const [text, setText] = useState("Computer On Or Off ?");
   const [isFocus, setIsFocus] = useState(true);
-  const [date, setDate] = useState(current);
+  const [date, setDate] = useState(undefined);
 
   function handleOnPress() {
     setOpen(!open);
   }
 
   function handleChange(Date) {
-    console.log(Date);
+    console.log("tanggal pilih", Date);
     setDate(Date);
   }
 
@@ -176,13 +105,17 @@ const AddNew = ({ navigation }) => {
       console.log(error);
     }
   };
+  const formik = useFormik({
+    initialValues: { id_master_sector: "", id_master_company: "", Date: "" },
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
 
   return (
-    // use if status bar overlaying
-    // <SafeAreaView style={{flex:1, marginTop:Constants.statusBarHeight
-    // }}>
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
+      {/* <Text>{JSON.stringify(dataSector)}</Text> */}
       <RefreshControl>
         <ScrollView>
           <View
@@ -245,59 +178,123 @@ const AddNew = ({ navigation }) => {
                   <Text style={styles.textStyle}>Pilih Tanggal</Text>
                 </Pressable>
               </View>
-              <View style={[styles.container, { paddingVertical: 10 }]}>
-                <Dropdown
-                  style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  iconStyle={styles.iconStyle}
-                  data={sector}
-                  maxHeight={300}
-                  placeholder={!isFocus ? "Sector" : ""}
-                  labelField="label"
-                  valueField="value"
-                  text="sector"
-                  value={value}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={(item) => {
-                    setValue(item.value);
-                    setIsFocus(false);
+              <View style={[styles.MechInfo]}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flex: 1,
+                    backgroundColor: "white",
+                    borderWidth: 0.4,
+                    borderColor: "#88888D",
+                    borderRadius: 10,
+                    height: 45,
+                    marginLeft: 5,
+                    marginBottom: 10,
                   }}
-                />
+                >
+                  <View
+                    style={[
+                      styles.container,
+                      {
+                        justifyContent: "center",
+                        backgroundColor: "white",
+                        flex: 1,
+                      },
+                    ]}
+                  >
+                    <Text style={styles.Abu}>Sector </Text>
+                  </View>
+                  <View
+                    style={[styles.container, { backgroundColor: "white" }]}
+                  >
+                    <Dropdown
+                      style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={dataSector.map((sector) => ({
+                        label: sector.name,
+                        value: sector.id_master_sectors,
+                      }))}
+                      maxHeight={300}
+                      width={40}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={
+                        dataSector.find(
+                          (item) =>
+                            item.id_master_sectors ===
+                            formik.values.id_master_sector
+                        )?.name
+                      }
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={(item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_sector", item.value);
+                        console.log(item);
+                      }}
+                    />
+                  </View>
+                </View>
               </View>
-              <View style={[styles.container, { paddingVertical: 10 }]}>
-                <Dropdown
-                  style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  iconStyle={styles.iconStyle}
-                  data={company}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={!isFocus ? "Company" : ""}
-                  value={value}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={(item) => {
-                    setValue(item.value);
-                    setIsFocus(false);
+              <View style={[styles.MechInfo]}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flex: 1,
+                    backgroundColor: "white",
+                    borderWidth: 0.4,
+                    borderColor: "#88888D",
+                    borderRadius: 10,
+                    height: 45,
+                    marginLeft: 5,
+                    marginBottom: 10,
                   }}
-                />
-                <View style={[styles.button_waktu1]}>
-                  <Button
-                    buttonStyle={{ borderRadius: 20 }}
-                    item={{
-                      title: "Check Status Machine",
-                      height: 40,
-                      textcolor: "#007AFF",
-                      marginTop: 10,
-                      backgroundcolor: "#DEEBFF",
-                      alginSelf: "center",
-                      onPress: () => navigation.navigate("Status"),
-                    }}
-                  />
+                >
+                  <View
+                    style={[
+                      styles.container,
+                      {
+                        justifyContent: "center",
+                        backgroundColor: "white",
+                        flex: 1,
+                      },
+                    ]}
+                  >
+                    <Text style={styles.Abu}>Company </Text>
+                  </View>
+                  <View
+                    style={[styles.container, { backgroundColor: "white" }]}
+                  >
+                    <Dropdown
+                      style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={dataCompany.map((company) => ({
+                        label: company.name,
+                        value: company.id,
+                      }))}
+                      maxHeight={300}
+                      width={40}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={
+                        dataCompany.find(
+                          (item) =>
+                            item.id_master_company ===
+                            formik.values.id_master_company
+                        )?.name
+                      }
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={(item) => {
+                        formik.setFieldValue("id_master_company", item.value);
+                        console.log(item);
+                      }}
+                    />
+                  </View>
                 </View>
               </View>
             </View>
@@ -324,164 +321,325 @@ const AddNew = ({ navigation }) => {
             >
               Machine Information
             </Text>
+
             <View style={[styles.MechInfo]}>
-              <Dropdown
-                style={[
-                  styles.dropdownMech,
-                  { marginTop: 20 },
-                  isFocus && { borderColor: "#8888D" },
-                ]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                iconStyle={styles.iconStyle}
-                data={machine_id}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder={!isFocus ? "Machine ID" : ""}
-                value={value}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={(item) => {
-                  setValue(item.value);
-                  setIsFocus(false);
+              <View
+                style={{
+                  flexDirection: "row",
+                  flex: 1,
+                  backgroundColor: "white",
+                  borderWidth: 0.4,
+                  borderColor: "#88888D",
+                  borderRadius: 10,
+                  height: 45,
+                  marginLeft: 10,
+                  marginRight: 10,
+                  marginTop: 20,
+                  marginBottom: 5,
                 }}
-              />
-              <Dropdown
-                style={[
-                  styles.dropdownMech,
-                  isFocus && { borderColor: "#8888D" },
-                ]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                iconStyle={styles.iconStyle}
-                data={estate}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder={!isFocus ? "Estate" : ""}
-                value={value}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={(item) => {
-                  setValue(item.value);
-                  setIsFocus(false);
-                }}
-              />
-              <View style={styles.Compartement_input1}>
+              >
                 <View
                   style={[
                     styles.container,
-                    { justifyContent: "center", flex: 1 },
+                    {
+                      justifyContent: "center",
+                      backgroundColor: "white",
+                      flex: 1,
+                    },
                   ]}
                 >
-                  <Text style={styles.Abu}>Compartement Id </Text>
+                  <Text style={styles.Abu}>Estate </Text>
                 </View>
-                <View style={[styles.container]}>
+                <View style={[styles.container, { backgroundColor: "white" }]}>
+                  <Dropdown
+                    style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    iconStyle={styles.iconStyle}
+                    data={dataEstate.map((estate) => ({
+                      label: estate.name,
+                      value: estate.id,
+                    }))}
+                    maxHeight={300}
+                    width={20}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={
+                      dataEstate.find(
+                        (item) =>
+                          item.id_master_estate ===
+                          formik.values.id_master_estate
+                      )?.name
+                    }
+                    // value={company}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={(item) => {
+                      formik.setFieldValue("id_master_estate", item.value);
+                      console.log(item);
+                    }}
+                  />
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  flex: 1,
+                  borderWidth: 0.4,
+                  borderColor: "#88888D",
+                  backgroundColor: "white",
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  marginHorizontal: 10,
+                  height: 45,
+                  marginTop: 10,
+                }}
+              >
+                <View
+                  style={[
+                    styles.container,
+                    {
+                      justifyContent: "center",
+                      backgroundColor: "white",
+                      flex: 1,
+                    },
+                  ]}
+                >
+                  <Text style={styles.Abu}>Compartement ID </Text>
+                </View>
+                <View
+                  style={[
+                    styles.container,
+                    { backgroundColor: "white", marginLeft: -4 },
+                  ]}
+                >
                   <View
                     style={[
-                      styles.container1,
-                      { justifyContent: "flex-end", alignContent: "flex-end" },
+                      styles.containerInput1,
+                      {
+                        alignItems: "flex-end",
+                        justifyContent: "center",
+                        marginTop: 5,
+                      },
                     ]}
                   >
                     <Input
                       item={{
-                        placeholder: "13 TON",
-                        borderWidth: 0.5,
+                        placeholder: " XXX ",
                       }}
+                      style={{ borderWidth: 0.5 }}
                     />
                   </View>
                 </View>
               </View>
-              <Dropdown
-                style={[
-                  styles.dropdownMech,
-                  isFocus && { borderColor: "#8888D" },
-                ]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                iconStyle={styles.iconStyle}
-                data={type}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder={!isFocus ? "Type" : ""}
-                value={value}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={(item) => {
-                  setValue(item.value);
-                  setIsFocus(false);
+              <View
+                style={{
+                  flexDirection: "row",
+                  flex: 1,
+                  backgroundColor: "white",
+                  borderWidth: 0.4,
+                  borderColor: "#88888D",
+                  borderRadius: 10,
+                  height: 45,
+                  marginLeft: 10,
+                  marginRight: 10,
+                  marginTop: 10,
+                  marginBottom: 5,
                 }}
-              />
-              <Dropdown
-                style={[
-                  styles.dropdownMech,
-                  { marginTop: 5 },
-                  isFocus && { borderColor: "#8888D" },
-                ]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                iconStyle={styles.iconStyle}
-                data={main_activity}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                placeholder={!isFocus ? "Main Activity" : ""}
-                value={value}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
-                onChange={(item) => {
-                  setValue(item.value);
-                  setIsFocus(false);
+              >
+                <View
+                  style={[
+                    styles.container,
+                    {
+                      justifyContent: "center",
+                      backgroundColor: "white",
+                      flex: 1,
+                    },
+                  ]}
+                >
+                  <Text style={styles.Abu}>Type </Text>
+                </View>
+                <View style={[styles.container, { backgroundColor: "white" }]}>
+                {/* <Dropdown
+                    style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    iconStyle={styles.iconStyle}
+                    data={dataMachineType.map((machine_type) => ({
+                      label: machine_type.name,
+                      value: machine_type.id,
+                    }))}
+                    maxHeight={300}
+                    width={20}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={
+                      dataMachineType.find(
+                        (item) =>
+                          item.id_master_machine_type ===
+                          formik.values.id_master_machine_type
+                      )?.name
+                    }
+                    // value={company}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={(item) => {
+                      formik.setFieldValue("id_master_machine_type", item.value);
+                      console.log(item);
+                    }}
+                  /> */}
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flex: 1,
+                  backgroundColor: "white",
+                  borderWidth: 0.4,
+                  borderColor: "#88888D",
+                  borderRadius: 10,
+                  height: 45,
+                  marginLeft: 10,
+                  marginRight: 10,
+                  marginTop: 10,
+                  marginBottom: 10,
                 }}
-              />
-
+              >
+                <View
+                  style={[
+                    styles.container,
+                    {
+                      justifyContent: "center",
+                      backgroundColor: "white",
+                      flex: 1,
+                    },
+                  ]}
+                >
+                  <Text style={styles.Abu}>Main Activity </Text>
+                </View>
+                <View style={[styles.container, { backgroundColor: "white" }]}>
+                  <Dropdown
+                    style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    iconStyle={styles.iconStyle}
+                    data={[]}
+                    maxHeight={300}
+                    width={40}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={!isFocus ? " Grapple" : ""}
+                    // value={company}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={(item) => {
+                      setIsFocus(false);
+                    }}
+                  />
+                </View>
+              </View>
               {isEnable ? (
                 <>
-                  <Dropdown
-                    style={[
-                      styles.dropdownMech,
-                      isFocus && { borderColor: "#8888D" },
-                    ]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    iconStyle={styles.iconStyle}
-                    data={lastUpdate}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={!isFocus ? "HM-Last Update" : ""}
-                    value={value}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(item) => {
-                      setValue(item.value);
-                      setIsFocus(false);
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flex: 1,
+                      backgroundColor: "white",
+                      borderWidth: 0.4,
+                      borderColor: "#88888D",
+                      borderRadius: 10,
+                      height: 45,
+                      marginLeft: 10,
+                      marginRight: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
                     }}
-                  />
-                  <Dropdown
-                    style={[
-                      styles.dropdownMech,
-                      { marginBottom: 20 },
-                      isFocus && { borderColor: "#8888D" },
-                    ]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    iconStyle={styles.iconStyle}
-                    data={current}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={!isFocus ? "HM-Current" : ""}
-                    value={value}
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(item) => {
-                      setValue(item.value);
-                      setIsFocus(false);
+                  >
+                    <View
+                      style={[
+                        styles.container,
+                        {
+                          justifyContent: "center",
+                          backgroundColor: "white",
+                          flex: 1,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.Abu}>Last HM </Text>
+                    </View>
+                    <View
+                      style={[styles.container, { backgroundColor: "white" }]}
+                    >
+                      <View
+                        style={[
+                          styles.container,
+                          {
+                            backgroundColor: "white",
+                            justifyContent: "center",
+                            alignItems: "flex-end",
+                            marginRight: 20,
+                          },
+                        ]}
+                      >
+                        <Text style={{ fontSize: 16, color: "#88888D" }}>
+                          XXX
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      flex: 1,
+                      borderWidth: 0.4,
+                      borderColor: "#88888D",
+                      backgroundColor: "white",
+                      borderRadius: 10,
+                      marginBottom: 5,
+                      marginHorizontal: 10,
+                      height: 45,
+                      marginTop: 10,
                     }}
-                  />
+                  >
+                    <View
+                      style={[
+                        styles.container,
+                        {
+                          justifyContent: "center",
+                          backgroundColor: "white",
+                          flex: 1,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.Abu}> Current HM </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.container,
+                        { backgroundColor: "white", marginLeft: -4 },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.containerInput1,
+                          {
+                            alignItems: "flex-end",
+                            justifyContent: "center",
+                            marginTop: 5,
+                          },
+                        ]}
+                      >
+                        <Input
+                          item={{
+                            placeholder: " XXX ",
+                          }}
+                          style={{ borderWidth: 0.5 }}
+                        />
+                      </View>
+                    </View>
+                  </View>
                 </>
               ) : null}
 
@@ -629,11 +787,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     flex: 1,
   },
-  Content1: {
-    marginTop: 50,
-    flexDirection: "column",
-    marginLeft: 10,
-  },
   Container_bar: {
     flexDirection: "row",
     backgroundColor: "white",
@@ -662,10 +815,11 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
   },
   button_waktu: {
-    width: "95%",
+    width: "93%",
     marginTop: 10,
-    marginBottom: 5,
+    marginBottom: 10,
     marginLeft: 10,
+    height: 45,
     justifyContent: "center",
     borderRadius: 10,
     backgroundColor: "white",
@@ -688,14 +842,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    // marginHorizontal:,
     justifyContent: "center",
-    marginHorizontal:8
+    marginHorizontal: 8,
   },
   container1: {
-    // flex: 1,
-    // flexDirection: "column",
-    // marginHorizontal:,
     justifyContent: "center",
   },
   Compartement_input1: {
@@ -708,7 +858,6 @@ const styles = StyleSheet.create({
     borderColor: "black",
     marginTop: 10,
     shadowColor: "#000",
-    height: 40,
     flex: 1,
     backgroundColor: "#D8D8D8",
     opacity: 0.5,
@@ -717,8 +866,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     justifyContent: "center",
     alignContent: "center",
-    // width:'95%',
-    // borderColor: 'gray',
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
@@ -729,12 +876,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     backgroundColor: "white",
-    // backgroundColor:'red',
     flexDirection: "column",
-    // marginHorizontal: 7,
-    // marginRight: 7,
-    marginLeft: 4
-    // marginRight:10
+    marginLeft: 4,
   },
   Details1: {
     flex: 1,
@@ -761,7 +904,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "center",
     width: "95%",
-    // borderColor: 'gray',
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
@@ -855,14 +997,16 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    // shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
   },
   button: {
     borderRadius: 10,
     padding: 10,
-    elevation: 2,
+    elevation: 5,
+    height: 45,
+    marginTop: 10,
+    marginBottom: 10,
   },
   buttonOpen: {
     backgroundColor: "white",
@@ -872,11 +1016,47 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     color: "#",
-    // fontWeight: "",
     textAlign: "center",
   },
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+  },
+
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    marginHorizontal: 10,
+  },
+  containerInput1: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    marginHorizontal: 10,
+  },
+  Abu: {
+    color: "#88888D",
+  },
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    marginHorizontal: 10,
+  },
+  containerInput1: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    marginHorizontal: 10,
+  },
+  dropdown: {
+    height: 40,
+    // borderColor: 'gray',
+    // borderWidth: 0.5,
+    backgroundColor: "white",
+    opacity: 0.4,
+    borderRadius: 8,
+    paddingHorizontal: 8,
   },
 });

@@ -1,12 +1,8 @@
 //Home IP
-// const API_URL = "http://192.168.100.21:8000/api/";
+// const API_URL = "http://192.168.100.15:8000/api/";
 //hostspot IP
-// const API_URL = "http://192.168.94.219:8000/api/";
-// const API_URL = "http://192.168.8.102:8000/api/";
-const API_URL = "http://192.168.245.219:8000/api/";
-
-
-
+// const API_URL = "http://192.168.8.100:8000/api/";
+const API_URL = "http://192.168.3.219:8000/api/";
 
 // const API_URL = "https://api.lapor-mas.id/v1";
 
@@ -51,7 +47,7 @@ class Api {
       const response = await fetch(`${API_URL}${path}`, requestOptions);
       // console.log("API Await.Get", await response.text());
       const res = await response.json();
-      console.log("API .Get",res);
+      // console.log("API .Get",res);
 
       if (!response.ok) {
         throw new Error(res.message);

@@ -11,35 +11,35 @@ export default schemaMigrations({
     {
       toVersion: 2,
       steps: [
-        //         // createTable({
-        //         //   name: "master_company",
-        //         //   columns: [
-        //         //     // { name: "id_master_companies", type: "string", isIndexed: true },
-        //         //     { name: "name", type: "string" },
-        //         //     { name: "isSync", type: "boolean" },
-        //         //     { name: "isConnected", type: "boolean" },
-        //         //     { name: "created_at", type: "number" },
-        //         //     { name: "deleted_at", type: "number" },
-        //         //     { name: "updated_at", type: "number" },
-        //         //   ],
-        //         // }),
-        //         // createTable({
-        //         //   name: "master_estates",
-        //         //   columns: [
-        //         //     { name: "id_master_estates", type: "string", isIndexed: true },
-        //         //     { name: "master_sector_id", type: "string" },
-        //         //     { name: "name", type: "string" },
-        //         //     { name: "isSync", type: "boolean" },
-        //         //     { name: "isConnected", type: "boolean" },
-        //         //     { name: "created_at", type: "number" },
-        //         //     { name: "deleted_at", type: "number" },
-        //         //     { name: "updated_at", type: "number" },
-        //         //   ],
-        //         // }),
+        createTable({
+          name: "master_company",
+          columns: [
+            { name: "id_master_company", type: "string", isIndexed: true },
+            { name: "name", type: "string" },
+            { name: "isSync", type: "boolean" },
+            { name: "isConnected", type: "boolean" },
+            { name: "created_at", type: "number" },
+            { name: "deleted_at", type: "number" },
+            { name: "updated_at", type: "number" },
+          ],
+        }),
+        createTable({
+          name: "master_estates",
+          columns: [
+            { name: "id_master_estates", type: "string", isIndexed: true },
+            { name: "master_sector_id", type: "string" },
+            { name: "name", type: "string" },
+            { name: "isSync", type: "boolean" },
+            { name: "isConnected", type: "boolean" },
+            { name: "created_at", type: "number" },
+            { name: "deleted_at", type: "number" },
+            { name: "updated_at", type: "number" },
+          ],
+        }),
         createTable({
           name: "master_sectors",
           columns: [
-            { name: "id_master_sectors", type: "string", isIndexed: true },
+            { name: "id_master_sectors", type: "number", isIndexed: true },
             { name: "name", type: "string" },
             { name: "isSync", type: "boolean" },
             { name: "isConnected", type: "boolean" },

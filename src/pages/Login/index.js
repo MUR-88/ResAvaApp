@@ -21,36 +21,24 @@ const Login = ({ navigation }) => {
     password: yup.string().required("Password harus diisi"),
   });
 
-  
   //hook
- 
+
   const formik = useFormik({
     validationSchema: schema,
     initialValues: { SAP: "123456", password: "12345678" },
     onSubmit: async (values) => {
       try {
         const response = await API.post("login", values);
+        await AsyncStorage.setItem("token", response.token.plainTextToken);
         API.setToken(response.token.plainTextToken);
-        if(response.status == 1){
-          try{
-            await AsyncStorage.setItem("token", response.token.plainTextToken);
-          } catch (err){
-            Toast.show({
-              type:"error",
-              type1: err.message,
-              text2: "Gagal menyimpan token",
-            })
-            console.log(err)
-          }
-        }
+
         navigation.replace("Mytabs");
       } catch (error) {
         Toast.show({
           type: "error",
           text1: error.message,
         });
-        console.log(error)
-
+        console.log(error);
       }
     },
   });
@@ -80,14 +68,14 @@ const Login = ({ navigation }) => {
             Data Collection
           </Text>
           <View style={styles.containerInput}>
-            <View style={{ flex: 1, height: 150 }}>
+            <View style={{ flex: 1, height: 120 }}>
               <View style={{ flex: 1, flexDirection: "column" }}>
                 <Input
                   onChangeText={formik.handleChange("SAP")}
                   item={{
                     label: "SAP",
                     backgroundColor: "black",
-                    width: 50,
+                    // width: 50,
                     // vales: values.SAP,
                     marginBottom: 10,
                     placeholder: "Isi SAP",

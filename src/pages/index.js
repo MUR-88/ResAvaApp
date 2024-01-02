@@ -6,6 +6,7 @@ import Login from './Login'
 import Report from './Report'
 import Status from './Status'
 import NewForm from './NewForm'
+import Splash from './Splash'
 // import PilihTanggal from './PilihTanggal'
 
 export{
@@ -14,6 +15,7 @@ export{
     // Profile
     Home,
     Login,
+    Splash,
     AddNew,
     Register,
     Profile,

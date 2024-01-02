@@ -36,16 +36,16 @@ const master_main_activity = [
   { label: "Item 8", value: "8" },
 ];
 
-// const company = [
-//   { label: "PTSI", value: "1" },
-//   { label: "Item 2", value: "2" },
-//   { label: "Item 3", value: "3" },
-//   { label: "Item 4", value: "4" },
-//   { label: "Item 5", value: "5" },
-//   { label: "Item 6", value: "6" },
-//   { label: "Item 7", value: "7" },
-//   { label: "Item 8", value: "8" },
-// ];
+const company = [
+  { label: "PTSI", value: "1" },
+  { label: "Item 2", value: "2" },
+  { label: "Item 3", value: "3" },
+  { label: "Item 4", value: "4" },
+  { label: "Item 5", value: "5" },
+  { label: "Item 6", value: "6" },
+  { label: "Item 7", value: "7" },
+  { label: "Item 8", value: "8" },
+];
 
 const Register = () => {
   // const queryClient = useQueryClient();
@@ -187,30 +187,24 @@ const Register = () => {
                 <Text style={styles.Abu}>Company </Text>
               </View>
               <View style={[styles.container, { backgroundColor: "white" }]}>
-                {query?.data?.data?.data.map((item, index) => {
-                  return (
-                    <Dropdown
-                      key={`master_company${index}`}
-                      style={[styles.dropdown, isFocus && { borderColor: "" }]}
-                      placeholderStyle={styles.placeholderStyle}
-                      selectedTextStyle={styles.selectedTextStyle}
-                      iconStyle={styles.iconStyle}
-                      data={item.name}
-                      maxHeight={300}
-                      width={40}
-                      labelField="label"
-                      valueField="value"
-                      placeholder={!isFocus ? " PTSI" : ""}
-                      value={value}
-                      onFocus={() => setIsFocus(true)}
-                      onBlur={() => setIsFocus(false)}
-                      onChange={(item) => {
-                        setValue(item.value);
-                        setIsFocus(false);
-                      }}
-                    />
-                  );
-                })}
+                <Dropdown
+                  style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  iconStyle={styles.iconStyle}
+                  data={company}
+                  maxHeight={300}
+                  width={40}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={!isFocus ? " PTSI" : ""}
+                  value={company}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={(item) => {
+                    setIsFocus(false);
+                  }}
+                />
               </View>
             </View>
             <View

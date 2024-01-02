@@ -35,26 +35,39 @@ const Home = ({ navigation }) => {
   async function mySync() {
     try {
       await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration),
-          )}`
-          console.log("URL Params", urlParams);
-          const response = await API.get(`master_sector/sync?${urlParams}`);
-          console.log(response);
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-            return  { changes: response.data, timestamp: dayjs().unix() };
-        },
+          database,
+          pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+            const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+              JSON.stringify(migration)
+            )}`;
+            const response = await API.get(`master_estate/sync?${urlParams}`);
+            // console.log(JSON.stringify(response, null, 2));
+    
+            // Check if the request was successful
+            if (response.status_code !== 200) {
+              throw new Error(`Request failed with status ${response.status}`);
+            }
+            const timestamp = dayjs().unix();
+    
+            console.log("data Estate", response.data.length);
+            return { changes: response.data, timestamp: timestamp };
 
+          },
       });
     } catch (error) {
-      console.log("Catch Mysync",error);
+      console.log("Catch Mysync", error);
     }
   }
+
+  const timeStamp = async () => {
+    const currentUnixTimestamp = dayjs().unix();
+    console.log(currentUnixTimestamp);
+
+    const formattedDate = dayjs
+      .unix(currentUnixTimestamp)
+      .format("YYYY-MM-DD HH:mm:ss");
+    console.log(formattedDate);
+  };
 
   const [masterCompany, setMasterCompany] = useState([]);
   const [masterSector, setMasterSector] = useState([]);
@@ -72,65 +85,6 @@ const Home = ({ navigation }) => {
   // const masterCompanies = database.collections.get("master_company");
   // const database = database(MasterCompany.table);
   // main.js
-
-  const runExample = async () => {
-    try {
-      // Membuat data baru
-      const newCompany = await database.write(async () => {
-        const masterCompany = await database
-          .get(MasterCompany.table)
-          .create((company) => {
-            company.name = "PT. Rimba";
-            company.isSynced = true;
-            company.isConnected = true;
-          });
-
-        return masterCompany;
-      });
-
-      console.log("Company created:", newCompany);
-
-      // Mendapatkan semua data dari tabel
-      const allCompanies = await database
-        .get(MasterCompany.table)
-        .query()
-        .fetch();
-
-      console.log("All Companies:", allCompanies);
-
-      setMasterCompany(allCompanies.map((masterCompany) => masterCompany._raw));
-
-      // Mengubah data
-      await database.write(async () => {
-        newCompany.update((company) => {
-          company.name = "PT. NewRimba";
-        });
-      });
-
-      console.log("Company after update:", newCompany);
-
-      // Menghapus data
-      // await database.write(async () => {
-      //   await newCompany.destroyPermanently();
-      // });
-
-      // console.log("Company deleted");
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  // const onDelete = async () => {
-  //   try {
-  //     // Menghapus data
-  //     await database.write(async () => {
-  //       await masterSector.destroyPermanently();
-  //     });
-  //     console.log("Sector deleted");
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // };
 
   const onDelete = async (sectorId) => {
     try {
@@ -169,62 +123,25 @@ const Home = ({ navigation }) => {
       console.log("Company created:", newSector);
 
       // Mendapatkan semua data dari tabel
-      const allSector = await database.get(MasterCompany.table).query().fetch();
+      const allSector = await database.get(MasterSector.table).query().fetch();
 
       console.log("All Sector:", allSector);
 
       setMasterSector(allSector.map((masterSector) => masterSector._raw));
-
-      // Mengubah data
-      // await database.write(async () => {
-      //   newCompany.update((company) => {
-      //     company.name = "PT. NewRimba";
-      //   });
-      // });
-
-      // console.log("Company after update:", newCompany);
-
-      // Menghapus data
-      await database.write(async () => {
-        const allCompanies = await database
-          .get(MasterCompany.table)
-          .query()
-          .fetch();
-        await newCompany.destroyPermanently();
-      });
-
-      // console.log("Company deleted");
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
   // manggil data dari hook
-  const { data: dataSector, isLoading : isLoadingSector, connected: connectedMasterSector } = useMasterSector();
-  console.log("check connection", connectedMasterSector);
-
-  const onRead = async () => {
-    try {
-      const allCompanies = await database
-        .get(MasterSector.table)
-        .query()
-        .fetch();
-
-      console.log("All Sector:", allCompanies);
-
-      // setMasterCompany(allCompanies.map((masterCompany) => masterCompany._raw));
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
 
   const onReadSector = async () => {
     try {
-      const allSector = await database.get(MasterSector.table).query().fetch();
+      const allCompany = await database.get(MasterSector.table).query().fetch();
 
-      console.log("All Sector:", allSector);
+      console.log("All Company:", allCompany);
 
-      setMasterSector(allSector.map((masterSector) => masterSector._raw));
+      setMasterSector(allCompany.map((masterCompany) => masterCompany._raw));
     } catch (error) {
       console.log("error", error);
     }
@@ -279,6 +196,7 @@ const Home = ({ navigation }) => {
   //   const masterCompany = allCompanies.map((company) => company._raw);
   //   setRawData(masterCompany);
   // }, []);
+  const dateNow = Date.now();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
@@ -349,12 +267,6 @@ const Home = ({ navigation }) => {
                   }}
                 />
               </View>
-              <TouchableOpacity
-                onPress={runExample}
-                style={{ marginVertical: 5 }}
-              >
-                <Text>Create</Text>
-              </TouchableOpacity>
               <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
                 <Text>Sync</Text>
               </TouchableOpacity>
@@ -369,6 +281,12 @@ const Home = ({ navigation }) => {
                 style={{ marginVertical: 5 }}
               >
                 <Text>onRead</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={timeStamp}
+                style={{ marginVertical: 5 }}
+              >
+                <Text>timeStamp</Text>
               </TouchableOpacity>
               {masterSector.map((sector, index) => (
                 <View style={[styles.Isi]}>
@@ -428,11 +346,12 @@ const Home = ({ navigation }) => {
                       <View>
                         <Text>ID: {sector.id}</Text>
                         <Text>Name: {sector.name}</Text>
+                        <Text>Sync: {sector.isSync}</Text>
                         <Text>
-                          Create:{" "}
-                          {dayjs(sector.created_at)
+                          Create: {sector.last_pulled_at}
+                          {/* {dayjs(sector.deleted_at)
                             .locale("id")
-                            .format("DD/MMM/YYYY HH:mm")}
+                            .format("DD/MMM/YYYY ")} */}
                         </Text>
 
                         {/* Add more fields as needed */}
@@ -447,7 +366,9 @@ const Home = ({ navigation }) => {
                           { fontSize: 10, marginVertical: 2 },
                         ]}
                       >
-                        Updated at 17/10/2023, 17:15 Wib
+                        {dayjs(sector.created_at)
+                          .locale("id")
+                          .format("DD/MMM/YYYY ")}
                       </Text>
                     </View>
                     <View
@@ -506,33 +427,36 @@ const Home = ({ navigation }) => {
                           .format("dddd, DD MMMM YYYY")}
                       </Text>
                       <View>
-                        <TouchableOpacity
-                          onPress={() => navigation.navigate("")}
-                          style={{
-                            flex: 1,
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Text>?</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => navigation.navigate("")}
-                          style={{
-                            flex: 1,
-                            justifyContent: "center",
-                            marginRight: 10,
-                            opacity: 0.1,
-                          }}
-                        >
-                          <Image
-                            source={Delete}
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                          <TouchableOpacity
+                            onPress={() => navigation.navigate("")}
                             style={{
-                              height: 20,
-                              width: 20,
-                              marginHorizontal: 8,
+                              flex: 1,
+                              justifyContent: "center",
+                              // backgroundColor: "red",
                             }}
-                          ></Image>
-                        </TouchableOpacity>
+                          >
+                            <Text>?</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => navigation.navigate("")}
+                            style={{
+                              flex: 1,
+                              justifyContent: "center",
+                              marginRight: 10,
+                              opacity: 0.1,
+                            }}
+                          >
+                            <Image
+                              source={Delete}
+                              style={{
+                                height: 20,
+                                width: 20,
+                                marginHorizontal: 8,
+                              }}
+                            ></Image>
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     </View>
                     <View

@@ -8,7 +8,7 @@ import {
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AutoHeightImage from "react-native-auto-height-image";
 import { StyleSheet } from "react-native";
-import { Home, AddNew, Register, Report, Login, PilihTanggal, Status, NewForm } from "../pages";
+import { Home, AddNew, Register, Report, Login, PilihTanggal, Status, NewForm, Splash } from "../pages";
 import {
   Add_Active,
   Add,
@@ -306,11 +306,13 @@ export default function Route() {
   return (
     <NavigationContainer>
       <Stack.Navigator
+        initialRouteName="Splash"
         screenOptions={{
           headerShown: false,
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}
       >
+        <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Mytabs" component={Mytabs} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Status" component={Status} />
