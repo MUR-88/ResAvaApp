@@ -5,8 +5,12 @@ import { database } from "../assets/Model/db";
 import API from "../function/API";
 import dayjs from "dayjs";
 import MasterCompany from "../assets/Model/master_company";
+import MasterEstate from "../assets/Model/master_estates";
+import MasterMainActivitiy from "../assets/Model/master_main_activity";
+import MasterMachineActivities from "../assets/Model/master_log_activity";
+import MasterMainActivities from "../assets/Model/master_main_activity";
 
-export const useMasterCompany = ( { isGetData } ) => {
+export const useMasterAcivity = ({ isGetData} ) => {
   // const . cari connected atau tidak
   // setelah itu useEffect untuk ambil data dari API jika connected, jika tidak ambil data dari WatermelonDB
   const [connected, setConnected] = useState(undefined);
@@ -20,7 +24,7 @@ export const useMasterCompany = ( { isGetData } ) => {
         const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
           JSON.stringify(migration)
         )}`;
-        const response = await API.get(`master_company/sync?${urlParams}`);
+        const response = await API.get(`master_main_activity/sync?${urlParams}`);
         // console.log(JSON.stringify(response, null, 2));
 
         // Check if the request was successful
@@ -34,18 +38,18 @@ export const useMasterCompany = ( { isGetData } ) => {
     });
   }
 
-  function getAllCompany() {
+  function getAllActivity() {
     setIsLoading(true);
-    const allCompany = database
-      .get(MasterCompany.table)
+    const getAllActivity = database
+      .get(MasterMainActivities.table)
       .query()
       .observe()
-      .subscribe((masterCompany) => {
-        console.log("masterCompany");
-        setData(masterCompany.map((masterCompany) => masterCompany._raw));
+      .subscribe((masterActivity) => {
+        console.log("masterActivity");
+        setData(masterActivity.map((masterActivity) => masterActivity._raw));
         setIsLoading(false);
       });
-    return allCompany;
+    return getAllActivity;
   }
 
   useEffect(() => {
@@ -55,11 +59,9 @@ export const useMasterCompany = ( { isGetData } ) => {
     };
     checkInternetConnection();
     if(isGetData){
-      const company = getAllCompany();
-      return () => company.unsubscribe();
+      const masterActivity = getAllEstate();
+      return () => masterActivity.unsubscribe();
     }
-    // const company = getAllCompany();
-    // return () => company.unsubscribe();
   }, []);
 
   return { data, connected, isLoading, fetching };

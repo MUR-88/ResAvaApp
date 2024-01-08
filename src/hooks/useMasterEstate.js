@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import MasterCompany from "../assets/Model/master_company";
 import MasterEstate from "../assets/Model/master_estates";
 
-export const useMasterEstate = ( ) => {
+export const useMasterEstate = ( { isGetData} ) => {
   // const . cari connected atau tidak
   // setelah itu useEffect untuk ambil data dari API jika connected, jika tidak ambil data dari WatermelonDB
   const [connected, setConnected] = useState(undefined);
@@ -55,8 +55,12 @@ export const useMasterEstate = ( ) => {
       setConnected(netInfoState.isConnected);
     };
     checkInternetConnection();
-    const estate = getAllEstate();
-    return () => estate.unsubscribe();
+    if(isGetData){
+      const masterEstate = getAllEstate();
+      return () => masterEstate.unsubscribe();
+    }
+    // const masterEstate = getAllEstate();
+    // return () => masterEstate.unsubscribe();
   }, []);
 
   return { data, connected, isLoading, fetching };

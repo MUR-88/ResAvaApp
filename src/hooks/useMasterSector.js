@@ -6,7 +6,7 @@ import { database } from "../assets/Model/db";
 import API from "../function/API";
 import dayjs from "dayjs";
 
-export const useMasterSector = () => {
+export const useMasterSector = ({ isGetData }) => {
   // const . cari connected atau tidak
   // setelah itu useEffect untuk ambil data dari API jika connected, jika tidak ambil data dari WatermelonDB
   const [connected, setConnected] = useState(undefined);
@@ -54,8 +54,10 @@ export const useMasterSector = () => {
       setConnected(netInfoState.isConnected);
     };
     checkInternetConnection();
-    const sector = getAllSector();
-    return () => sector.unsubscribe();
+    if(isGetData){
+      const sector = getAllSector();
+      return () => sector.unsubscribe();
+    }
   }, []);
 
   return { data, connected, isLoading, fetching };

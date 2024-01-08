@@ -40,8 +40,8 @@ const Home = ({ navigation }) => {
             const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
               JSON.stringify(migration)
             )}`;
-            const response = await API.get(`master_estate/sync?${urlParams}`);
-            // console.log(JSON.stringify(response, null, 2));
+            const response = await API.get(`master_machine_type/sync?${urlParams}`);
+            console.log(JSON.stringify(response, null, 2));
     
             // Check if the request was successful
             if (response.status_code !== 200) {
@@ -49,7 +49,7 @@ const Home = ({ navigation }) => {
             }
             const timestamp = dayjs().unix();
     
-            console.log("data Estate", response.data.length);
+            console.log("data Type", response.data.length);
             return { changes: response.data, timestamp: timestamp };
 
           },
@@ -234,59 +234,8 @@ const Home = ({ navigation }) => {
               >
                 Today's Update
               </Text>
-              {/* {query?.data?.data?.data?.map((item, index) => {
-              return() })} */}
-              <View
-                style={{
-                  width: 100,
-                  marginLeft: 20,
-                  justifyContent: "center",
-                  backgroundColor: "black",
-                }}
-              >
-                <Button
-                  buttonStyle={{ borderRadius: 20 }}
-                  item={{
-                    title: "Check Connection",
-                    textcolor: "black",
-                    backgroundcolor: "white",
-                    alginSelf: "center",
-                    onPress: () => navigation.navigate("NewForm"),
-                    // width:20
-                  }}
-                />
-                <Button
-                  buttonStyle={{ borderRadius: 20 }}
-                  item={{
-                    title: "Login",
-                    textcolor: "black",
-                    backgroundcolor: "white",
-                    alginSelf: "center",
-                    onPress: () => navigation.navigate("Login"),
-                    // width:20
-                  }}
-                />
-              </View>
               <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
                 <Text>Sync</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={runSector}
-                style={{ marginVertical: 5 }}
-              >
-                <Text>Sector</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={onReadSector}
-                style={{ marginVertical: 5 }}
-              >
-                <Text>onRead</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={timeStamp}
-                style={{ marginVertical: 5 }}
-              >
-                <Text>timeStamp</Text>
               </TouchableOpacity>
               {masterSector.map((sector, index) => (
                 <View style={[styles.Isi]}>

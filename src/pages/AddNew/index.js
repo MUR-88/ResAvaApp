@@ -32,41 +32,60 @@ import {
   useMasterCompany,
   useMasterEstate,
   useMasterMachineType,
+  useMasterMachine,
+  useMasterMainActivity,
 } from "../../hooks";
 import { useFormik } from "formik";
 
-const AddNew = ({ navigation }) => {
+const AddNew = ({ navigation, }) => {
+  // try {
+
+  // } catch (error) {
+  //   console.log(error);
+  // }
   const {
     data: dataSector,
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
-  } = useMasterSector();
+  } = useMasterSector({isGetData: true });
   console.log("data sector", dataSector.length);
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
-  } = useMasterCompany();
+  } = useMasterCompany({isGetData: true });
   console.log("data Company", dataCompany.length);
   const {
     data: dataEstate,
     isLoading: isLoadingEstate,
     connected: connectedMasterEstate,
-  } = useMasterEstate();
-  console.log("data Estate", dataEstate);
+  } = useMasterEstate({isGetData: true });
   console.log("data Estate", dataEstate.length);
-  console.log(JSON.stringify(dataEstate, null, 2));
-  // const {
-  //   data: dataMachineType,
-  //   isLoading: isLoadingMachineType,
-  //   connected: connectedMasterMachineType,
-  // } = useMasterMachineType();
+  // console.log(JSON.stringify(dataEstate, null, 2));
+  // console.log("data Estate", dataEstate.length);
+  // console.log(JSON.stringify(dataEstate, null, 2));
 
-  // console.log(JSON.stringify(dataCompany, null, 2));
-  // console.log("Data Sector", dataSector);
-  // console.log("Loading", isLoadingSector);
-  // console.log("Connected", connectedMasterSector);
-
+  const {
+    data: dataMachineType,
+    isLoading: isLoadingMachineType,
+    connected: connectedMasterMachineType,
+  } = useMasterMachineType({isGetData: true });
+  console.log("data Machine Type", dataMachineType.length);
+  // console.log(JSON.stringify(dataMachineType, null, 2));
+  const {
+    data: dataMachine,
+    isLoading: isLoadingMachine,
+    connected: connectedMasterMachine,
+  } = useMasterMachine({isGetData: true });
+  console.log("data Machine", dataMachine.length);
+  // console.log(JSON.stringify(dataMachine, null, 2));
+  const {
+    data: dataMainActivity,
+    isLoading: isLoadingMainActivity,
+    connected: connectedMasterMainActivity,
+  } = useMasterMainActivity({isGetData: true });
+  console.log("data Main Activity", dataMainActivity.length);
+  // console.log(JSON.stringify(dataMainActivity, null, 2));
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date();
 
@@ -202,13 +221,73 @@ const AddNew = ({ navigation }) => {
                       },
                     ]}
                   >
+                    <Text style={styles.Abu}>Company </Text>
+                  </View>
+                  <View
+                    style={[styles.container, { backgroundColor: "white" }]}
+                  >
+                    <Dropdown
+                      style={[styles.dropdown]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={dataCompany.map((company) => ({
+                        label: company.name,
+                        value: company.id_master_company,
+                      }))}
+                      maxHeight={300}
+                      width={40}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={
+                        dataCompany.find(
+                          (item) =>
+                            item.id_master_company ===
+                            formik.values.id_master_company
+                        )?.name
+                      }
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={(item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_company", item.value);
+                        console.log(item);
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
+              <View style={[styles.MechInfo]}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flex: 1,
+                    backgroundColor: "white",
+                    borderWidth: 0.4,
+                    borderColor: "#88888D",
+                    borderRadius: 10,
+                    height: 45,
+                    marginLeft: 5,
+                    marginBottom: 5,
+                  }}
+                >
+                  <View
+                    style={[
+                      styles.container,
+                      {
+                        justifyContent: "center",
+                        backgroundColor: "white",
+                        flex: 1,
+                      },
+                    ]}
+                  >
                     <Text style={styles.Abu}>Sector </Text>
                   </View>
                   <View
                     style={[styles.container, { backgroundColor: "white" }]}
                   >
                     <Dropdown
-                      style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                      style={[styles.dropdown]}
                       placeholderStyle={styles.placeholderStyle}
                       selectedTextStyle={styles.selectedTextStyle}
                       iconStyle={styles.iconStyle}
@@ -238,64 +317,23 @@ const AddNew = ({ navigation }) => {
                   </View>
                 </View>
               </View>
-              <View style={[styles.MechInfo]}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flex: 1,
-                    backgroundColor: "white",
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    borderRadius: 10,
-                    height: 45,
-                    marginLeft: 5,
+              <View style={[styles.button_waktu1]}>
+                <Button
+                  buttonStyle={{
+                    borderRadius: 20,
+                    marginHorizontal: 10,
                     marginBottom: 10,
                   }}
-                >
-                  <View
-                    style={[
-                      styles.container,
-                      {
-                        justifyContent: "center",
-                        backgroundColor: "white",
-                        flex: 1,
-                      },
-                    ]}
-                  >
-                    <Text style={styles.Abu}>Company </Text>
-                  </View>
-                  <View
-                    style={[styles.container, { backgroundColor: "white" }]}
-                  >
-                    <Dropdown
-                      style={[styles.dropdown, isFocus && { borderColor: "" }]}
-                      placeholderStyle={styles.placeholderStyle}
-                      selectedTextStyle={styles.selectedTextStyle}
-                      iconStyle={styles.iconStyle}
-                      data={dataCompany.map((company) => ({
-                        label: company.name,
-                        value: company.id,
-                      }))}
-                      maxHeight={300}
-                      width={40}
-                      labelField="label"
-                      valueField="value"
-                      placeholder={
-                        dataCompany.find(
-                          (item) =>
-                            item.id_master_company ===
-                            formik.values.id_master_company
-                        )?.name
-                      }
-                      onFocus={() => setIsFocus(true)}
-                      onBlur={() => setIsFocus(false)}
-                      onChange={(item) => {
-                        formik.setFieldValue("id_master_company", item.value);
-                        console.log(item);
-                      }}
-                    />
-                  </View>
-                </View>
+                  item={{
+                    title: "Check Status Machine",
+                    height: 40,
+                    textcolor: "#007AFF",
+                    // marginTop: 10,
+                    backgroundcolor: "#DEEBFF",
+                    alginSelf: "center",
+                    onPress: () => navigation.navigate("Status"),
+                  }}
+                />
               </View>
             </View>
             <View
@@ -321,7 +359,6 @@ const AddNew = ({ navigation }) => {
             >
               Machine Information
             </Text>
-
             <View style={[styles.MechInfo]}>
               <View
                 style={{
@@ -334,7 +371,65 @@ const AddNew = ({ navigation }) => {
                   height: 45,
                   marginLeft: 10,
                   marginRight: 10,
-                  marginTop: 20,
+                  marginTop: 10,
+                  marginBottom: 5,
+                }}
+              >
+                <View
+                  style={[
+                    styles.container,
+                    {
+                      justifyContent: "center",
+                      backgroundColor: "white",
+                      flex: 1,
+                    },
+                  ]}
+                >
+                  <Text style={styles.Abu}>Machine Id </Text>
+                </View>
+                <View style={[styles.container, { backgroundColor: "white" }]}>
+                  <Dropdown
+                    style={[styles.dropdown]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    iconStyle={styles.iconStyle}
+                    data={dataMachine.map((machine) => ({
+                      label: machine.machine_id,
+                      value: machine.id_master_machine,
+                    }))}
+                    maxHeight={300}
+                    width={40}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={
+                      dataMachine.find(
+                        (item) =>
+                          item.id_master_machine ===
+                          formik.values.id_master_machine
+                      )?.name
+                    }
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    onChange={(item) => {
+                      setIsFocus(false);
+                      formik.setFieldValue("id_master_machine", item.value);
+                      console.log(item);
+                    }}
+                  />
+                </View>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flex: 1,
+                  backgroundColor: "white",
+                  borderWidth: 0.4,
+                  borderColor: "#88888D",
+                  borderRadius: 10,
+                  height: 45,
+                  marginLeft: 10,
+                  marginRight: 10,
+                  marginTop: 10,
                   marginBottom: 5,
                 }}
               >
@@ -356,10 +451,12 @@ const AddNew = ({ navigation }) => {
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     iconStyle={styles.iconStyle}
-                    data={dataEstate.map((estate) => ({
+                    data={
+                      dataEstate.map((estate) => ({
                       label: estate.name,
                       value: estate.id,
-                    }))}
+                      }))
+                    }
                     maxHeight={300}
                     width={20}
                     labelField="label"
@@ -371,7 +468,6 @@ const AddNew = ({ navigation }) => {
                           formik.values.id_master_estate
                       )?.name
                     }
-                    // value={company}
                     onFocus={() => setIsFocus(true)}
                     onBlur={() => setIsFocus(false)}
                     onChange={(item) => {
@@ -461,14 +557,14 @@ const AddNew = ({ navigation }) => {
                   <Text style={styles.Abu}>Type </Text>
                 </View>
                 <View style={[styles.container, { backgroundColor: "white" }]}>
-                {/* <Dropdown
+                  <Dropdown
                     style={[styles.dropdown, isFocus && { borderColor: "" }]}
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     iconStyle={styles.iconStyle}
-                    data={dataMachineType.map((machine_type) => ({
-                      label: machine_type.name,
-                      value: machine_type.id,
+                    data={dataMachineType.map((type) => ({
+                      label: type.name,
+                      value: type.id,
                     }))}
                     maxHeight={300}
                     width={20}
@@ -477,18 +573,17 @@ const AddNew = ({ navigation }) => {
                     placeholder={
                       dataMachineType.find(
                         (item) =>
-                          item.id_master_machine_type ===
-                          formik.values.id_master_machine_type
+                          item.id_master_machine_types ===
+                          formik.values.id_master_machine_types
                       )?.name
                     }
-                    // value={company}
                     onFocus={() => setIsFocus(true)}
                     onBlur={() => setIsFocus(false)}
                     onChange={(item) => {
-                      formik.setFieldValue("id_master_machine_type", item.value);
+                      formik.setFieldValue("id_master_estate", item.value);
                       console.log(item);
                     }}
-                  /> */}
+                  />
                 </View>
               </View>
               <View
@@ -524,17 +619,27 @@ const AddNew = ({ navigation }) => {
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     iconStyle={styles.iconStyle}
-                    data={[]}
+                    data={dataMainActivity.map((mainActivity) => ({
+                      label: mainActivity.name,
+                      value: mainActivity.id_master_main_activities,
+                    }))}
                     maxHeight={300}
                     width={40}
                     labelField="label"
                     valueField="value"
-                    placeholder={!isFocus ? " Grapple" : ""}
-                    // value={company}
+                    placeholder={
+                      dataMainActivity.find(
+                        (item) =>
+                          item.id_master_main_activities ===
+                          formik.values.id_master_main_activities
+                      )?.name
+                    }
                     onFocus={() => setIsFocus(true)}
                     onBlur={() => setIsFocus(false)}
                     onChange={(item) => {
                       setIsFocus(false);
+                      formik.setFieldValue("id_master_main_activities", item.value);
+                      console.log(item);
                     }}
                   />
                 </View>

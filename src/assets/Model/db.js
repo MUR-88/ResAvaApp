@@ -11,7 +11,6 @@ import MasterMachine from "./master_machine";
 import MasterMachineType from "./master_machine_types";
 import MasterMainActivities from "./master_main_activity";
 import Migration from "../Migration";
-import { Platform } from "react-native";
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
 
@@ -29,10 +28,10 @@ export const database = new Database({
     MasterCompany,
     MasterSector,
     MasterEstate,
-    // MasterLogActivity,
-    // MasterMachine,
+    MasterLogActivity,
+    MasterMachine,
     MasterMachineType,
-    // MasterMainActivities,
+    MasterMainActivities,
   ],
   actionsEnabled: true,
 });

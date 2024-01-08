@@ -6,15 +6,20 @@ import {
 import { useMasterCompany } from "./useMasterCompany";
 import { useMasterSector } from "./useMasterSector";
 import { useMasterEstate } from "./useMasterEstate";
-// import { useMasterMachineType } from "./useMasterMachineType";
+import { useMasterMachineType } from "./useMasterMachineType";
 import { useMasterMachine } from "./useMasterMachine";
+import { useMasterMainActivity } from "./useMasterMainActivity";
+import { useMasterLog } from "./useMasterLog";
+
 export {
   useToastErrorDispatch,
   useToastSuccessDispatch,
   useToastWarningDispatch,
   useMasterCompany,
-  // useMasterMachine,
+  useMasterMachine,
   useMasterSector,
   useMasterEstate,
-  // useMasterMachineType,
+  useMasterMachineType,
+  useMasterMainActivity,
+  useMasterLog
 };

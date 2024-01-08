@@ -7,7 +7,7 @@ export default mySchema = appSchema({
     tableSchema({
       name: "master_company",
       columns: [
-        { name: "id_master_company", type:"number",isIndexed: true },
+        { name: "id_master_company", type: "number", isIndexed: true },
         { name: "name", type: "string" },
         { name: "isSynced", type: "boolean" },
         { name: "isConnected", type: "boolean" },
@@ -15,14 +15,14 @@ export default mySchema = appSchema({
         { name: "deleted_at", type: "number" },
         { name: "updated_at", type: "number" },
       ],
-      unsafeSql: sql => sql.replace(/create table [^)]+\)/, '$& without rowid'),
-      
+      unsafeSql: (sql) =>
+        sql.replace(/create table [^)]+\)/, "$& without rowid"),
     }),
     tableSchema({
       name: "master_estates",
       columns: [
         { name: "id_master_sectors", type: "number", isIndexed: true },
-        { name: "id_master_esate", type: "number", isIndexed: true },
+        { name: "id_master_estate", type: "number", isIndexed: true },
         { name: "name", type: "string" },
         { name: "isSync", type: "boolean" },
         { name: "isConnected", type: "boolean" },
@@ -31,29 +31,10 @@ export default mySchema = appSchema({
         { name: "deleted_at", type: "number" },
         { name: "updated_at", type: "number" },
       ],
-      unsafeSql: sql => sql.replace(/create table [^)]+\)/, '$& without rowid'),
+      unsafeSql: (sql) =>
+        sql.replace(/create table [^)]+\)/, "$& without rowid"),
     }),
-    // tableSchema({
-    //   name: "master_log_activity",
-    //   columns: [
-    //     { name: "body", type: "string" },
-    //     { name: "id_master_log_activity", type: "string", isIndexed: true },
-    //     { name: "master_company_id", type: "string" },
-    //     { name: "master_sector_id", type: "string" },
-    //     { name: "master_estate_id", type: "string" },
-    //     { name: "master_machine_id", type: "string" },
-    //     { name: "master_machine_type_id", type: "string" },
-    //     { name: "master_main_activity_id", type: "string" },
-    //     { name: "current_hour_meter", type: "number" },
-    //     { name: "last_hour_meter", type: "number" },
-    //     { name: "keterangan", type: "string" },
-    //     { name: "isSync", type: "boolean" },
-    //     { name: "isConnected", type: "boolean" },
-    //     { name: "created_at", type: "number" },
-    //     { name: "deleted_at", type: "number" },
-    //     { name: "updated_at", type: "number" },
-    //   ],
-    // }),
+    //
     tableSchema({
       name: "master_machine_types",
       columns: [
@@ -68,16 +49,17 @@ export default mySchema = appSchema({
     tableSchema({
       name: "master_machine",
       columns: [
-        { name: "id_master_machine", type: "string", isIndexed: true },
-        { name: "master_machine_type_id", type: "string" },
-        { name: "master_company_id", type: "string" },
-        { name: "class", type: "number" },
+        { name: "id_master_machine", type: "number", isIndexed: true },
         { name: "machine_id", type: "string" },
+        { name: "master_machine_type_id", type: "number" },
+        { name: "brand", type: "string" },
+        { name: "master_company_id", type: "number" },
+        { name: "class", type: "number" },
         { name: "current_hour_meter", type: "number" },
         { name: "last_update_hm", type: "number" },
-        { name: "master_main_activity_id", type: "string" },
-        { name: "master_machine_type_id", type: "string" },
-        { name: "working_hour", type: "string" },
+        { name: "master_main_activity_id", type: "number" },
+        { name: "master_machine_type_id", type: "number" },
+        { name: "working_hour", type: "number" },
         { name: "isSync", type: "boolean" },
         { name: "isConnected", type: "boolean" },
         { name: "created_at", type: "number" },
@@ -85,18 +67,19 @@ export default mySchema = appSchema({
         { name: "updated_at", type: "number" },
       ],
     }),
-    // tableSchema({
-    //   name: "master_main_activities",
-    //   columns: [
-    //     { name: "id_master_main_activities", type: "string", isIndexed: true },
-    //     { name: "name", type: "string" },
-    //     { name: "isSync", type: "boolean" },
-    //     { name: "isConnected", type: "boolean" },
-    //     { name: "created_at", type: "number" },
-    //     { name: "deleted_at", type: "number" },
-    //     { name: "updated_at", type: "number" },
-    //   ],
-    // }),
+    tableSchema({
+      name: "master_main_activities",
+      columns: [
+        { name: "id_master_main_activities", type: "number", isIndexed: true },
+        { name: "master_machine_types_id", type: "number", isIndexed: true },
+        { name: "name", type: "string" },
+        { name: "isSync", type: "boolean" },
+        { name: "isConnected", type: "boolean" },
+        { name: "created_at", type: "number" },
+        { name: "deleted_at", type: "number" },
+        { name: "updated_at", type: "number" },
+      ],
+    }),
     tableSchema({
       name: "master_sectors",
       columns: [
@@ -109,8 +92,32 @@ export default mySchema = appSchema({
         { name: "deleted_at", type: "number" },
         { name: "updated_at", type: "number" },
       ],
-      unsafeSql: sql => sql.replace(/create table [^)]+\)/, '$& without rowid'),
+      unsafeSql: (sql) =>
+        sql.replace(/create table [^)]+\)/, "$& without rowid"),
     }),
+    tableSchema({
+      name: "master_log_activity",
+      columns: [
+        { name: "id_master_log_activity", type: "number", isIndexed: true },
+        { name: "master_company_id", type: "number", isIndexed: true },
+        { name: "master_sector_id", type: "number", isIndexed: true },
+        { name: "master_estate_id", type: "number", isIndexed: true },
+        { name: "master_machine_id", type: "number", isIndexed: true },
+        { name: "master_machine_type_id", type: "number", isIndexed: true },
+        { name: "master_main_activity_id", type: "number", isIndexed: true },
+        { name: "brand", type: "string" },
+        { name: "class", type: "number" },
+        { name: "current_hour_meter", type: "number" },
+        { name: "last_hour_meter", type: "number" },
+        { name: "keterangan", type: "string" },
+        { name: "isSync", type: "boolean" },
+        { name: "isConnected", type: "boolean" },
+        { name: "created_at", type: "number" },
+        { name: "deleted_at", type: "number" },
+        { name: "updated_at", type: "number" },
+      ],
+    }),
+    
     // tableSchema({
     //   name: "users",
     //   columns: [
@@ -127,5 +134,4 @@ export default mySchema = appSchema({
     //   ],
     // }),
   ],
-  
 });

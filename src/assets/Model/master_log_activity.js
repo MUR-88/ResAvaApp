@@ -1,7 +1,7 @@
 import { Model } from "@nozbe/watermelondb";
 import { date, field, text, immutableRelation  } from '@nozbe/watermelondb/decorators'
 
-export default class MasterMachineActivities extends Model {
+export default class MasterLogActivity extends Model {
   static table = "master_log_activity";
   
   static associations = {
@@ -36,6 +36,7 @@ export default class MasterMachineActivities extends Model {
     },
   };
   @field('id') id
+  @field('id_master_log_activity') idMasterLogActivity
   @field('master_company_id') masterCompanyId
   @field('master_sector_id') masterSectorId
   @field('master_estate_id') masterEstateId
