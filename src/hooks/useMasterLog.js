@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
-import MasterSector from "../assets/Model/master_sectors";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { database } from "../assets/Model/db";
 import API from "../function/API";
 import dayjs from "dayjs";
-import MasterMachineType from "../assets/Model/master_machine_types";
 import MasterLogActivity from "../assets/Model/master_log_activity";
 
 export const useMasterLog = ({ isGetData }) => {
@@ -36,9 +34,9 @@ export const useMasterLog = ({ isGetData }) => {
     })
   }
 
-  function getAllMasterLog() {
+  function getAllLog() {
     setIsLoading(true);
-    const allMasterLog = database
+    const allLogActivity = database
       .get(MasterLogActivity.table)
       .query()
       .observe()
@@ -47,7 +45,7 @@ export const useMasterLog = ({ isGetData }) => {
         setData(masterLog.map((masterLog) => masterLog._raw));
         setIsLoading(false);
       });
-    return allMasterLog;
+    return allLogActivity;
   }
 
   useEffect(() => {
@@ -57,7 +55,7 @@ export const useMasterLog = ({ isGetData }) => {
     };
     checkInternetConnection();
     if(isGetData){
-      const masterLog = getAllMasterLog();
+      const masterLog = getAllLog();
       return () => masterLog.unsubscribe();
     }
   }, []);

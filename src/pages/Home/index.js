@@ -30,29 +30,39 @@ import MasterSector from "../../assets/Model/master_sectors";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { getLastPulledAt } from "@nozbe/watermelondb/sync/impl";
 import { useMasterSector } from "../../hooks/useMasterSector";
+import { useMasterLog } from "../../hooks";
 
 const Home = ({ navigation }) => {
+  const {
+    data: dataMasterLog,
+    isLoading: isLoadingLog,
+    connected: connectedMasterLog,
+  } = useMasterLog({ isGetData: true });
+  console.log("data Log", dataMasterLog.length);
+  console.log(JSON.stringify(dataMasterLog, null, 2));
+
   async function mySync() {
     try {
       await synchronize({
-          database,
-          pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-            const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-              JSON.stringify(migration)
-            )}`;
-            const response = await API.get(`master_machine_type/sync?${urlParams}`);
-            console.log(JSON.stringify(response, null, 2));
-    
-            // Check if the request was successful
-            if (response.status_code !== 200) {
-              throw new Error(`Request failed with status ${response.status}`);
-            }
-            const timestamp = dayjs().unix();
-    
-            console.log("data Type", response.data.length);
-            return { changes: response.data, timestamp: timestamp };
+        database,
+        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+            JSON.stringify(migration)
+          )}`;
+          const response = await API.get(
+            `master_machine_type/sync?${urlParams}`
+          );
+          console.log(JSON.stringify(response, null, 2));
 
-          },
+          // Check if the request was successful
+          if (response.status_code !== 200) {
+            throw new Error(`Request failed with status ${response.status}`);
+          }
+          const timestamp = dayjs().unix();
+
+          console.log("data Type", response.data.length);
+          return { changes: response.data, timestamp: timestamp };
+        },
       });
     } catch (error) {
       console.log("Catch Mysync", error);
@@ -237,7 +247,7 @@ const Home = ({ navigation }) => {
               <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
                 <Text>Sync</Text>
               </TouchableOpacity>
-              {masterSector.map((sector, index) => (
+              {dataMasterLog.map((logActivity, index) => (
                 <View style={[styles.Isi]}>
                   <View
                     style={{
@@ -245,7 +255,7 @@ const Home = ({ navigation }) => {
                       flexDirection: "row",
                       justifyContent: "space-between",
                     }}
-                    key={`master_sector_${index}`}
+                    key={`master_Activity${index}`}
                   >
                     <Text
                       style={{
@@ -293,11 +303,12 @@ const Home = ({ navigation }) => {
                     />
                     <View style={{ flex: 1 }}>
                       <View>
-                        <Text>ID: {sector.id}</Text>
-                        <Text>Name: {sector.name}</Text>
-                        <Text>Sync: {sector.isSync}</Text>
+                        <Text>ID: {logActivity.id_master_log_activivty}</Text>
+                        <Text>Name: {logActivity.master_company_id}</Text>
+                        <Text>Brand: {logActivity.brand}</Text>
+                        <Text>Sync: {logActivity.isSync}</Text>
                         <Text>
-                          Create: {sector.last_pulled_at}
+                          Create: {dayjs(logActivity.last_pulled_at).locale('id').format("DD/MMM/YYYY ")}
                           {/* {dayjs(sector.deleted_at)
                             .locale("id")
                             .format("DD/MMM/YYYY ")} */}
@@ -315,9 +326,9 @@ const Home = ({ navigation }) => {
                           { fontSize: 10, marginVertical: 2 },
                         ]}
                       >
-                        {dayjs(sector.created_at)
+                        {/* {dayjs(sector.created_at)
                           .locale("id")
-                          .format("DD/MMM/YYYY ")}
+                          .format("DD/MMM/YYYY ")} */}
                       </Text>
                     </View>
                     <View
@@ -352,7 +363,7 @@ const Home = ({ navigation }) => {
               >
                 30 Days History
               </Text>
-              {query?.data?.data?.data.map((item, index) => {
+              {/* {query?.data?.data?.data.map((item, index) => {
                 return (
                   <View style={[styles.Isi]}>
                     <View
@@ -445,7 +456,7 @@ const Home = ({ navigation }) => {
                     </View>
                   </View>
                 );
-              })}
+              })} */}
             </View>
           </ScrollView>
         ) : (

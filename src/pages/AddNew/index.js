@@ -11,22 +11,12 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import Constants from "expo-constants";
 import { Button, Input } from "../../component";
-import {
-  RefreshControl,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native-gesture-handler";
+import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 // import {color} from "../..variabel";
-import dayjs from "dayjs";
 import "dayjs/locale/id";
 import { Dropdown } from "react-native-element-dropdown";
-import { useEffect } from "react";
-import DatePicker, {
-  getToday,
-  getFormatedDate,
-} from "react-native-modern-datepicker";
+import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 import {
   useMasterSector,
   useMasterCompany,
@@ -34,58 +24,67 @@ import {
   useMasterMachineType,
   useMasterMachine,
   useMasterMainActivity,
+  useMasterLog,
 } from "../../hooks";
-import { useFormik } from "formik";
+import { Formik, useFormik } from "formik";
 
-const AddNew = ({ navigation, }) => {
-  // try {
+const AddNew = ({ navigation }) => {
+// let schema = yup.object().shape({
+//   id_master_sector: yup.string().required("Required"),
+//   hm_current : yup.string().required("Mohon masukkan format yang benar"),
+//   id_master_company: yup.string().required("Required"),
+//   Date: yup.string().required("Required"),
+// });
 
-  // } catch (error) {
-  //   console.log(error);
-  // }
   const {
     data: dataSector,
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
-  } = useMasterSector({isGetData: true });
+  } = useMasterSector({ isGetData: true });
   console.log("data sector", dataSector.length);
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
-  } = useMasterCompany({isGetData: true });
+  } = useMasterCompany({ isGetData: true });
   console.log("data Company", dataCompany.length);
   const {
     data: dataEstate,
     isLoading: isLoadingEstate,
     connected: connectedMasterEstate,
-  } = useMasterEstate({isGetData: true });
+  } = useMasterEstate({ isGetData: true });
   console.log("data Estate", dataEstate.length);
-  // console.log(JSON.stringify(dataEstate, null, 2));
-  // console.log("data Estate", dataEstate.length);
   // console.log(JSON.stringify(dataEstate, null, 2));
 
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
     connected: connectedMasterMachineType,
-  } = useMasterMachineType({isGetData: true });
+  } = useMasterMachineType({ isGetData: true });
   console.log("data Machine Type", dataMachineType.length);
   // console.log(JSON.stringify(dataMachineType, null, 2));
   const {
     data: dataMachine,
     isLoading: isLoadingMachine,
     connected: connectedMasterMachine,
-  } = useMasterMachine({isGetData: true });
+  } = useMasterMachine({ isGetData: true });
   console.log("data Machine", dataMachine.length);
   // console.log(JSON.stringify(dataMachine, null, 2));
   const {
     data: dataMainActivity,
     isLoading: isLoadingMainActivity,
     connected: connectedMasterMainActivity,
-  } = useMasterMainActivity({isGetData: true });
+  } = useMasterMainActivity({ isGetData: true });
   console.log("data Main Activity", dataMainActivity.length);
   // console.log(JSON.stringify(dataMainActivity, null, 2));
+  const {
+    data: dataMasterLog,
+    isLoading: isLoadingLog,
+    connected: connectedMasterLog,
+  } = useMasterLog({ isGetData: true });
+  console.log("data Log", dataMasterLog.length);
+  // console.log(JSON.stringify(dataMasterLog, null, 2));
+
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date();
 
@@ -101,12 +100,14 @@ const AddNew = ({ navigation, }) => {
   const [text, setText] = useState("Computer On Or Off ?");
   const [isFocus, setIsFocus] = useState(true);
   const [date, setDate] = useState(undefined);
+  const [showTime, setShowTime] = useState(false);
 
   function handleOnPress() {
     setOpen(!open);
   }
 
-  function handleChange(Date) {
+  function handleChangeDate(Date) {
+    // setShowTime(!showTime );
     console.log("tanggal pilih", Date);
     setDate(Date);
   }
@@ -136,516 +137,255 @@ const AddNew = ({ navigation, }) => {
       <StatusBar style="light" />
       {/* <Text>{JSON.stringify(dataSector)}</Text> */}
       <RefreshControl>
-        <ScrollView>
-          <View
-            style={{
-              backgroundColor: "#007AFF",
-              height: 100,
-              justifyContent: "flex_start",
-            }}
-          >
-            <View style={[styles.Kotak]}>
-              <Text style={[styles.Header1, { marginBottom: -10 }]}>
-                Resources Update
-              </Text>
-            </View>
-          </View>
-          <View style={[styles.Content]}>
-            <Text
-              style={{
-                color: "#007AFF",
-                fontSize: 18,
-                fontFamily: "Poppins-Medium",
-                marginTop: 5,
-              }}
-            >
-              Details
-            </Text>
-            <View style={[styles.Details1]}>
-              <View style={[styles.button_waktu]}>
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={modalVisible}
-                  onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
-                    setModalVisible(!modalVisible);
+        <Formik
+          initialValues={{ 
+            // id_master_sector, id_master_company, date 
+          }}
+          // validationSchema={schema}
+          onSubmit={async (values) => {}}
+        >
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            isSubmit,
+            setFieldValue,
+          }) => (
+            <ScrollView>
+              <View
+                style={{
+                  backgroundColor: "#007AFF",
+                  height: 100,
+                  justifyContent: "flex_start",
+                }}
+              >
+                <View style={[styles.Kotak]}>
+                  <Text style={[styles.Header1, { marginBottom: -10 }]}>
+                    Resources Update
+                  </Text>
+                </View>
+              </View>
+              <View style={[styles.Content]}>
+                <Text
+                  style={{
+                    color: "#007AFF",
+                    fontSize: 18,
+                    fontFamily: "Poppins-Medium",
+                    marginTop: 5,
                   }}
                 >
-                  <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                      <DatePicker
-                        onSelectedChange={(date) => setSelectedDate(date)}
-                        mode="calendar"
-                        minimumDate={startDate}
-                        selected={date}
-                        onDateChange={handleChange}
-                      />
-                      <Pressable
-                        style={[styles.button, styles.buttonClose]}
-                        onPress={() => setModalVisible(!modalVisible)}
+                  Details
+                </Text>
+                <View style={[styles.Details1]}>
+                  <View style={[styles.button_waktu]}>
+                    <Modal
+                      animationType="slide"
+                      transparent={true}
+                      visible={modalVisible}
+                      onRequestClose={() => {
+                        Alert.alert("Modal has been closed.");
+                        setModalVisible(!modalVisible);
+                      }}
+                    >
+                      <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                          <DatePicker
+                            onSelectedChange={(date) => setSelectedDate(date)}
+                            mode="calendar"
+                            display = "spinner"
+                            minimumDate={startDate}
+                            selected={date}
+                            onDateChange={handleChangeDate}
+                          />
+                          <Pressable
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => setModalVisible(!modalVisible)}
+                          >
+                            <Text style={styles.textStyle}>{}Simpan</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    </Modal>
+                    {/* {showTime? } */}
+                    <Pressable
+                      style={[styles.button, styles.buttonOpen]}
+                      onPress={() => setModalVisible(true)}
+                    >
+                      <Text style={styles.textStyle}>Pilih Tanggal</Text>
+                    </Pressable>
+                  </View>
+                  <View style={[styles.MechInfo]}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        flex: 1,
+                        backgroundColor: "white",
+                        borderWidth: 0.4,
+                        borderColor: "#88888D",
+                        borderRadius: 10,
+                        height: 45,
+                        marginLeft: 5,
+                        marginBottom: 10,
+                      }}
+                    >
+                      <View
+                        style={[
+                          styles.container,
+                          {
+                            justifyContent: "center",
+                            backgroundColor: "white",
+                            flex: 1,
+                          },
+                        ]}
                       >
-                        <Text style={styles.textStyle}>{}Simpan</Text>
-                      </Pressable>
+                        <Text style={styles.Abu}>Company </Text>
+                      </View>
+                      <View
+                        style={[styles.container, { backgroundColor: "white" }]}
+                      >
+                        <Dropdown
+                          style={[styles.dropdown]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          iconStyle={styles.iconStyle}
+                          data={dataCompany.map((company) => ({
+                            label: company.name,
+                            value: company.id_master_company,
+                          }))}
+                          maxHeight={300}
+                          width={40}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={
+                            dataCompany.find(
+                              (item) =>
+                                item.id_master_company ===
+                                formik.values.id_master_company
+                            )?.name
+                          }
+                          onFocus={() => setIsFocus(true)}
+                          onBlur={() => setIsFocus(false)}
+                          onChange={(item) => {
+                            setIsFocus(false);
+                            formik.setFieldValue(
+                              "id_master_company",
+                              item.value
+                            );
+                            console.log(item);
+                          }}
+                        />
+                      </View>
                     </View>
                   </View>
-                </Modal>
-                <Pressable
-                  style={[styles.button, styles.buttonOpen]}
-                  onPress={() => setModalVisible(true)}
-                >
-                  <Text style={styles.textStyle}>Pilih Tanggal</Text>
-                </Pressable>
-              </View>
-              <View style={[styles.MechInfo]}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flex: 1,
-                    backgroundColor: "white",
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    borderRadius: 10,
-                    height: 45,
-                    marginLeft: 5,
-                    marginBottom: 10,
-                  }}
-                >
-                  <View
-                    style={[
-                      styles.container,
-                      {
-                        justifyContent: "center",
-                        backgroundColor: "white",
+                  <View style={[styles.MechInfo]}>
+                    <View
+                      style={{
+                        flexDirection: "row",
                         flex: 1,
-                      },
-                    ]}
-                  >
-                    <Text style={styles.Abu}>Company </Text>
+                        backgroundColor: "white",
+                        borderWidth: 0.4,
+                        borderColor: "#88888D",
+                        borderRadius: 10,
+                        height: 45,
+                        marginLeft: 5,
+                        marginBottom: 5,
+                      }}
+                    >
+                      <View
+                        style={[
+                          styles.container,
+                          {
+                            justifyContent: "center",
+                            backgroundColor: "white",
+                            flex: 1,
+                          },
+                        ]}
+                      >
+                        <Text style={styles.Abu}>Sector </Text>
+                      </View>
+                      <View
+                        style={[styles.container, { backgroundColor: "white" }]}
+                      >
+                        <Dropdown
+                          style={[styles.dropdown]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          iconStyle={styles.iconStyle}
+                          data={dataSector.map((sector) => ({
+                            label: sector.name,
+                            value: sector.id_master_sectors,
+                          }))}
+                          maxHeight={300}
+                          width={40}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={
+                            dataSector.find(
+                              (item) =>
+                                item.id_master_sectors ===
+                                formik.values.id_master_sector
+                            )?.name
+                          }
+                          onFocus={() => setIsFocus(true)}
+                          onBlur={() => setIsFocus(false)}
+                          onChange={(item) => {
+                            setIsFocus(false);
+                            formik.setFieldValue(
+                              "id_master_sector",
+                              item.value
+                            );
+                            console.log(item);
+                          }}
+                        />
+                      </View>
+                    </View>
                   </View>
-                  <View
-                    style={[styles.container, { backgroundColor: "white" }]}
-                  >
-                    <Dropdown
-                      style={[styles.dropdown]}
-                      placeholderStyle={styles.placeholderStyle}
-                      selectedTextStyle={styles.selectedTextStyle}
-                      iconStyle={styles.iconStyle}
-                      data={dataCompany.map((company) => ({
-                        label: company.name,
-                        value: company.id_master_company,
-                      }))}
-                      maxHeight={300}
-                      width={40}
-                      labelField="label"
-                      valueField="value"
-                      placeholder={
-                        dataCompany.find(
-                          (item) =>
-                            item.id_master_company ===
-                            formik.values.id_master_company
-                        )?.name
-                      }
-                      onFocus={() => setIsFocus(true)}
-                      onBlur={() => setIsFocus(false)}
-                      onChange={(item) => {
-                        setIsFocus(false);
-                        formik.setFieldValue("id_master_company", item.value);
-                        console.log(item);
+                  <View style={[styles.button_waktu1]}>
+                    <Button
+                      buttonStyle={{
+                        borderRadius: 20,
+                        marginHorizontal: 10,
+                        marginBottom: 10,
+                      }}
+                      item={{
+                        title: "Check Status Machine",
+                        height: 40,
+                        textcolor: "#007AFF",
+                        // marginTop: 10,
+                        backgroundcolor: "#DEEBFF",
+                        alginSelf: "center",
+                        onPress: () => navigation.navigate("Status"),
                       }}
                     />
                   </View>
                 </View>
-              </View>
-              <View style={[styles.MechInfo]}>
                 <View
                   style={{
-                    flexDirection: "row",
                     flex: 1,
-                    backgroundColor: "white",
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    borderRadius: 10,
-                    height: 45,
-                    marginLeft: 5,
-                    marginBottom: 5,
-                  }}
-                >
-                  <View
-                    style={[
-                      styles.container,
-                      {
-                        justifyContent: "center",
-                        backgroundColor: "white",
-                        flex: 1,
-                      },
-                    ]}
-                  >
-                    <Text style={styles.Abu}>Sector </Text>
-                  </View>
-                  <View
-                    style={[styles.container, { backgroundColor: "white" }]}
-                  >
-                    <Dropdown
-                      style={[styles.dropdown]}
-                      placeholderStyle={styles.placeholderStyle}
-                      selectedTextStyle={styles.selectedTextStyle}
-                      iconStyle={styles.iconStyle}
-                      data={dataSector.map((sector) => ({
-                        label: sector.name,
-                        value: sector.id_master_sectors,
-                      }))}
-                      maxHeight={300}
-                      width={40}
-                      labelField="label"
-                      valueField="value"
-                      placeholder={
-                        dataSector.find(
-                          (item) =>
-                            item.id_master_sectors ===
-                            formik.values.id_master_sector
-                        )?.name
-                      }
-                      onFocus={() => setIsFocus(true)}
-                      onBlur={() => setIsFocus(false)}
-                      onChange={(item) => {
-                        setIsFocus(false);
-                        formik.setFieldValue("id_master_sector", item.value);
-                        console.log(item);
-                      }}
-                    />
-                  </View>
-                </View>
-              </View>
-              <View style={[styles.button_waktu1]}>
-                <Button
-                  buttonStyle={{
-                    borderRadius: 20,
-                    marginHorizontal: 10,
-                    marginBottom: 10,
-                  }}
-                  item={{
-                    title: "Check Status Machine",
-                    height: 40,
-                    textcolor: "#007AFF",
-                    // marginTop: 10,
-                    backgroundcolor: "#DEEBFF",
-                    alginSelf: "center",
-                    onPress: () => navigation.navigate("Status"),
+                    marginLeft: -20,
+                    borderBottomColor: "#3C3C43",
+                    opacity: 0.3,
+                    borderBottomWidth: 1,
+                    marginVertical: 15,
+                    marginRight: -200,
                   }}
                 />
-              </View>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                marginLeft: -20,
-                borderBottomColor: "#3C3C43",
-                opacity: 0.3,
-                borderBottomWidth: 1,
-                marginVertical: 15,
-                marginRight: -200,
-              }}
-            />
-            <Text
-              style={{
-                marginBottom: 20,
-                color: "#88888D",
-                fontFamily: "Poppins-Regular",
-                fontWeight: 900,
-                fontSize: 18,
-                marginLeft: 10,
-              }}
-            >
-              Machine Information
-            </Text>
-            <View style={[styles.MechInfo]}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flex: 1,
-                  backgroundColor: "white",
-                  borderWidth: 0.4,
-                  borderColor: "#88888D",
-                  borderRadius: 10,
-                  height: 45,
-                  marginLeft: 10,
-                  marginRight: 10,
-                  marginTop: 10,
-                  marginBottom: 5,
-                }}
-              >
-                <View
-                  style={[
-                    styles.container,
-                    {
-                      justifyContent: "center",
-                      backgroundColor: "white",
-                      flex: 1,
-                    },
-                  ]}
+                <Text
+                  style={{
+                    marginBottom: 20,
+                    color: "#88888D",
+                    fontFamily: "Poppins-Regular",
+                    fontWeight: 900,
+                    fontSize: 18,
+                    marginLeft: 10,
+                  }}
                 >
-                  <Text style={styles.Abu}>Machine Id </Text>
-                </View>
-                <View style={[styles.container, { backgroundColor: "white" }]}>
-                  <Dropdown
-                    style={[styles.dropdown]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    iconStyle={styles.iconStyle}
-                    data={dataMachine.map((machine) => ({
-                      label: machine.machine_id,
-                      value: machine.id_master_machine,
-                    }))}
-                    maxHeight={300}
-                    width={40}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={
-                      dataMachine.find(
-                        (item) =>
-                          item.id_master_machine ===
-                          formik.values.id_master_machine
-                      )?.name
-                    }
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(item) => {
-                      setIsFocus(false);
-                      formik.setFieldValue("id_master_machine", item.value);
-                      console.log(item);
-                    }}
-                  />
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flex: 1,
-                  backgroundColor: "white",
-                  borderWidth: 0.4,
-                  borderColor: "#88888D",
-                  borderRadius: 10,
-                  height: 45,
-                  marginLeft: 10,
-                  marginRight: 10,
-                  marginTop: 10,
-                  marginBottom: 5,
-                }}
-              >
-                <View
-                  style={[
-                    styles.container,
-                    {
-                      justifyContent: "center",
-                      backgroundColor: "white",
-                      flex: 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.Abu}>Estate </Text>
-                </View>
-                <View style={[styles.container, { backgroundColor: "white" }]}>
-                  <Dropdown
-                    style={[styles.dropdown, isFocus && { borderColor: "" }]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    iconStyle={styles.iconStyle}
-                    data={
-                      dataEstate.map((estate) => ({
-                      label: estate.name,
-                      value: estate.id,
-                      }))
-                    }
-                    maxHeight={300}
-                    width={20}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={
-                      dataEstate.find(
-                        (item) =>
-                          item.id_master_estate ===
-                          formik.values.id_master_estate
-                      )?.name
-                    }
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(item) => {
-                      formik.setFieldValue("id_master_estate", item.value);
-                      console.log(item);
-                    }}
-                  />
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  flex: 1,
-                  borderWidth: 0.4,
-                  borderColor: "#88888D",
-                  backgroundColor: "white",
-                  borderRadius: 10,
-                  marginBottom: 5,
-                  marginHorizontal: 10,
-                  height: 45,
-                  marginTop: 10,
-                }}
-              >
-                <View
-                  style={[
-                    styles.container,
-                    {
-                      justifyContent: "center",
-                      backgroundColor: "white",
-                      flex: 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.Abu}>Compartement ID </Text>
-                </View>
-                <View
-                  style={[
-                    styles.container,
-                    { backgroundColor: "white", marginLeft: -4 },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.containerInput1,
-                      {
-                        alignItems: "flex-end",
-                        justifyContent: "center",
-                        marginTop: 5,
-                      },
-                    ]}
-                  >
-                    <Input
-                      item={{
-                        placeholder: " XXX ",
-                      }}
-                      style={{ borderWidth: 0.5 }}
-                    />
-                  </View>
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flex: 1,
-                  backgroundColor: "white",
-                  borderWidth: 0.4,
-                  borderColor: "#88888D",
-                  borderRadius: 10,
-                  height: 45,
-                  marginLeft: 10,
-                  marginRight: 10,
-                  marginTop: 10,
-                  marginBottom: 5,
-                }}
-              >
-                <View
-                  style={[
-                    styles.container,
-                    {
-                      justifyContent: "center",
-                      backgroundColor: "white",
-                      flex: 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.Abu}>Type </Text>
-                </View>
-                <View style={[styles.container, { backgroundColor: "white" }]}>
-                  <Dropdown
-                    style={[styles.dropdown, isFocus && { borderColor: "" }]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    iconStyle={styles.iconStyle}
-                    data={dataMachineType.map((type) => ({
-                      label: type.name,
-                      value: type.id,
-                    }))}
-                    maxHeight={300}
-                    width={20}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={
-                      dataMachineType.find(
-                        (item) =>
-                          item.id_master_machine_types ===
-                          formik.values.id_master_machine_types
-                      )?.name
-                    }
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(item) => {
-                      formik.setFieldValue("id_master_estate", item.value);
-                      console.log(item);
-                    }}
-                  />
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flex: 1,
-                  backgroundColor: "white",
-                  borderWidth: 0.4,
-                  borderColor: "#88888D",
-                  borderRadius: 10,
-                  height: 45,
-                  marginLeft: 10,
-                  marginRight: 10,
-                  marginTop: 10,
-                  marginBottom: 10,
-                }}
-              >
-                <View
-                  style={[
-                    styles.container,
-                    {
-                      justifyContent: "center",
-                      backgroundColor: "white",
-                      flex: 1,
-                    },
-                  ]}
-                >
-                  <Text style={styles.Abu}>Main Activity </Text>
-                </View>
-                <View style={[styles.container, { backgroundColor: "white" }]}>
-                  <Dropdown
-                    style={[styles.dropdown, isFocus && { borderColor: "" }]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    iconStyle={styles.iconStyle}
-                    data={dataMainActivity.map((mainActivity) => ({
-                      label: mainActivity.name,
-                      value: mainActivity.id_master_main_activities,
-                    }))}
-                    maxHeight={300}
-                    width={40}
-                    labelField="label"
-                    valueField="value"
-                    placeholder={
-                      dataMainActivity.find(
-                        (item) =>
-                          item.id_master_main_activities ===
-                          formik.values.id_master_main_activities
-                      )?.name
-                    }
-                    onFocus={() => setIsFocus(true)}
-                    onBlur={() => setIsFocus(false)}
-                    onChange={(item) => {
-                      setIsFocus(false);
-                      formik.setFieldValue("id_master_main_activities", item.value);
-                      console.log(item);
-                    }}
-                  />
-                </View>
-              </View>
-              {isEnable ? (
-                <>
+                  Machine Information
+                </Text>
+                <View style={[styles.MechInfo]}>
                   <View
                     style={{
                       flexDirection: "row",
@@ -658,7 +398,7 @@ const AddNew = ({ navigation, }) => {
                       marginLeft: 10,
                       marginRight: 10,
                       marginTop: 10,
-                      marginBottom: 10,
+                      marginBottom: 5,
                     }}
                   >
                     <View
@@ -671,26 +411,101 @@ const AddNew = ({ navigation, }) => {
                         },
                       ]}
                     >
-                      <Text style={styles.Abu}>Last HM </Text>
+                      <Text style={styles.Abu}>Machine Id </Text>
                     </View>
                     <View
                       style={[styles.container, { backgroundColor: "white" }]}
                     >
-                      <View
+                      <Dropdown
+                        style={[styles.dropdown]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={dataMachine.map((machine) => ({
+                          label: machine.machine_id,
+                          value: machine.id_master_machine,
+                        }))}
+                        maxHeight={300}
+                        width={40}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={
+                          dataMachine.find(
+                            (item) =>
+                              item.id_master_machine ===
+                              formik.values.id_master_machine
+                          )?.name
+                        }
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(item) => {
+                          setIsFocus(false);
+                          formik.setFieldValue("id_master_machine", item.value);
+                          console.log(item);
+                        }}
+                      />
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flex: 1,
+                      backgroundColor: "white",
+                      borderWidth: 0.4,
+                      borderColor: "#88888D",
+                      borderRadius: 10,
+                      height: 45,
+                      marginLeft: 10,
+                      marginRight: 10,
+                      marginTop: 10,
+                      marginBottom: 5,
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.container,
+                        {
+                          justifyContent: "center",
+                          backgroundColor: "white",
+                          flex: 1,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.Abu}>Estate </Text>
+                    </View>
+                    <View
+                      style={[styles.container, { backgroundColor: "white" }]}
+                    >
+                      <Dropdown
                         style={[
-                          styles.container,
-                          {
-                            backgroundColor: "white",
-                            justifyContent: "center",
-                            alignItems: "flex-end",
-                            marginRight: 20,
-                          },
+                          styles.dropdown,
+                          isFocus && { borderColor: "" },
                         ]}
-                      >
-                        <Text style={{ fontSize: 16, color: "#88888D" }}>
-                          XXX
-                        </Text>
-                      </View>
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={dataEstate.map((estate) => ({
+                          label: estate.name,
+                          value: estate.id,
+                        }))}
+                        maxHeight={300}
+                        width={20}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={
+                          dataEstate.find(
+                            (item) =>
+                              item.id_master_estate ===
+                              formik.values.id_master_estate
+                          )?.name
+                        }
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(item) => {
+                          formik.setFieldValue("id_master_estate", item.value);
+                          console.log(item);
+                        }}
+                      />
                     </View>
                   </View>
                   <View
@@ -718,7 +533,7 @@ const AddNew = ({ navigation, }) => {
                         },
                       ]}
                     >
-                      <Text style={styles.Abu}> Current HM </Text>
+                      <Text style={styles.Abu}>Compartement ID </Text>
                     </View>
                     <View
                       style={[
@@ -745,102 +560,341 @@ const AddNew = ({ navigation, }) => {
                       </View>
                     </View>
                   </View>
-                </>
-              ) : null}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flex: 1,
+                      backgroundColor: "white",
+                      borderWidth: 0.4,
+                      borderColor: "#88888D",
+                      borderRadius: 10,
+                      height: 45,
+                      marginLeft: 10,
+                      marginRight: 10,
+                      marginTop: 10,
+                      marginBottom: 5,
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.container,
+                        {
+                          justifyContent: "center",
+                          backgroundColor: "white",
+                          flex: 1,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.Abu}>Type </Text>
+                    </View>
+                    <View
+                      style={[styles.container, { backgroundColor: "white" }]}
+                    >
+                      <Dropdown
+                        style={[
+                          styles.dropdown,
+                          isFocus && { borderColor: "" },
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={dataMachineType.map((type) => ({
+                          label: type.name,
+                          value: type.id,
+                        }))}
+                        maxHeight={300}
+                        width={20}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={
+                          dataMachineType.find(
+                            (item) =>
+                              item.id_master_machine_types ===
+                              formik.values.id_master_machine_types
+                          )?.name
+                        }
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(item) => {
+                          formik.setFieldValue("id_master_estate", item.value);
+                          console.log(item);
+                        }}
+                      />
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flex: 1,
+                      backgroundColor: "white",
+                      borderWidth: 0.4,
+                      borderColor: "#88888D",
+                      borderRadius: 10,
+                      height: 45,
+                      marginLeft: 10,
+                      marginRight: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.container,
+                        {
+                          justifyContent: "center",
+                          backgroundColor: "white",
+                          flex: 1,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.Abu}>Main Activity </Text>
+                    </View>
+                    <View
+                      style={[styles.container, { backgroundColor: "white" }]}
+                    >
+                      <Dropdown
+                        style={[
+                          styles.dropdown,
+                          isFocus && { borderColor: "" },
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={dataMainActivity.map((mainActivity) => ({
+                          label: mainActivity.name,
+                          value: mainActivity.id_master_main_activities,
+                        }))}
+                        maxHeight={300}
+                        width={40}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={
+                          dataMainActivity.find(
+                            (item) =>
+                              item.id_master_main_activities ===
+                              formik.values.id_master_main_activities
+                          )?.name
+                        }
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(item) => {
+                          setIsFocus(false);
+                          formik.setFieldValue(
+                            "id_master_main_activities",
+                            item.value
+                          );
+                          console.log(item);
+                        }}
+                      />
+                    </View>
+                  </View>
+                  {isEnable ? (
+                    <>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flex: 1,
+                          backgroundColor: "white",
+                          borderWidth: 0.4,
+                          borderColor: "#88888D",
+                          borderRadius: 10,
+                          height: 45,
+                          marginLeft: 10,
+                          marginRight: 10,
+                          marginTop: 10,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <View
+                          style={[
+                            styles.container,
+                            {
+                              justifyContent: "center",
+                              backgroundColor: "white",
+                              flex: 1,
+                            },
+                          ]}
+                        >
+                          <Text style={styles.Abu}>Last HM </Text>
+                        </View>
+                        <View
+                          style={[
+                            styles.container,
+                            { backgroundColor: "white" },
+                          ]}
+                        >
+                          <View
+                            style={[
+                              styles.container,
+                              {
+                                backgroundColor: "white",
+                                justifyContent: "center",
+                                alignItems: "flex-end",
+                                marginRight: 20,
+                              },
+                            ]}
+                          >
+                            <Text style={{ fontSize: 16, color: "#88888D" }}>
+                              XXX
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "center",
+                          flex: 1,
+                          borderWidth: 0.4,
+                          borderColor: "#88888D",
+                          backgroundColor: "white",
+                          borderRadius: 10,
+                          marginBottom: 5,
+                          marginHorizontal: 10,
+                          height: 45,
+                          marginTop: 10,
+                        }}
+                      >
+                        <View
+                          style={[
+                            styles.container,
+                            {
+                              justifyContent: "center",
+                              backgroundColor: "white",
+                              flex: 1,
+                            },
+                          ]}
+                        >
+                          <Text style={styles.Abu}> Current HM </Text>
+                        </View>
+                        <View
+                          style={[
+                            styles.container,
+                            { backgroundColor: "white", marginLeft: -4 },
+                          ]}
+                        >
+                          <View
+                            style={[
+                              styles.containerInput1,
+                              {
+                                alignItems: "flex-end",
+                                justifyContent: "center",
+                                marginTop: 5,
+                              },
+                            ]}
+                          >
+                            <Input
+                              item={{
+                                placeholder: " XXX ",
+                              }}
+                              style={{ borderWidth: 0.5 }}
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </>
+                  ) : null}
 
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      marginHorizontal: 5,
+                      marginVertical: 3,
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.container,
+                        { justifyContent: "center", flex: 1 },
+                      ]}
+                    >
+                      <Text style={{ opacity: 0.4 }}>Computer HM ? </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        marginHorizontal: 10,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row ",
+                          alignContent: "center",
+                          marginVertical: 2,
+                        }}
+                      >
+                        <Switch
+                          trackColor={{ false: "#FB9797", true: "#CAE6CA" }}
+                          // tumbColor={isEnable ? "red" : "green"}
+                          onValueChange={toggleSwitch}
+                          value={isEnable}
+                        />
+                        <Text style={{ color: "#AFAFAF" }}>
+                          {isEnable ? "on" : "off"}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                <View
+                  style={[styles.container, { paddingVertical: 10 }]}
+                ></View>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  borderRadius: 20,
+                  flex: 1,
+                }}
+              >
+                <View style={[styles.atas, { borderRadius: 10 }]}>
+                  <View
+                    style={[
+                      styles.containerInput,
+                      { backgroundColor: "#D8D8D8" },
+                    ]}
+                  >
+                    <Input
+                      item={{
+                        height: 200,
+                        marginHorizontal: 20,
+                        label: "Keterangan",
+                        placeholder: "Maintainance to Workshop for Repairment",
+                      }}
+                      input={{ backgroundColor: "black" }}
+                    />
+                  </View>
+                </View>
+              </View>
               <View
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  flexDirection: "row",
-                  marginHorizontal: 5,
-                  marginVertical: 3,
+                  marginTop: 10,
+                  marginBottom: 20,
+                  marginHorizontal: 20,
                 }}
               >
-                <View
-                  style={[
-                    styles.container,
-                    { justifyContent: "center", flex: 1 },
-                  ]}
-                >
-                  <Text style={{ opacity: 0.4 }}>Computer HM ? </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    marginHorizontal: 10,
-                    justifyContent: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                      flexDirection: "row ",
-                      alignContent: "center",
-                      marginVertical: 2,
-                    }}
-                  >
-                    <Switch
-                      trackColor={{ false: "#FB9797", true: "#CAE6CA" }}
-                      // tumbColor={isEnable ? "red" : "green"}
-                      onValueChange={toggleSwitch}
-                      value={isEnable}
-                    />
-                    <Text style={{ color: "#AFAFAF" }}>
-                      {isEnable ? "on" : "off"}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-            <View style={[styles.container, { paddingVertical: 10 }]}></View>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              borderRadius: 20,
-              flex: 1,
-            }}
-          >
-            <View style={[styles.atas, { borderRadius: 10 }]}>
-              <View
-                style={[styles.containerInput, { backgroundColor: "#D8D8D8" }]}
-              >
-                <Input
+                <Button
                   item={{
-                    height: 200,
-                    marginHorizontal: 20,
-                    label: "Keterangan",
-                    placeholder: "Maintainance to Workshop for Repairment",
+                    title: "Submit",
+                    backgroundcolor: "#8296FF",
+                    textcolor: "#FFFFFF",
+                    width: "100%",
+                    justifyContent: "center",
+                    onPress: () => handleSubmit("Home"),
                   }}
-                  input={{ backgroundColor: "black" }}
                 />
               </View>
-            </View>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              marginTop: 10,
-              marginBottom: 20,
-              marginHorizontal: 20,
-            }}
-          >
-            <Button
-              item={{
-                title: "Submit",
-                backgroundcolor: "#8296FF",
-                textcolor: "#FFFFFF",
-                width: "100%",
-                justifyContent: "center",
-                onPress: () => navigation.navigate(""),
-              }}
-            />
-          </View>
-        </ScrollView>
+            </ScrollView>
+          )}
+        </Formik>
       </RefreshControl>
     </SafeAreaView>
   );

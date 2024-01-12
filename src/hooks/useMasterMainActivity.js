@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
+import MasterSector from "../assets/Model/master_sectors";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { database } from "../assets/Model/db";
 import API from "../function/API";
 import dayjs from "dayjs";
 import MasterMainActivities from "../assets/Model/master_main_activity";
 
-export const useMasterMainActivity = ({isGetData}) => {
+export const useMasterMainActivity = ({ isGetData }) => {
   // const . cari connected atau tidak
   // setelah itu useEffect untuk ambil data dari API jika connected, jika tidak ambil data dari WatermelonDB
   const [connected, setConnected] = useState(undefined);
@@ -40,9 +41,9 @@ export const useMasterMainActivity = ({isGetData}) => {
       .get(MasterMainActivities.table)
       .query()
       .observe()
-      .subscribe((masterMainActivity) => {
-        console.log("masterMainActivity", );
-        setData(masterMainActivity.map((masterMainActivity) => masterMainActivity._raw));
+      .subscribe((mainActivity) => {
+        console.log("mainActivity", );
+        setData(mainActivity.map((mainActivity) => mainActivity._raw));
         setIsLoading(false);
       });
     return allMainActivity;
@@ -58,8 +59,6 @@ export const useMasterMainActivity = ({isGetData}) => {
       const mainActivity = getAllMainActivity();
       return () => mainActivity.unsubscribe();
     }
-    // const mainActivity = getAllMainActivity();
-    // return () => mainActivity.unsubscribe();
   }, []);
 
   return { data, connected, isLoading, fetching };

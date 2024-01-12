@@ -21,6 +21,7 @@ export const useMasterMachine = ({ isGetData }) => {
           JSON.stringify(migration)
         )}`;
         const response = await API.get(`master_machine/sync?${urlParams}`);
+      
         // console.log(JSON.stringify(response, null, 2));
 
         // Check if the request was successful
