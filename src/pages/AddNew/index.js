@@ -11,7 +11,7 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import { Button, DropdownComp, Input } from "../../component";
+import { Button, DropdownComp, Input, InputData } from "../../component";
 import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 // import {color} from "../..variabel";
 import "dayjs/locale/id";
@@ -168,7 +168,6 @@ const AddNew = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
-      {/* <Text>{JSON.stringify(dataSector)}</Text> */}
       <RefreshControl>
         <Formik
           initialValues={
@@ -176,7 +175,6 @@ const AddNew = ({ navigation }) => {
               // id_master_sector, id_master_company, date
             }
           }
-          // validationSchema={schema}
           onSubmit={async (values) => {}}
         >
           {({
@@ -372,67 +370,17 @@ const AddNew = ({ navigation }) => {
                       },
                     }}
                   />
-                  <Input
-                    titleInput="Compartement ID"
+                  <InputData
+                    Title="Compartement ID"
                     item={{
-                      placeholder: " XXX ",
+                      placeholder: "XXX",
+                      value: formik.values.compartement_id,
                     }}
-                    value={formik.values.compartement_id}
-                    style={{ borderWidth: 0.5 }}
+                    buttonStyle={{
+                      borderWidth: 0.1,
+                      borderColor: "#DDDDDD",
+                    }}
                   />
-                  {/* <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      flex: 1,
-                      borderWidth: 0.4,
-                      borderColor: "#88888D",
-                      backgroundColor: "white",
-                      borderRadius: 10,
-                      marginBottom: 5,
-                      marginHorizontal: 10,
-                      height: 45,
-                      marginTop: 10,
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.container,
-                        {
-                          justifyContent: "center",
-                          backgroundColor: "white",
-                          flex: 1,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.Abu}>Compartement ID </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.container,
-                        { backgroundColor: "white", marginLeft: -4 },
-                      ]}
-                    >
-                      <View
-                        style={[
-                          styles.containerInput1,
-                          {
-                            alignItems: "flex-end",
-                            justifyContent: "center",
-                            marginTop: 5,
-                          },
-                        ]}
-                      >
-                        <Input
-                          item={{
-                            placeholder: " XXX ",
-                          }}
-                          values
-                          style={{ borderWidth: 0.5 }}
-                        />
-                      </View>
-                    </View>
-                  </View> */}
                   <DropdownComp
                     title="Machine Type"
                     item={{
@@ -529,67 +477,16 @@ const AddNew = ({ navigation }) => {
                           </View>
                         </View>
                       </View>
-                      {/* <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "center",
-                          flex: 1,
-                          borderWidth: 0.4,
-                          borderColor: "#88888D",
-                          backgroundColor: "white",
-                          borderRadius: 10,
-                          marginBottom: 5,
-                          marginHorizontal: 10,
-                          height: 45,
-                          marginTop: 10,
+                      <InputData
+                        Title="Current HM"
+                        item={{
+                          placeholder: "XXX",
+                          value: formik.values.hm_current,
                         }}
-                      >
-                        <View
-                          style={[
-                            styles.container,
-                            {
-                              justifyContent: "center",
-                              backgroundColor: "white",
-                              flex: 1,
-                            },
-                          ]}
-                        >
-                          <Text style={styles.Abu}> Current HM </Text>
-                        </View>
-                        <View
-                          style={[
-                            styles.container,
-                            { backgroundColor: "white", marginLeft: -4 },
-                          ]}
-                        >
-                          <View
-                            style={[
-                              styles.containerInput1,
-                              {
-                                alignItems: "flex-end",
-                                justifyContent: "center",
-                                marginTop: 5,
-                              },
-                            ]}
-                          >
-                            <Input
-                              item={{
-                                placeholder: " XXX ",
-                              }}
-                              value={formik.values.hm_current}
-                              style={{ borderWidth: 0.5 }}
-                            />
-                          </View>
-                        </View> */}
-                      {/* </View> */}
-                      <Input
-                    titleInput="HM Current"
-                    item={{
-                      placeholder: " XXX ",
-                    }}
-                    values
-                    style={{ borderWidth: 0.5 }}
-                  />
+                        buttonStyle={{
+                          borderColor: "#DDDDDD",
+                        }}
+                      />
                     </>
                   ) : null}
 
@@ -660,11 +557,10 @@ const AddNew = ({ navigation }) => {
                   >
                     <Input
                       item={{
-                        height: 200,
-                        marginHorizontal: 20,
                         label: "Keterangan",
                         placeholder: "Maintainance to Workshop for Repairment",
                         value: formik.values.keterangan,
+                        backgroundColor: "red",
                       }}
                       input={{ backgroundColor: "black" }}
                     />
@@ -745,33 +641,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     flex: 1,
   },
-  Container_bar: {
-    flexDirection: "row",
-    backgroundColor: "white",
-    alignItems: "center",
-    justifyContent: "space-around",
-    borderRadius: 24,
-    shadowColor: "#000",
-    height: 40,
-    width: 300,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 6,
-    marginTop: -40,
-  },
-
-  IsiContent: {
-    flexDirection: "row",
-    marginVertical: 5,
-  },
-  IsiText: {
-    fontSize: 12,
-    fontFamily: "Poppins",
-  },
   button_waktu: {
     width: "93%",
     marginTop: 10,
@@ -803,31 +672,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 8,
   },
-  container1: {
-    justifyContent: "center",
-  },
-  Compartement_input1: {
-    flexDirection: "row",
-    flex: 1,
-    backgroundColor: "white",
-    borderRadius: 10,
-    height: 40,
-    marginLeft: 10,
-    borderColor: "black",
-    marginTop: 10,
-    shadowColor: "#000",
-    flex: 1,
-    backgroundColor: "#D8D8D8",
-    opacity: 0.5,
-    marginRight: 10,
-    marginVertical: 5,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignContent: "center",
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
   MechInfo: {
     flex: 1,
     width: "95%",
@@ -844,31 +688,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginHorizontal: 5,
   },
-  dropdown: {
-    height: 40,
-    borderWidth: 0.5,
-    backgroundColor: "white",
-    opacity: 0.4,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  dropdownMech: {
-    height: 40,
-    flex: 1,
-    backgroundColor: "#D8D8D8",
-    opacity: 0.4,
-    marginVertical: 5,
-    borderRadius: 25,
-    justifyContent: "center",
-    alignContent: "center",
-    width: "95%",
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  icon: {
-    marginRight: 5,
-  },
   label: {
     position: "absolute",
     backgroundColor: "white",
@@ -877,16 +696,6 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 8,
     fontSize: 14,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
   },
   atas: {
     flex: 1,
@@ -914,29 +723,6 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
 
-  Compartement_input: {
-    flexDirection: "row",
-    backgroundColor: "white",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    height: 40,
-    marginLeft: 10,
-    borderColor: "black",
-    marginTop: 10,
-    shadowColor: "#000",
-    height: 40,
-    flex: 1,
-    backgroundColor: "#D8D8D8",
-    opacity: 0.5,
-    marginRight: 10,
-    marginVertical: 5,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignContent: "center",
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
   centeredView: {
     flex: 1,
     justifyContent: "center",
@@ -987,12 +773,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 10,
   },
-  containerInput1: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    marginHorizontal: 10,
-  },
   Abu: {
     color: "#88888D",
   },
@@ -1001,20 +781,5 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     marginHorizontal: 10,
-  },
-  containerInput1: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    marginHorizontal: 10,
-  },
-  dropdown: {
-    height: 40,
-    // borderColor: 'gray',
-    // borderWidth: 0.5,
-    backgroundColor: "white",
-    opacity: 0.4,
-    borderRadius: 8,
-    paddingHorizontal: 8,
   },
 });

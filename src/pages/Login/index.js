@@ -44,7 +44,7 @@ const Login = ({ navigation }) => {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, alignContent: "center" }}
@@ -80,6 +80,10 @@ const Login = ({ navigation }) => {
                     marginBottom: 10,
                     placeholder: "Isi SAP",
                   }}
+                  buttonStyle={{
+                    borderWidth: 0.5,
+                    borderColor: "#DDDDDD",
+                  }}
                 />
                 {formik.errors.SAP
                   ? () => {
@@ -95,6 +99,10 @@ const Login = ({ navigation }) => {
                     label: "Password",
                     // value: values.password,
                     placeholder: "Password",
+                  }}
+                  buttonStyle={{
+                    borderWidth: 0.5,
+                    borderColor: "#DDDDDD",
                   }}
                 />
                 {formik.errors.password

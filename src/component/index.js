@@ -3,6 +3,7 @@ import Header from './Header';
 import Button from './Button';
 import Input from './Input'
 import DropdownComp from './DropdownComp';
+import InputData from './InputData'
 
 
 export  {
@@ -10,5 +11,6 @@ export  {
     Input,
     Header,
     Button,
-    DropdownComp
+    DropdownComp,
+    InputData
 }
