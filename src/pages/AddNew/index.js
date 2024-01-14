@@ -11,7 +11,7 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import { Button, Input } from "../../component";
+import { Button, DropdownComp, Input } from "../../component";
 import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 // import {color} from "../..variabel";
 import "dayjs/locale/id";
@@ -27,14 +27,16 @@ import {
   useMasterLog,
 } from "../../hooks";
 import { Formik, useFormik } from "formik";
+import MasterSector from "../../assets/Model/master_sectors";
+import MasterLogActivity from "../../assets/Model/master_log_activity";
 
 const AddNew = ({ navigation }) => {
-// let schema = yup.object().shape({
-//   id_master_sector: yup.string().required("Required"),
-//   hm_current : yup.string().required("Mohon masukkan format yang benar"),
-//   id_master_company: yup.string().required("Required"),
-//   Date: yup.string().required("Required"),
-// });
+  // let schema = yup.object().shape({
+  //   id_master_sector: yup.string().required("Required"),
+  //   hm_current : yup.string().required("Mohon masukkan format yang benar"),
+  //   id_master_company: yup.string().required("Required"),
+  //   Date: yup.string().required("Required"),
+  // });
 
   const {
     data: dataSector,
@@ -126,8 +128,39 @@ const AddNew = ({ navigation }) => {
     }
   };
   const formik = useFormik({
-    initialValues: { id_master_sector: "", id_master_company: "", Date: "" },
-    onSubmit: (values) => {
+    initialValues: {
+      id_master_sector: "",
+      id_master_company: "",
+      Date: "",
+      keterangan: "",
+      hm_current: "",
+      id_master_machine: "",
+      id_master_estate: "",
+      id_master_machine_types: "",
+      id_master_main_activities: "",
+    },
+    onSubmit: async (values) => {
+      await database.write(async () => {
+        const masterLog = await database
+          .get(MasterLogActivity.table)
+          .create((master_log_activities) => {
+            master_log_activities.id_master_sector = values.id_master_sector;
+            master_log_activities.id_master_company = values.id_master_company;
+            master_log_activities.date = values.Date;
+            master_log_activities.keterangan = values.keterangan;
+            master_log_activities.hm_current = values.hm_current;
+            master_log_activities.id_master_machine = values.id_master_machine;
+            master_log_activities.id_master_estate = values.id_master_estate;
+            master_log_activities.id_master_machine_types =
+              values.id_master_machine_types;
+            master_log_activities.id_master_main_activities =
+              values.id_master_main_activities;
+            // sector.isSynced = true;
+            // sector.isConnected = true;
+          });
+
+        return masterLog;
+      });
       console.log(values);
     },
   });
@@ -138,9 +171,11 @@ const AddNew = ({ navigation }) => {
       {/* <Text>{JSON.stringify(dataSector)}</Text> */}
       <RefreshControl>
         <Formik
-          initialValues={{ 
-            // id_master_sector, id_master_company, date 
-          }}
+          initialValues={
+            {
+              // id_master_sector, id_master_company, date
+            }
+          }
           // validationSchema={schema}
           onSubmit={async (values) => {}}
         >
@@ -195,7 +230,7 @@ const AddNew = ({ navigation }) => {
                           <DatePicker
                             onSelectedChange={(date) => setSelectedDate(date)}
                             mode="calendar"
-                            display = "spinner"
+                            display="spinner"
                             minimumDate={startDate}
                             selected={date}
                             onDateChange={handleChangeDate}
@@ -217,132 +252,45 @@ const AddNew = ({ navigation }) => {
                       <Text style={styles.textStyle}>Pilih Tanggal</Text>
                     </Pressable>
                   </View>
-                  <View style={[styles.MechInfo]}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        flex: 1,
-                        backgroundColor: "white",
-                        borderWidth: 0.4,
-                        borderColor: "#88888D",
-                        borderRadius: 10,
-                        height: 45,
-                        marginLeft: 5,
-                        marginBottom: 10,
-                      }}
-                    >
-                      <View
-                        style={[
-                          styles.container,
-                          {
-                            justifyContent: "center",
-                            backgroundColor: "white",
-                            flex: 1,
-                          },
-                        ]}
-                      >
-                        <Text style={styles.Abu}>Company </Text>
-                      </View>
-                      <View
-                        style={[styles.container, { backgroundColor: "white" }]}
-                      >
-                        <Dropdown
-                          style={[styles.dropdown]}
-                          placeholderStyle={styles.placeholderStyle}
-                          selectedTextStyle={styles.selectedTextStyle}
-                          iconStyle={styles.iconStyle}
-                          data={dataCompany.map((company) => ({
-                            label: company.name,
-                            value: company.id_master_company,
-                          }))}
-                          maxHeight={300}
-                          width={40}
-                          labelField="label"
-                          valueField="value"
-                          placeholder={
-                            dataCompany.find(
-                              (item) =>
-                                item.id_master_company ===
-                                formik.values.id_master_company
-                            )?.name
-                          }
-                          onFocus={() => setIsFocus(true)}
-                          onBlur={() => setIsFocus(false)}
-                          onChange={(item) => {
-                            setIsFocus(false);
-                            formik.setFieldValue(
-                              "id_master_company",
-                              item.value
-                            );
-                            console.log(item);
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View style={[styles.MechInfo]}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        flex: 1,
-                        backgroundColor: "white",
-                        borderWidth: 0.4,
-                        borderColor: "#88888D",
-                        borderRadius: 10,
-                        height: 45,
-                        marginLeft: 5,
-                        marginBottom: 5,
-                      }}
-                    >
-                      <View
-                        style={[
-                          styles.container,
-                          {
-                            justifyContent: "center",
-                            backgroundColor: "white",
-                            flex: 1,
-                          },
-                        ]}
-                      >
-                        <Text style={styles.Abu}>Sector </Text>
-                      </View>
-                      <View
-                        style={[styles.container, { backgroundColor: "white" }]}
-                      >
-                        <Dropdown
-                          style={[styles.dropdown]}
-                          placeholderStyle={styles.placeholderStyle}
-                          selectedTextStyle={styles.selectedTextStyle}
-                          iconStyle={styles.iconStyle}
-                          data={dataSector.map((sector) => ({
-                            label: sector.name,
-                            value: sector.id_master_sectors,
-                          }))}
-                          maxHeight={300}
-                          width={40}
-                          labelField="label"
-                          valueField="value"
-                          placeholder={
-                            dataSector.find(
-                              (item) =>
-                                item.id_master_sectors ===
-                                formik.values.id_master_sector
-                            )?.name
-                          }
-                          onFocus={() => setIsFocus(true)}
-                          onBlur={() => setIsFocus(false)}
-                          onChange={(item) => {
-                            setIsFocus(false);
-                            formik.setFieldValue(
-                              "id_master_sector",
-                              item.value
-                            );
-                            console.log(item);
-                          }}
-                        />
-                      </View>
-                    </View>
-                  </View>
+                  <DropdownComp
+                    title="Company"
+                    item={{
+                      props: dataCompany.map((company) => ({
+                        label: company.name,
+                        value: company.id_master_company,
+                      })),
+                      placeholder: dataCompany.find(
+                        (item) =>
+                          item.id_master_company ===
+                          formik.values.id_master_company
+                      )?.name,
+                      onchange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_company", item.value);
+                        console.log(item);
+                      },
+                    }}
+                  />
+                  <DropdownComp
+                    title="Sector"
+                    item={{
+                      props: dataSector.map((sector) => ({
+                        label: sector.name,
+                        value: sector.id_master_sectors,
+                      })),
+                      placeholder: dataSector.find(
+                        (item) =>
+                          item.id_master_sectors ===
+                          formik.values.id_master_sector
+                      )?.name,
+                      onchange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_sector", item.value);
+                        console.log(item);
+                      },
+                    }}
+                  />
+
                   <View style={[styles.button_waktu1]}>
                     <Button
                       buttonStyle={{
@@ -386,129 +334,53 @@ const AddNew = ({ navigation }) => {
                   Machine Information
                 </Text>
                 <View style={[styles.MechInfo]}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      flex: 1,
-                      backgroundColor: "white",
-                      borderWidth: 0.4,
-                      borderColor: "#88888D",
-                      borderRadius: 10,
-                      height: 45,
-                      marginLeft: 10,
-                      marginRight: 10,
-                      marginTop: 10,
-                      marginBottom: 5,
+                  <DropdownComp
+                    title="Machine ID"
+                    item={{
+                      props: dataMachine.map((machine) => ({
+                        label: machine.machine_id,
+                        value: machine.id_master_machine,
+                      })),
+                      placeholder: dataMachine.find(
+                        (item) =>
+                          item.id_master_machine ===
+                          formik.values.id_master_machine
+                      )?.name,
+                      onchange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_machine", item.value);
+                        console.log(item);
+                      },
                     }}
-                  >
-                    <View
-                      style={[
-                        styles.container,
-                        {
-                          justifyContent: "center",
-                          backgroundColor: "white",
-                          flex: 1,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.Abu}>Machine Id </Text>
-                    </View>
-                    <View
-                      style={[styles.container, { backgroundColor: "white" }]}
-                    >
-                      <Dropdown
-                        style={[styles.dropdown]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        iconStyle={styles.iconStyle}
-                        data={dataMachine.map((machine) => ({
-                          label: machine.machine_id,
-                          value: machine.id_master_machine,
-                        }))}
-                        maxHeight={300}
-                        width={40}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={
-                          dataMachine.find(
-                            (item) =>
-                              item.id_master_machine ===
-                              formik.values.id_master_machine
-                          )?.name
-                        }
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={(item) => {
-                          setIsFocus(false);
-                          formik.setFieldValue("id_master_machine", item.value);
-                          console.log(item);
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      flex: 1,
-                      backgroundColor: "white",
-                      borderWidth: 0.4,
-                      borderColor: "#88888D",
-                      borderRadius: 10,
-                      height: 45,
-                      marginLeft: 10,
-                      marginRight: 10,
-                      marginTop: 10,
-                      marginBottom: 5,
+                  />
+                  <DropdownComp
+                    title="Estate"
+                    item={{
+                      props: dataEstate.map((estate) => ({
+                        label: estate.name,
+                        value: estate.id_master_estate,
+                      })),
+                      placeholder: dataEstate.find(
+                        (item) =>
+                          item.id_master_estate ===
+                          formik.values.id_master_estate
+                      )?.name,
+                      onchange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_estate", item.value);
+                        console.log(item);
+                      },
                     }}
-                  >
-                    <View
-                      style={[
-                        styles.container,
-                        {
-                          justifyContent: "center",
-                          backgroundColor: "white",
-                          flex: 1,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.Abu}>Estate </Text>
-                    </View>
-                    <View
-                      style={[styles.container, { backgroundColor: "white" }]}
-                    >
-                      <Dropdown
-                        style={[
-                          styles.dropdown,
-                          isFocus && { borderColor: "" },
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        iconStyle={styles.iconStyle}
-                        data={dataEstate.map((estate) => ({
-                          label: estate.name,
-                          value: estate.id,
-                        }))}
-                        maxHeight={300}
-                        width={20}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={
-                          dataEstate.find(
-                            (item) =>
-                              item.id_master_estate ===
-                              formik.values.id_master_estate
-                          )?.name
-                        }
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={(item) => {
-                          formik.setFieldValue("id_master_estate", item.value);
-                          console.log(item);
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View
+                  />
+                  <Input
+                    titleInput="Compartement ID"
+                    item={{
+                      placeholder: " XXX ",
+                    }}
+                    value={formik.values.compartement_id}
+                    style={{ borderWidth: 0.5 }}
+                  />
+                  {/* <View
                     style={{
                       flexDirection: "row",
                       justifyContent: "center",
@@ -555,139 +427,56 @@ const AddNew = ({ navigation }) => {
                           item={{
                             placeholder: " XXX ",
                           }}
+                          values
                           style={{ borderWidth: 0.5 }}
                         />
                       </View>
                     </View>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      flex: 1,
-                      backgroundColor: "white",
-                      borderWidth: 0.4,
-                      borderColor: "#88888D",
-                      borderRadius: 10,
-                      height: 45,
-                      marginLeft: 10,
-                      marginRight: 10,
-                      marginTop: 10,
-                      marginBottom: 5,
+                  </View> */}
+                  <DropdownComp
+                    title="Machine Type"
+                    item={{
+                      props: dataMachineType.map((type) => ({
+                        label: type.name,
+                        value: type.id_master_machine_types,
+                      })),
+                      placeholder: dataMachineType.find(
+                        (item) =>
+                          item.id_master_machine_types ===
+                          formik.values.id_master_machine_types
+                      )?.name,
+                      onchange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue(
+                          "id_master_machine_types",
+                          item.value
+                        );
+                        console.log(item);
+                      },
                     }}
-                  >
-                    <View
-                      style={[
-                        styles.container,
-                        {
-                          justifyContent: "center",
-                          backgroundColor: "white",
-                          flex: 1,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.Abu}>Type </Text>
-                    </View>
-                    <View
-                      style={[styles.container, { backgroundColor: "white" }]}
-                    >
-                      <Dropdown
-                        style={[
-                          styles.dropdown,
-                          isFocus && { borderColor: "" },
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        iconStyle={styles.iconStyle}
-                        data={dataMachineType.map((type) => ({
-                          label: type.name,
-                          value: type.id,
-                        }))}
-                        maxHeight={300}
-                        width={20}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={
-                          dataMachineType.find(
-                            (item) =>
-                              item.id_master_machine_types ===
-                              formik.values.id_master_machine_types
-                          )?.name
-                        }
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={(item) => {
-                          formik.setFieldValue("id_master_estate", item.value);
-                          console.log(item);
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      flex: 1,
-                      backgroundColor: "white",
-                      borderWidth: 0.4,
-                      borderColor: "#88888D",
-                      borderRadius: 10,
-                      height: 45,
-                      marginLeft: 10,
-                      marginRight: 10,
-                      marginTop: 10,
-                      marginBottom: 10,
+                  />
+                  <DropdownComp
+                    title="Main Activity"
+                    item={{
+                      props: dataMainActivity.map((mainActivity) => ({
+                        label: mainActivity.name,
+                        value: mainActivity.id_master_main_activities,
+                      })),
+                      placeholder: dataMainActivity.find(
+                        (item) =>
+                          item.id_master_main_activities ===
+                          formik.values.id_master_main_activities
+                      )?.name,
+                      onchange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue(
+                          "id_master_main_activities",
+                          item.value
+                        );
+                        console.log(item);
+                      },
                     }}
-                  >
-                    <View
-                      style={[
-                        styles.container,
-                        {
-                          justifyContent: "center",
-                          backgroundColor: "white",
-                          flex: 1,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.Abu}>Main Activity </Text>
-                    </View>
-                    <View
-                      style={[styles.container, { backgroundColor: "white" }]}
-                    >
-                      <Dropdown
-                        style={[
-                          styles.dropdown,
-                          isFocus && { borderColor: "" },
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        iconStyle={styles.iconStyle}
-                        data={dataMainActivity.map((mainActivity) => ({
-                          label: mainActivity.name,
-                          value: mainActivity.id_master_main_activities,
-                        }))}
-                        maxHeight={300}
-                        width={40}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={
-                          dataMainActivity.find(
-                            (item) =>
-                              item.id_master_main_activities ===
-                              formik.values.id_master_main_activities
-                          )?.name
-                        }
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
-                        onChange={(item) => {
-                          setIsFocus(false);
-                          formik.setFieldValue(
-                            "id_master_main_activities",
-                            item.value
-                          );
-                          console.log(item);
-                        }}
-                      />
-                    </View>
-                  </View>
+                  />
                   {isEnable ? (
                     <>
                       <View
@@ -740,7 +529,7 @@ const AddNew = ({ navigation }) => {
                           </View>
                         </View>
                       </View>
-                      <View
+                      {/* <View
                         style={{
                           flexDirection: "row",
                           justifyContent: "center",
@@ -787,11 +576,20 @@ const AddNew = ({ navigation }) => {
                               item={{
                                 placeholder: " XXX ",
                               }}
+                              value={formik.values.hm_current}
                               style={{ borderWidth: 0.5 }}
                             />
                           </View>
-                        </View>
-                      </View>
+                        </View> */}
+                      {/* </View> */}
+                      <Input
+                    titleInput="HM Current"
+                    item={{
+                      placeholder: " XXX ",
+                    }}
+                    values
+                    style={{ borderWidth: 0.5 }}
+                  />
                     </>
                   ) : null}
 
@@ -866,6 +664,7 @@ const AddNew = ({ navigation }) => {
                         marginHorizontal: 20,
                         label: "Keterangan",
                         placeholder: "Maintainance to Workshop for Repairment",
+                        value: formik.values.keterangan,
                       }}
                       input={{ backgroundColor: "black" }}
                     />
@@ -976,7 +775,7 @@ const styles = StyleSheet.create({
   button_waktu: {
     width: "93%",
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 5,
     marginLeft: 10,
     height: 45,
     justifyContent: "center",

@@ -13,6 +13,8 @@ import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Dropdown } from "react-native-element-dropdown";
 import API from "../../function/API";
+import { useMasterCompany, useMasterMachineType, useMasterMainActivity } from "../../hooks";
+import { Formik, useFormik } from "formik";
 
 const master_machine_type = [
   { label: "Barging Jumbo", value: "1" },
@@ -36,18 +38,48 @@ const master_main_activity = [
   { label: "Item 8", value: "8" },
 ];
 
-const company = [
-  { label: "PTSI", value: "1" },
-  { label: "Item 2", value: "2" },
-  { label: "Item 3", value: "3" },
-  { label: "Item 4", value: "4" },
-  { label: "Item 5", value: "5" },
-  { label: "Item 6", value: "6" },
-  { label: "Item 7", value: "7" },
-  { label: "Item 8", value: "8" },
-];
+// const company = [
+//   { label: "PTSI", value: "1" },
+//   { label: "Item 2", value: "2" },
+//   { label: "Item 3", value: "3" },
+//   { label: "Item 4", value: "4" },
+//   { label: "Item 5", value: "5" },
+//   { label: "Item 6", value: "6" },
+//   { label: "Item 7", value: "7" },
+//   { label: "Item 8", value: "8" },
+// ];
 
 const Register = () => {
+  const {
+    data: dataCompany,
+    isLoading: isLoadingCompany,
+    connected: connectedMasterCompany,
+  } = useMasterCompany({ isGetData: true });
+  console.log("data Company", dataCompany.length);
+
+  const {
+    data: dataMainActivity,
+    isLoading: isLoadingMainActivity,
+    connected: connectedMasterMainActivity,
+  } = useMasterMainActivity({ isGetData: true });
+  console.log("data Main Activity", dataMainActivity.length);
+  // console.log(JSON.stringify(dataMainActivity, null, 2));
+
+  const {
+    data: dataMachineType,
+    isLoading: isLoadingMachineType,
+    connected: connectedMasterMachineType,
+  } = useMasterMachineType({ isGetData: true });
+  console.log("data Machine Type", dataMachineType.length);
+  // console.log(JSON.stringify(dataMachineType, null, 2));
+
+  const formik = useFormik({
+    initialValues: { id_master_sector: "", id_master_company: "", Date: "" },
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
+
   // const queryClient = useQueryClient();
   // // Queries
   // const postRegisterMachine = () => {
@@ -188,21 +220,31 @@ const Register = () => {
               </View>
               <View style={[styles.container, { backgroundColor: "white" }]}>
                 <Dropdown
-                  style={[styles.dropdown, isFocus && { borderColor: "" }]}
+                  style={[styles.dropdown]}
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
                   iconStyle={styles.iconStyle}
-                  data={company}
+                  data={dataCompany.map((company) => ({
+                    label: company.name,
+                    value: company.id_master_company,
+                  }))}
                   maxHeight={300}
                   width={40}
                   labelField="label"
                   valueField="value"
-                  placeholder={!isFocus ? " PTSI" : ""}
-                  value={company}
+                  placeholder={
+                    dataCompany.find(
+                      (item) =>
+                        item.id_master_company ===
+                        formik.values.id_master_company
+                    )?.name
+                  }
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={(item) => {
                     setIsFocus(false);
+                    formik.setFieldValue("id_master_company", item.value);
+                    console.log(item);
                   }}
                 />
               </View>
@@ -355,18 +397,26 @@ const Register = () => {
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
                   iconStyle={styles.iconStyle}
-                  data={master_machine_type}
+                  data={dataMachineType.map((type) => ({
+                    label: type.name,
+                    value: type.id_master_machine_types,
+                  }))}
                   maxHeight={300}
-                  width={40}
+                  width={20}
                   labelField="label"
                   valueField="value"
-                  placeholder={!isFocus ? " Fix Grapple" : ""}
-                  value={master_machine_type}
+                  placeholder={
+                    dataMachineType.find(
+                      (item) =>
+                        item.id_master_machine_types ===
+                        formik.values.id_master_machine_types
+                    )?.name
+                  }
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={(item) => {
-                    // setSelectedValueMachineType(item.value);
-                    setIsFocus(false);
+                    formik.setFieldValue("id_master_machine_types", item.value);
+                    console.log(item);
                   }}
                 />
               </View>
@@ -400,18 +450,30 @@ const Register = () => {
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
                   iconStyle={styles.iconStyle}
-                  data={master_main_activity || []}
+                  data={dataMainActivity.map((mainActivity) => ({
+                    label: mainActivity.name,
+                    value: mainActivity.id_master_main_activities,
+                  }))}
                   maxHeight={300}
                   width={40}
                   labelField="label"
                   valueField="value"
-                  placeholder={!isFocus ? " Loading" : ""}
-                  value={master_machine_type}
+                  placeholder={
+                    dataMainActivity.find(
+                      (item) =>
+                        item.id_master_main_activities ===
+                        formik.values.id_master_main_activities
+                    )?.name
+                  }
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={(item) => {
-                    // setSelectedValueMainActivity(item.value);
                     setIsFocus(false);
+                    formik.setFieldValue(
+                      "id_master_main_activities",
+                      item.value
+                    );
+                    console.log(item);
                   }}
                 />
               </View>

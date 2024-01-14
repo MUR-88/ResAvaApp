@@ -7,7 +7,7 @@ export default class MasterLogActivity extends Model {
   static associations = {
     masterCompany: {
       type: "belongs_to",
-      key: "master_company_id",
+      key: "id_master_company",
     },
     masterMainActivity: {
       type: "belongs_to",

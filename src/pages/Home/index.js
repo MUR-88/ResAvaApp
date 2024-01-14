@@ -39,7 +39,7 @@ const Home = ({ navigation }) => {
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
   console.log("data Log", dataMasterLog.length);
-  console.log(JSON.stringify(dataMasterLog, null, 2));
+  // console.log(JSON.stringify(dataMasterLog, null, 2));
 
   async function mySync() {
     try {
@@ -52,7 +52,7 @@ const Home = ({ navigation }) => {
           const response = await API.get(
             `master_machine_type/sync?${urlParams}`
           );
-          console.log(JSON.stringify(response, null, 2));
+          // console.log(JSON.stringify(response, null, 2));
 
           // Check if the request was successful
           if (response.status_code !== 200) {
@@ -247,7 +247,7 @@ const Home = ({ navigation }) => {
               <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
                 <Text>Sync</Text>
               </TouchableOpacity>
-              {dataMasterLog.map((logActivity, index) => (
+              {dataMasterLog.map((item, index) => (
                 <View style={[styles.Isi]}>
                   <View
                     style={{
@@ -303,17 +303,16 @@ const Home = ({ navigation }) => {
                     />
                     <View style={{ flex: 1 }}>
                       <View>
-                        <Text>ID: {logActivity.id_master_log_activivty}</Text>
-                        <Text>Name: {logActivity.master_company_id}</Text>
-                        <Text>Brand: {logActivity.brand}</Text>
-                        <Text>Sync: {logActivity.isSync}</Text>
+                        <Text>ID: {item.id}</Text>
+                        <Text>Name: {item.master_company_id}</Text>
+                        <Text>Brand: {item.brand}</Text>
+                        <Text>Sync: {item.isSync}</Text>
                         <Text>
-                          Create: {dayjs(logActivity.last_pulled_at).locale('id').format("DD/MMM/YYYY ")}
-                          {/* {dayjs(sector.deleted_at)
+                          Create:{" "}
+                          {dayjs(item.last_pulled_at)
                             .locale("id")
-                            .format("DD/MMM/YYYY ")} */}
+                            .format("DD/MMM/YYYY ")}
                         </Text>
-
                         {/* Add more fields as needed */}
                         <Text style={[styles.IsiText, { fontWeight: 900 }]}>
                           {/* {company.name} */}
@@ -326,9 +325,9 @@ const Home = ({ navigation }) => {
                           { fontSize: 10, marginVertical: 2 },
                         ]}
                       >
-                        {/* {dayjs(sector.created_at)
+                        {dayjs(item.last_pulled_at)
                           .locale("id")
-                          .format("DD/MMM/YYYY ")} */}
+                          .format("DD/MMM/YYYY ")}
                       </Text>
                     </View>
                     <View
@@ -363,7 +362,7 @@ const Home = ({ navigation }) => {
               >
                 30 Days History
               </Text>
-              {/* {query?.data?.data?.data.map((item, index) => {
+              {query?.data?.data?.data.map((item, index) => {
                 return (
                   <View style={[styles.Isi]}>
                     <View
@@ -456,7 +455,7 @@ const Home = ({ navigation }) => {
                     </View>
                   </View>
                 );
-              })} */}
+              })}
             </View>
           </ScrollView>
         ) : (
