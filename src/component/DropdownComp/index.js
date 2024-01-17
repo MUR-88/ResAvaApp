@@ -6,7 +6,7 @@ const index = ({ title, item }) => {
   const [isFocus, setIsFocus] = useState(true);
 
   return (
-    <View style={[styles.Top]}>
+    <View style={[styles.Top, item.Dropdown]}>
       <View style={[styles.container]}>
         <Text style={styles.Abu}>{title} </Text>
       </View>
@@ -17,7 +17,9 @@ const index = ({ title, item }) => {
           selectedTextStyle={styles.selectedTextStyle}
           iconStyle={styles.iconStyle}
           data={item.props}
-          maxHeight={300}
+          maxHeight={item.height}
+          search
+          searchPlaceholder="Seacrh..."
           width={20}
           labelField="label"
           valueField="value"
@@ -38,12 +40,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flex: 1,
     backgroundColor: "white",
-    borderWidth: 0.4,
-    borderColor: "#88888D",
+    // borderWidth: 0.4,
+    // borderColor: "#88888D",
     borderRadius: 10,
     height: 45,
-    marginLeft: 10,
-    marginRight: 10,
+    // marginLeft: 10,
+    // marginRight: 10,
     marginTop: 10,
     marginBottom: 5,
   },

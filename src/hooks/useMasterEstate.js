@@ -42,7 +42,7 @@ export const useMasterEstate = ( { isGetData} ) => {
       .query()
       .observe()
       .subscribe((masterEstate) => {
-        console.log("masterEstate");
+        // console.log("masterEstate");
         setData(masterEstate.map((masterEstate) => masterEstate._raw));
         setIsLoading(false);
       });

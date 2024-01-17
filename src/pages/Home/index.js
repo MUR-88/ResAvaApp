@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -208,10 +208,21 @@ const Home = ({ navigation }) => {
   // }, []);
   const dateNow = Date.now();
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onReferesh = useCallback((async) => {
+    setRefreshing(true);
+    // await Home();
+    setRefreshing(false);
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       <StatusBar style="light" />
-      <RefreshControl style={{ flex: 1 }}>
+      <RefreshControl
+        style={{ flex: 1 }}
+        refreshing={refreshing}
+        onRefresh={onReferesh}
+      >
         {isConnected ? (
           <ScrollView style={{ flex: 1 }}>
             <View

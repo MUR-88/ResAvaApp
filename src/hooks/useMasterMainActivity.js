@@ -42,7 +42,7 @@ export const useMasterMainActivity = ({ isGetData }) => {
       .query()
       .observe()
       .subscribe((mainActivity) => {
-        console.log("mainActivity", );
+        // console.log("mainActivity", );
         setData(mainActivity.map((mainActivity) => mainActivity._raw));
         setIsLoading(false);
       });

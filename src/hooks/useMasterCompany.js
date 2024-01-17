@@ -41,7 +41,7 @@ export const useMasterCompany = ( { isGetData } ) => {
       .query()
       .observe()
       .subscribe((masterCompany) => {
-        console.log("masterCompany");
+        // console.log("masterCompany");
         setData(masterCompany.map((masterCompany) => masterCompany._raw));
         setIsLoading(false);
       });

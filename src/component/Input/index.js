@@ -14,6 +14,7 @@ const Input = ({
 }) => {
   return (
     <View style={styles.Login}>
+      <View style={{flex:1, justifyContent: 'center',alignContent:'center'}}> 
       <TextInput
         secureTextEntry={secureTextEntry}
         placeholder={item.placeholder}
@@ -25,7 +26,10 @@ const Input = ({
         multiline={multiline}
         onFocus={onFocus}
         editable={editable}
+        
       />
+
+        </View>
     </View>
   );
 };
@@ -45,13 +49,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     height: 40,
-    // borderWidth: 0.4,
     height: 30,
     marginBottom: 5,
-    borderRadius: 10,
+    borderRadius: 5,
     height: 100,
     textAlignVertical: "top",
     paddingVertical: 8,
-    // paddingHorizontal: ,
   },
 });

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, StatusBar } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import AutoHeightImage from "react-native-auto-height-image";
 import { Button, Input } from "../../component";
 import { globalStyles } from "../../styles";
@@ -21,17 +21,20 @@ const Login = ({ navigation }) => {
     password: yup.string().required("Password harus diisi"),
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   //hook
 
   const formik = useFormik({
     validationSchema: schema,
-    initialValues: { SAP: "123456", password: "12345678" },
+    // initialValues: { SAP: "123456", password: "12345678" },
     onSubmit: async (values) => {
       try {
+        setIsLoading(true);
         const response = await API.post("login", values);
         await AsyncStorage.setItem("token", response.token.plainTextToken);
         API.setToken(response.token.plainTextToken);
-
+        setIsLoading(false);
         navigation.replace("Mytabs");
       } catch (error) {
         Toast.show({
@@ -83,6 +86,8 @@ const Login = ({ navigation }) => {
                   buttonStyle={{
                     borderWidth: 0.5,
                     borderColor: "#DDDDDD",
+                    paddingHorizontal: 10,
+                    borderRadius: 10,
                   }}
                 />
                 {formik.errors.SAP
@@ -102,7 +107,9 @@ const Login = ({ navigation }) => {
                   }}
                   buttonStyle={{
                     borderWidth: 0.5,
+                    borderRadius: 10,
                     borderColor: "#DDDDDD",
+                    paddingHorizontal: 10,
                   }}
                 />
                 {formik.errors.password

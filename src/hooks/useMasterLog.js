@@ -41,7 +41,7 @@ export const useMasterLog = ({ isGetData }) => {
       .query()
       .observe()
       .subscribe((masterLog) => {
-        console.log("masterLog", );
+        // console.log("masterLog", );
         setData(masterLog.map((masterLog) => masterLog._raw));
         setIsLoading(false);
       });

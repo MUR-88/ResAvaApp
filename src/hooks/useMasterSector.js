@@ -41,7 +41,7 @@ export const useMasterSector = ({ isGetData }) => {
       .query()
       .observe()
       .subscribe((masterSector) => {
-        console.log("masterSector", );
+        // console.log("masterSector", );
         setData(masterSector.map((masterSector) => masterSector._raw));
         setIsLoading(false);
       });

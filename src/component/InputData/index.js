@@ -15,19 +15,21 @@ const InputData = ({
 }) => {
   return (
     <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "center",
-        flex: 1,
-        borderWidth: 0.5,
-        borderColor: "#88888D",
-        backgroundColor: "white",
-        borderRadius: 10,
-        marginBottom: 5,
-        marginHorizontal: 10,
-        height: 45,
-        marginTop: 10,
-      }}
+      style={[
+        item.Input,
+        {
+          flexDirection: "row",
+          justifyContent: "center",
+          flex: 1,
+          // borderWidth: 0.5,
+          // borderColor: "#88888D",
+          backgroundColor: "white",
+          borderRadius: 10,
+          marginBottom: 5,
+          // marginHorizontal: 10,
+          marginTop: 10,
+        },
+      ]}
     >
       <View
         style={[
@@ -59,7 +61,7 @@ const InputData = ({
               secureTextEntry={secureTextEntry}
               placeholder={item.placeholder}
               style={[styles.input, buttonStyle]}
-              // style={[styles.input, {height:50, textAlignVertical: 'top', paddingVertical:8, paddingHorizontal:6}]}
+              // style={[styles.input, {height:50, textAlignVertical: 'top', paddingVertical:8, paddingHorizontal:6}, buttonStyle]}
               keyboardType={keyboardType}
               value={item.value}
               onChangeText={onChangeText}

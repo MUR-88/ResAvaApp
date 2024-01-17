@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { API } from "../../function";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -17,49 +17,55 @@ import { ScrollView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const Splash = ({ navigation,  }) => {
+const Splash = ({ navigation }) => {
   // make use effect to get token from async storage
   // if token exist, navigate to home
   // else navigate to login
+  const [isLoading, setIsLoading] = useState(true);
 
   //imoorting fetching
-    const { fetching: fatchingCompany } = useMasterCompany({ isGetData: false});
-    const { fetching: fatchingSector } = useMasterSector({ isGetData: false});
-    const { fetching: fatchingEstate } = useMasterEstate({ isGetData: false});
-    const { fetching: fatchingMachineType } = useMasterMachineType({ isGetData: false});
-    const { fetching: fatchingMachine } = useMasterMachine({ isGetData: false});
-    const { fetching: fatchingMainActivity } = useMasterMainActivity({ isGetData: false});
-    const { fetching: fatchingLog } = useMasterLog({ isGetData: false});
-    useEffect(() => {
-      (async () => {
-        try{
-          await fatchingCompany();
-          await fatchingMachine();
-          await fatchingSector();
-          await fatchingEstate();
-          await fatchingMachineType();
-          await fatchingMainActivity();
-          await fatchingLog();
+  const { fetching: fatchingCompany } = useMasterCompany({ isGetData: false });
+  const { fetching: fatchingSector } = useMasterSector({ isGetData: false });
+  const { fetching: fatchingEstate } = useMasterEstate({ isGetData: false });
+  const { fetching: fatchingMachineType } = useMasterMachineType({ isGetData: false, });
+  const { fetching: fatchingMachine } = useMasterMachine({ isGetData: false });
+  const { fetching: fatchingMainActivity } = useMasterMainActivity({ isGetData: false, });
+  const { fetching: fatchingLog } = useMasterLog({ isGetData: false });
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+        await fatchingCompany();
+        await fatchingMachine();
+        await fatchingSector();
+        await fatchingEstate();
+        await fatchingMachineType();
+        await fatchingMainActivity();
+        await fatchingLog();
+        setIsLoading(false);
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: error.message,
+        });
+        console.log(error);
+      }
+    })();
+  }, []);
 
-        } catch (error) {
-          console.log(error);
-        }
-      })();
-    }, []);
+  useEffect(() => {
+    const getToken = async () => {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        API.setToken(token);
+        navigation.replace("Mytabs");
+      } else {
+        navigation.replace("Login");
+      }
+    };
+    getToken();
+  }, []);
 
-    useEffect(() => {
-      const getToken = async () => {
-        const token = await AsyncStorage.getItem("token");
-        if (token) {
-          API.setToken(token);
-          navigation.replace("Mytabs");
-        } else {
-          navigation.replace("Login");
-        }
-      };
-      getToken();
-    }, []);
-  
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />

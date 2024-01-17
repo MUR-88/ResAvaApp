@@ -42,7 +42,7 @@ export const useMasterMachine = ({ isGetData }) => {
       .query()
       .observe()
       .subscribe((masterMachine) => {
-        console.log("masterMachine");
+        // console.log("masterMachine");
         setData(masterMachine.map((masterMachine) => masterMachine._raw));
         setIsLoading(false);
       });
