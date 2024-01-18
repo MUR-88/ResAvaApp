@@ -12,7 +12,11 @@ import {
   Pressable,
 } from "react-native";
 import { Button, DropdownComp, Input, InputData } from "../../component";
-import { RefreshControl, ScrollView } from "react-native-gesture-handler";
+import {
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
 // import {color} from "../..variabel";
 import "dayjs/locale/id";
 import * as yup from "yup";
@@ -27,13 +31,26 @@ import {
   useMasterLog,
 } from "../../hooks";
 import { Formik, useFormik } from "formik";
+import { database } from "../../assets/Model/db";
+import Toast from "react-native-toast-message";
+import { globalStyles } from '../../styles';
 import MasterLogActivity from "../../assets/Model/master_log_activity";
 
 const AddNew = ({ navigation }) => {
   let schema = yup.object().shape({
-    hm_current: yup.string().required("Mohon masukkan format yang benar"),
-    compartement_id: yup.number().min(3).required("Required"),
-    Date: yup.string().required("Required"),
+    hm_current: yup.number().required("Mohon masukkan format yang benar"),
+    compartement_id: yup
+      .string()
+      .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
+      .min(1)
+      .required("Masukkan Compartement ID"),
+    // Date: yup.date().required("Required"),
+    id_master_sector: yup.string().required("Pilih Sector"),
+    id_master_company: yup.string().required("Pilih Company"),
+    // id_master_machine: yup.string().required("Pilih Machine ID"),
+    id_master_estate: yup.string().required("Pilih Estate"),
+    id_master_machine_types: yup.string().required("Pilih Machine Type"),
+    id_master_main_activities: yup.string().required("Pilih Main Activity"),
   });
 
   const {
@@ -88,10 +105,7 @@ const AddNew = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date();
 
-  const startDate = getFormatedDate(
-    today.setDate(today.getDate() - 1),
-    "YYYY/MM/DD"
-  );
+  const startDate = getFormatedDate(today.setDate(today.getDate() - 1));
 
   const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
@@ -101,6 +115,41 @@ const AddNew = ({ navigation }) => {
   const [isFocus, setIsFocus] = useState(true);
   const [date, setDate] = useState(undefined);
   const [showTime, setShowTime] = useState(false);
+
+  const mySync = async () => {
+    try {
+      // Membuat data baru
+      const newLog = await database.write(async () => {
+        const masterLog = await database
+          .get(MasterLogActivity.table)
+          .create((item) => {
+            item.keterangan = "Bas";
+            // sector.isSynced = true;
+            // sector.isConnected = true;
+          });
+
+        return masterLog;
+      });
+
+      console.log("Company created:", newLog);
+
+      // Mendapatkan semua data dari tabel
+      const allLog = await database
+        .get(MasterLogActivity.table)
+        .query()
+        .fetch();
+
+      console.log("All Log:", allLog);
+
+      // setMasterLog(allSector.map((masterSector) => masterSector._raw));
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  const showLog = async () => {
+    // console.log(JSON.stringify(dataMasterLog, null, 2));
+    console.log("data Log", dataMasterLog.length);
+  };
 
   function handleOnPress() {
     setOpen(!open);
@@ -127,7 +176,7 @@ const AddNew = ({ navigation }) => {
   };
   const formik = useFormik({
     initialValues: {
-      Date: "",
+      date: "",
       id_master_sector: "",
       id_master_company: "",
       id_master_machine: "",
@@ -145,7 +194,7 @@ const AddNew = ({ navigation }) => {
           const masterLog = await database
             .get(MasterLogActivity.table)
             .create((item) => {
-              item.created_at = values.Date;
+              item.created_at = values.date;
               item.id_master_sector = values.id_master_sector;
               item.id_master_company = values.id_master_company;
               item.id_master_machine = values.id_master_machine;
@@ -159,8 +208,6 @@ const AddNew = ({ navigation }) => {
               sector.isConnected = false;
             });
           console.log(JSON.stringify(MasterLogActivity, null, 2));
-          navigation.replace("Mytabs");
-
           console.log(JSON.stringify(masterLog, null, 2));
           console.log("masterLog", masterLog);
           return masterLog;
@@ -170,12 +217,14 @@ const AddNew = ({ navigation }) => {
             text1: error.message,
           });
           console.log(database);
-          console.log(error);
+          // console.log(error);
         }
       });
       console.log("onSubmit", onSubmit());
+      navigation.replace("Mytabs");
     },
   });
+  console.log(formik.errors);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
@@ -207,6 +256,12 @@ const AddNew = ({ navigation }) => {
               Details
             </Text>
             <View style={[styles.Details1]}>
+              <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
+                <Text>Sync</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={showLog} style={{ marginVertical: 5 }}>
+                <Text>Log</Text>
+              </TouchableOpacity>
               <View style={[styles.button_waktu]}>
                 <Modal
                   animationType="slide"
@@ -225,7 +280,9 @@ const AddNew = ({ navigation }) => {
                         display="spinner"
                         minimumDate={startDate}
                         selected={date}
-                        onDateChange={handleChangeDate}
+                        onDateChange={(date) => {
+                          formik.setFieldValue("date", date);
+                        }}
                       />
                       <Pressable
                         style={[styles.button, styles.buttonClose]}
@@ -247,7 +304,7 @@ const AddNew = ({ navigation }) => {
               <DropdownComp
                 title="Company"
                 item={{
-                  props: dataCompany.map((company) => ({
+                  values: dataCompany.map((company) => ({
                     label: company.name,
                     value: company.id_master_company,
                   })),
@@ -268,10 +325,17 @@ const AddNew = ({ navigation }) => {
                   },
                 }}
               />
+              {formik.errors.id_master_company
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_company}
+                    </Text>;
+                  }
+                : null}
               <DropdownComp
                 title="Sector"
                 item={{
-                  props: dataSector.map((sector) => ({
+                  values: dataSector.map((sector) => ({
                     label: sector.name,
                     value: sector.id_master_sectors,
                   })),
@@ -292,6 +356,13 @@ const AddNew = ({ navigation }) => {
                   },
                 }}
               />
+              {formik.errors.id_master_sector
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_sector}
+                    </Text>;
+                  }
+                : null}
 
               <View style={[styles.button_waktu1]}>
                 <Button
@@ -339,7 +410,7 @@ const AddNew = ({ navigation }) => {
               <DropdownComp
                 title="Machine ID"
                 item={{
-                  props: dataMachine.map((machine) => ({
+                  values: dataMachine.map((machine) => ({
                     label: machine.machine_id,
                     value: machine.id_master_machine,
                   })),
@@ -360,10 +431,17 @@ const AddNew = ({ navigation }) => {
                   },
                 }}
               />
+              {formik.errors.id_master_machine
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_machine}
+                    </Text>;
+                  }
+                : null}
               <DropdownComp
                 title="Estate"
                 item={{
-                  props: dataEstate.map((estate) => ({
+                  values: dataEstate.map((estate) => ({
                     label: estate.name,
                     value: estate.id_master_estate,
                   })),
@@ -384,6 +462,13 @@ const AddNew = ({ navigation }) => {
                   },
                 }}
               />
+              {formik.errors.id_master_estate
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_estate}
+                    </Text>;
+                  }
+                : null}
               <InputData
                 Title="Compartement ID"
                 onChangeText={formik.handleChange("compartement_id")}
@@ -401,10 +486,17 @@ const AddNew = ({ navigation }) => {
                   borderColor: "#DDDDDD",
                 }}
               />
+              {formik.errors.compartement_id
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.compartement_id}
+                    </Text>;
+                  }
+                : null}
               <DropdownComp
                 title="Machine Type"
                 item={{
-                  props: dataMachineType.map((type) => ({
+                  values: dataMachineType.map((type) => ({
                     label: type.name,
                     value: type.id_master_machine_types,
                   })),
@@ -426,10 +518,17 @@ const AddNew = ({ navigation }) => {
                   },
                 }}
               />
+              {formik.errors.id_master_machine_types
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_machine_types}
+                    </Text>;
+                  }
+                : null}
               <DropdownComp
                 title="Main Activity"
                 item={{
-                  props: dataMainActivity.map((mainActivity) => ({
+                  values: dataMainActivity.map((mainActivity) => ({
                     label: mainActivity.name,
                     value: mainActivity.id_master_main_activities,
                   })),
@@ -454,6 +553,13 @@ const AddNew = ({ navigation }) => {
                   },
                 }}
               />
+              {formik.errors.id_master_main_activities
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_main_activities}
+                    </Text>;
+                  }
+                : null}
               {isEnable ? (
                 <>
                   <View
@@ -520,6 +626,13 @@ const AddNew = ({ navigation }) => {
                       borderColor: "#DDDDDD",
                     }}
                   />
+                  {formik.errors.hm_current
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.hm_current}
+                    </Text>;
+                  }
+                : null}
                 </>
               ) : null}
 

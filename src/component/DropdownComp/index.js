@@ -16,7 +16,7 @@ const index = ({ title, item }) => {
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           iconStyle={styles.iconStyle}
-          data={item.props}
+          data={item.values}
           maxHeight={item.height}
           search
           searchPlaceholder="Seacrh..."

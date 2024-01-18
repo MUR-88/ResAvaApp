@@ -17,19 +17,21 @@ export const useMasterLog = ({ isGetData }) => {
     await synchronize({
       database,
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+        console.log("last pull at", lastPulledAt)
         const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
           JSON.stringify(migration)
-        )}`;
-        const response = await API.get(`log_activity/sync?${urlParams}`);
-        // Check if the request was successful
-        if (response.status_code !== 200) {
-          throw new Error(
-            `Request failed with status ${response.status}`
-          );
-        }
-        const timestamp =  dayjs().unix();
-
-        return { changes: response.data, timestamp: timestamp };
+          )}`;
+          const response = await API.get(`log_activity/sync?${urlParams}`);
+          // Check if the request was successful
+          if (response.status_code !== 200) {
+            throw new Error(
+              `Request failed with status ${response.status}`
+              );
+            }
+            const timestamp =  dayjs().locale('id').unix();
+            
+            console.log("last_pull_at", timestamp)
+            return { changes: response.data, timestamp: timestamp };
       },
     })
   }
