@@ -31,6 +31,7 @@ import { synchronize } from "@nozbe/watermelondb/sync";
 import { getLastPulledAt } from "@nozbe/watermelondb/sync/impl";
 import { useMasterSector } from "../../hooks/useMasterSector";
 import { useMasterLog } from "../../hooks";
+import MasterLogActivity from "../../assets/Model/master_log_activity";
 
 const Home = ({ navigation }) => {
   const {
@@ -43,27 +44,27 @@ const Home = ({ navigation }) => {
 
   async function mySync() {
     try {
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(
-            `master_machine_type/sync?${urlParams}`
-          );
-          // console.log(JSON.stringify(response, null, 2));
+  //     await synchronize({
+  //       database,
+  //       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+  //         const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+  //           JSON.stringify(migration)
+  //         )}`;
+  //         const response = await API.get(
+  //           `master_log/sync?${urlParams}`
+  //         );
+  //         // console.log(JSON.stringify(response, null, 2));
 
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().unix();
+  //         // Check if the request was successful
+  //         if (response.status_code !== 200) {
+  //           throw new Error(`Request failed with status ${response.status}`);
+  //         }
+  //         const timestamp = dayjs().unix();
 
-          console.log("data Type", response.data.length);
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
+  //         console.log("data Type", response.data.length);
+  //         return { changes: response.data, timestamp: timestamp };
+  //       },
+  //     });
     } catch (error) {
       console.log("Catch Mysync", error);
     }
@@ -96,24 +97,20 @@ const Home = ({ navigation }) => {
   // const database = database(MasterCompany.table);
   // main.js
 
-  const onDelete = async (sectorId) => {
-    try {
-      // Find the specific masterSector object by its ID
-      // const sectorToDelete = masterSector.find(masterSector => masterSector.id === sectorId);
+  const [masterLogActivity, setMasterLogActivity] = useState([]);
 
-      // if (sectorToDelete) {
-      // Delete the masterSector object permanently
-      await database.write(async () => {
-        await masterSector.destroyAllPermanently();
-      });
-      console.log("Sector deleted");
-      // } else {
-      console.log("Master Sector not found");
-      // }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+  const deleteAllRecords = async () => {
+        try {
+          // Menghapus data
+          await database.write(async () => {
+            await database.get('master_log_activities').destroyPermanently();
+          });
+          console.log("Log deleted", database);
+        } catch (error) {
+          console.error("Error:", error);
+        }
+    };
+  
 
   const runSector = async () => {
     try {
@@ -258,6 +255,9 @@ const Home = ({ navigation }) => {
               <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
                 <Text>Sync</Text>
               </TouchableOpacity>
+              <TouchableOpacity onPress={deleteAllRecords} style={{ marginVertical: 5 }}>
+                <Text>Delete</Text>
+              </TouchableOpacity>
               {dataMasterLog.map((item, index) => (
                 <View style={[styles.Isi]}>
                   <View
@@ -279,7 +279,9 @@ const Home = ({ navigation }) => {
                       17 OCtober, 2023
                     </Text>
                     <TouchableOpacity
-                      onPress={onDelete}
+                      // onPress={onDelete}
+                      onPress={''}
+
                       style={{
                         flex: 1,
                         justifyContent: "center",
@@ -320,7 +322,7 @@ const Home = ({ navigation }) => {
                         <Text>Sync: {item.isSync}</Text>
                         <Text>
                           Create:{" "}
-                          {dayjs(item.last_pulled_at)
+                          {dayjs(item.date)
                             .locale("id")
                             .format("DD/MMM/YYYY ")}
                         </Text>
@@ -336,7 +338,7 @@ const Home = ({ navigation }) => {
                           { fontSize: 10, marginVertical: 2 },
                         ]}
                       >
-                        {dayjs(item.last_pulled_at)
+                        {dayjs(item.last_pulled_at*1000)
                           .locale("id")
                           .format("DD/MMM/YYYY ")}
                       </Text>

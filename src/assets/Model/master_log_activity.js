@@ -50,6 +50,7 @@ export default class MasterLogActivity extends Model {
   @field('isSync') isSync
   @field('isConnected') isConnected
   @field('created_at') createdAt
+  @field('date') date
   @field('deleted_at') deletedAt
   @field('updated_at') updatedAt
 }

@@ -113,6 +113,8 @@ export default mySchema = appSchema({
         { name: "isSync", type: "boolean" },
         { name: "isConnected", type: "boolean" },
         { name: "created_at", type: "number" },
+        { name: "date", type: "number" },
+
         { name: "deleted_at", type: "number" },
         { name: "updated_at", type: "number" },
       ],

@@ -19,6 +19,7 @@ import {
 import { Formik, useFormik } from "formik";
 import { Button, DropdownComp, Input, InputData } from "../../component";
 import { Dropdown } from "react-native-element-dropdown";
+import Toast from "react-native-toast-message";
 
 const Register = () => {
   const {
@@ -26,22 +27,22 @@ const Register = () => {
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
-  console.log("data Company", dataCompany.length);
+  // console.log("data Company", dataCompany.length);
 
   const {
     data: dataMainActivity,
     isLoading: isLoadingMainActivity,
     connected: connectedMasterMainActivity,
   } = useMasterMainActivity({ isGetData: true });
-  console.log("data Main Activity", dataMainActivity.length);
-  // console.log(JSON.stringify(dataMainActivity, null, 2));
+  // console.log("data Main Activity", dataMainActivity.length);
+  console.log(JSON.stringify(dataMainActivity, null, 2));
 
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
     connected: connectedMasterMachineType,
   } = useMasterMachineType({ isGetData: true });
-  console.log("data Machine Type", dataMachineType.length);
+  // console.log("data Machine Type", dataMachineType.length);
   // console.log(JSON.stringify(dataMachineType, null, 2));
 
   const queryClient = useQueryClient();
@@ -54,18 +55,6 @@ const Register = () => {
     queryKey: ["master_company"],
     queryFn: getMasterCompany,
   });
-
-  // const query = useQuery({
-  //   queryKey: ["master_company"],
-  //   queryFn: getMasterRegisterMachine,
-  // });
-  // console.log(query.data);
-
-  // const queryClient = useQueryClient();
-  // // Queries
-  // const getMasterCompany = () => {
-  //   return API.get("master_company");
-  // };
 
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);

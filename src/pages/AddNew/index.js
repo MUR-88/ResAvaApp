@@ -33,8 +33,11 @@ import {
 import { Formik, useFormik } from "formik";
 import { database } from "../../assets/Model/db";
 import Toast from "react-native-toast-message";
-import { globalStyles } from '../../styles';
+import { globalStyles } from "../../styles";
 import MasterLogActivity from "../../assets/Model/master_log_activity";
+import dayjs from "dayjs";
+import { synchronize } from "@nozbe/watermelondb/sync";
+import { API } from "../../function";
 
 const AddNew = ({ navigation }) => {
   let schema = yup.object().shape({
@@ -58,19 +61,19 @@ const AddNew = ({ navigation }) => {
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
   } = useMasterSector({ isGetData: true });
-  // console.log("data sector", dataSector.length);
+  console.log("data sector", dataSector.length);
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
-  // console.log("data Company", dataCompany.length);
+  console.log("data Company", dataCompany.length);
   const {
     data: dataEstate,
     isLoading: isLoadingEstate,
     connected: connectedMasterEstate,
   } = useMasterEstate({ isGetData: true });
-  // console.log("data Estate", dataEstate.length);
+  console.log("data Estate", dataEstate.length);
   // console.log(JSON.stringify(dataEstate, null, 2));
 
   const {
@@ -78,21 +81,21 @@ const AddNew = ({ navigation }) => {
     isLoading: isLoadingMachineType,
     connected: connectedMasterMachineType,
   } = useMasterMachineType({ isGetData: true });
-  // console.log("data Machine Type", dataMachineType.length);
+  console.log("data Machine Type", dataMachineType.length);
   // console.log(JSON.stringify(dataMachineType, null, 2));
   const {
     data: dataMachine,
     isLoading: isLoadingMachine,
     connected: connectedMasterMachine,
   } = useMasterMachine({ isGetData: true });
-  // console.log("data Machine", dataMachine.length);
+  console.log("data Machine", dataMachine.length);
   // console.log(JSON.stringify(dataMachine, null, 2));
   const {
     data: dataMainActivity,
     isLoading: isLoadingMainActivity,
     connected: connectedMasterMainActivity,
   } = useMasterMainActivity({ isGetData: true });
-  // console.log("data Main Activity", dataMainActivity.length);
+  console.log("data Main Activity", dataMainActivity.length);
   // console.log(JSON.stringify(dataMainActivity, null, 2));
   const {
     data: dataMasterLog,
@@ -100,7 +103,7 @@ const AddNew = ({ navigation }) => {
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
   // console.log(JSON.stringify(dataMasterLog, null, 2));
-  // console.log("data Log", dataMasterLog.length);
+  console.log("data Log", dataMasterLog.length);
 
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date();
@@ -118,28 +121,47 @@ const AddNew = ({ navigation }) => {
 
   const mySync = async () => {
     try {
-      // Membuat data baru
-      const newLog = await database.write(async () => {
-        const masterLog = await database
-          .get(MasterLogActivity.table)
-          .create((item) => {
-            item.keterangan = "Bas";
-            // sector.isSynced = true;
-            // sector.isConnected = true;
-          });
-
-        return masterLog;
+      await synchronize({
+        database,
+        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+            JSON.stringify(migration)
+          )}`;
+          const response = await API.get(`log_activity/sync?${urlParams}`);
+          // Check if the request was successful
+          if (response.status_code !== 200) {
+            throw new Error(`Request failed with status ${response.status}`);
+          }
+          const timestamp = dayjs().locale("id").unix();
+          // const lastePulledAt = response.data.last_pulled_at;
+          // console.log("last_pull_at", lastPulledAt)
+          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
+          console.log('sync', response.data)
+          return { changes: response.data, timestamp: timestamp };
+        },
       });
+      // // Membuat data baru
+      // const newLog = await database.write(async () => {
+      //   const masterLog = await database
+      //     .get(MasterLogActivity.table)
+      //     .create((item) => {
+      //       item.keterangan = "Bas";
+      //       // sector.isSynced = true;
+      //       // sector.isConnected = true;
+      //     });
 
-      console.log("Company created:", newLog);
+      //   return masterLog;
+      // });
+
+      // console.log("Log created:", newLog);
 
       // Mendapatkan semua data dari tabel
-      const allLog = await database
-        .get(MasterLogActivity.table)
-        .query()
-        .fetch();
+      // const allLog = await database
+      //   .get(MasterLogActivity.table)
+      //   .query()
+      //   .fetch();
 
-      console.log("All Log:", allLog);
+      // console.log("All Log:", allLog);
 
       // setMasterLog(allSector.map((masterSector) => masterSector._raw));
     } catch (error) {
@@ -155,10 +177,10 @@ const AddNew = ({ navigation }) => {
     setOpen(!open);
   }
 
-  function handleChangeDate(Date) {
+  function handleChangeDate(date) {
     // setShowTime(!showTime );
-    console.log("tanggal pilih", Date);
-    setDate(Date);
+    console.log("tanggal pilih", date);
+    setDate(date);
   }
 
   const toggleSwitch = () => {
@@ -189,12 +211,13 @@ const AddNew = ({ navigation }) => {
     },
     validationSchema: schema,
     onSubmit: async (values) => {
-      await database.write(async () => {
-        try {
+      try {
+        console.log("value", values.date);
+        console.log("value", dayjs(values.date).unix());
+        await database.write(async () => {
           const masterLog = await database
             .get(MasterLogActivity.table)
             .create((item) => {
-              item.created_at = values.date;
               item.id_master_sector = values.id_master_sector;
               item.id_master_company = values.id_master_company;
               item.id_master_machine = values.id_master_machine;
@@ -204,24 +227,25 @@ const AddNew = ({ navigation }) => {
               item.id_master_main_activities = values.id_master_main_activities;
               item.hm_current = values.hm_current;
               item.keterangan = values.keterangan;
-              sector.isSynced = false;
-              sector.isConnected = false;
+              item.isSynced = false;
+              item.isConnected = false;
+              item.date = dayjs(values.date).unix()*1000;
             });
-          console.log(JSON.stringify(MasterLogActivity, null, 2));
-          console.log(JSON.stringify(masterLog, null, 2));
-          console.log("masterLog", masterLog);
+          // console.log(JSON.stringify(MasterLogActivity, null, 2));
+          // console.log(JSON.stringify(masterLog, null, 2));
+          // console.log("masterLog", masterLog);
           return masterLog;
-        } catch (error) {
-          Toast.show({
-            type: "error",
-            text1: error.message,
-          });
-          console.log(database);
-          // console.log(error);
-        }
-      });
-      console.log("onSubmit", onSubmit());
-      navigation.replace("Mytabs");
+        });
+        navigation.replace("Mytabs");
+        console.log("value", values.date);
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: error.message,
+        });
+        console.log(database);
+        // console.log(error);
+      }
     },
   });
   console.log(formik.errors);
@@ -363,7 +387,6 @@ const AddNew = ({ navigation }) => {
                     </Text>;
                   }
                 : null}
-
               <View style={[styles.button_waktu1]}>
                 <Button
                   buttonStyle={{
@@ -627,15 +650,14 @@ const AddNew = ({ navigation }) => {
                     }}
                   />
                   {formik.errors.hm_current
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.hm_current}
-                    </Text>;
-                  }
-                : null}
+                    ? () => {
+                        <Text style={globalStyles.textError}>
+                          {formik.errors.hm_current}
+                        </Text>;
+                      }
+                    : null}
                 </>
               ) : null}
-
               <View
                 style={{
                   flex: 1,
