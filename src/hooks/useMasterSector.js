@@ -17,6 +17,7 @@ export const useMasterSector = ({ isGetData }) => {
     await synchronize({
       database,
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+        console.log("last pull master sector", lastPulledAt);
         const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
           JSON.stringify(migration)
         )}`;
@@ -27,7 +28,7 @@ export const useMasterSector = ({ isGetData }) => {
             `Request failed with status ${response.status}`
           );
         }
-        const timestamp =  dayjs().unix();
+        const timestamp =  dayjs().unix()*1000;
 
         return { changes: response.data, timestamp: timestamp };
       },

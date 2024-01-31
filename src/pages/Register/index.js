@@ -5,66 +5,75 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
-  Image,
   StatusBar,
 } from "react-native";
+import { Button, DropdownComp, Input, InputData } from "../../component";
 import { RefreshControl, ScrollView } from "react-native-gesture-handler";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import API from "../../function/API";
+// import {color} from "../..variabel";
+import "dayjs/locale/id";
+import * as yup from "yup";
+import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 import {
+  useMasterSector,
   useMasterCompany,
+  useMasterEstate,
   useMasterMachineType,
+  useMasterMachine,
   useMasterMainActivity,
+  useMasterLog,
 } from "../../hooks";
 import { Formik, useFormik } from "formik";
-import { Button, DropdownComp, Input, InputData } from "../../component";
-import { Dropdown } from "react-native-element-dropdown";
+import { database } from "../../assets/Model/db";
 import Toast from "react-native-toast-message";
+import { globalStyles } from "../../styles";
+import MasterLogActivity from "../../assets/Model/master_log_activity";
+import dayjs from "dayjs";
+import MasterMachine from "../../assets/Model/master_machine";
+const Register = ({ navigation }) => {
+  let schema = yup.object().shape({
+    // hm_current: yup.number().required("Mohon masukkan format yang benar"),
+    // compartement_id: yup
+    //   .string()
+    //   .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
+    //   .min(1)
+    //   .required("Masukkan Compartement ID"),
+    // // Date: yup.date().required("Required"),
+    // id_master_sector: yup.string().required("Pilih Sector"),
+    // id_master_company: yup.string().required("Pilih Company"),
+    // // id_master_machine: yup.string().required("Pilih Machine ID"),
+    // id_master_estate: yup.string().required("Pilih Estate"),
+    // id_master_machine_types: yup.string().required("Pilih Machine Type"),
+    // id_master_main_activities: yup.string().required("Pilih Main Activity"),
+  });
 
-const Register = () => {
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
-  // console.log("data Company", dataCompany.length);
-
-  const {
-    data: dataMainActivity,
-    isLoading: isLoadingMainActivity,
-    connected: connectedMasterMainActivity,
-  } = useMasterMainActivity({ isGetData: true });
-  // console.log("data Main Activity", dataMainActivity.length);
-  console.log(JSON.stringify(dataMainActivity, null, 2));
-
+  console.log("data Company", dataCompany.length);
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
     connected: connectedMasterMachineType,
   } = useMasterMachineType({ isGetData: true });
-  // console.log("data Machine Type", dataMachineType.length);
+  console.log("data Machine Type", dataMachineType.length);
   // console.log(JSON.stringify(dataMachineType, null, 2));
-
-  const queryClient = useQueryClient();
-  // Queries
-  const getMasterCompany = () => {
-    return API.get("master_company");
-  };
-
-  const query = useQuery({
-    queryKey: ["master_company"],
-    queryFn: getMasterCompany,
-  });
-
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
+  const {
+    data: dataMainActivity,
+    isLoading: isLoadingMainActivity,
+    connected: connectedMasterMainActivity,
+  } = useMasterMainActivity({ isGetData: true });
+  console.log("data Main Activity", dataMainActivity.length);
+  // console.log(JSON.stringify(dataMainActivity, null, 2));
 
   const formik = useFormik({
     initialValues: {
-      Date: "",
+      date: "",
       id_master_sector: "",
       id_master_company: "",
       id_master_machine: "",
+      master_machine_id: "",
       id_master_estate: "",
       compartement_id: "",
       id_master_machine_types: "",
@@ -72,233 +81,254 @@ const Register = () => {
       hm_current: "",
       keterangan: "",
     },
-    // validationSchema: schema,
+    validationSchema: schema,
+
     onSubmit: async (values) => {
-      await database.write(async () => {
-        try {
+      try {
+        //   console.log("value", values.date);
+        //   console.log("value", dayjs(values.date).unix());
+        await database.write(async () => {
           const masterLog = await database
-            .get(MasterLogActivity.table)
+            .get(MasterMachine.table)
             .create((item) => {
-              item.created_at = values.Date;
-              item.id_master_sector = values.id_master_sector;
-              item.id_master_company = values.id_master_company;
-              item.id_master_machine = values.id_master_machine;
-              item.id_master_estate = values.id_master_estate;
+              item.master_sector_id = values.id_master_sector;
+              item.master_company_id = values.id_master_company;
+              item.master_machine_id = values.id_master_machine;
+              item.master_estate_id = values.id_master_estate;
               item.compartement_id = values.compartement_id;
-              item.id_master_machine_types = values.id_master_machine_types;
-              item.id_master_main_activities = values.id_master_main_activities;
-              item.hm_current = values.hm_current;
+              item.master_machine_types_id = values.id_master_machine_types;
+              item.master_main_activity_id = values.id_master_main_activities;
+              item.brand = "KOMATSU";
+              item.current_hour_meter = values.hm_current;
               item.keterangan = values.keterangan;
-              sector.isSynced = false;
-              sector.isConnected = false;
+              item.isSynced = false;
+              item.isConnected = false;
+              item.date = dayjs(values.date).unix() * 1000;
+
             });
-          navigation.replace("Mytabs");
+
+          // console.log(JSON.stringify(MasterLogActivity, null, 2));
+          // console.log(JSON.stringify(masterLog, null, 2));
+          console.log("masterLog", database);
           return masterLog;
-        } catch (error) {
-          Toast.show({
-            type: "error",
-            text1: error.message,
-          });
-          console.log(error);
-        }
-      });
-      console.log(values);
+        });
+        // navigation.replace("Mytabs");
+        // console.log("value", values.date);
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: error.message,
+        });
+        console.log(database);
+      }
     },
   });
-
+  // console.log(formik.errors);
+  console.log("value", formik.values);
   return (
-    // use if status bar overlaying
-    // <SafeAreaView style={{flex:1, marginTop:Constants.statusBarHeight
-    // }}>
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
-      {/* <RefreshControl style={{flex:1}}> */}
-      {/* <ScrollView > */}
-      <ScrollView
-        contentContainerStyle={{
-          alignContent: "center",
-          justifyContent: "center",
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: "#007AFF",
-            height: 100,
-            justifyContent: "flex_start",
-          }}
-        >
-          <View style={[styles.Kotak]}>
-            <Text style={[styles.Header1, { marginBottom: -10 }]}>
-              Register Machine ID
-            </Text>
-          </View>
-        </View>
-        <View style={[styles.Content]}>
-          <Text
+      <RefreshControl>
+        <ScrollView>
+          <View
             style={{
-              marginBottom: 10,
-              color: "#88888D",
-              fontFamily: "Poppins-Regular",
-              fontWeight: 900,
-              fontSize: 18,
-              marginLeft: 10,
-              marginTop: 10,
+              backgroundColor: "#007AFF",
+              height: 100,
+              justifyContent: "flex_start",
             }}
           >
-            Machine Data
-          </Text>
-          <View style={[styles.MechInfo]}>
-            <DropdownComp
-              title="Company"
-              item={{
-                props: dataCompany.map((company) => ({
-                  label: company.name,
-                  value: company.id_master_company,
-                })),
-                placeholder: dataCompany.find(
-                  (item) =>
-                    item.id_master_company === formik.values.id_master_company
-                )?.name,
-                onChange: (item) => {
-                  setIsFocus(false);
-                  formik.setFieldValue("id_master_company", item.value);
-                  console.log(item);
-                },
-                Dropdown: { height: 50 },
-              }}
-            />
-
-            <InputData
-              Title="Equipment Brand"
-              item={{
-                placeholder: "CATTERPILAR",
-                value: formik.values.brand,
-                Input: { height: 45 },
-              }}
-              buttonStyle={{
-                borderColor: "#DDDDDD",
-              }}
-            />
-
-            <InputData
-              Title="Equipment Class (Ton)"
-              item={{
-                placeholder: "40",
-                value: formik.values.clas,
-                Input: { height: 45 },
-              }}
-              buttonStyle={{
-                borderColor: "#DDDDDD",
-              }}
-            />
-
-            <InputData
-              Title="Machine ID"
-              item={{
-                placeholder: "MCH_123",
-                value: formik.values.machine_id,
-                Input: { height: 45 },
-              }}
-              buttonStyle={{
-                borderColor: "#DDDDDD",
-              }}
-            />
-            <DropdownComp
-              title="Machine Type"
-              item={{
-                props: dataMachineType.map((type) => ({
-                  label: type.name,
-                  value: type.id_master_machine_types,
-                })),
-                placeholder: dataMachineType.find(
-                  (item) =>
-                    item.id_master_machine_types ===
-                    formik.values.id_master_machine_types
-                )?.name,
-                onChange: (item) => {
-                  setIsFocus(false);
-                  formik.setFieldValue("id_master_machine_types", item.value);
-                  console.log(item);
-                },
-              }}
-            />
-            <DropdownComp
-              title="Main Activity"
-              item={{
-                props: dataMainActivity.map((mainActivity) => ({
-                  label: mainActivity.name,
-                  value: mainActivity.id_master_main_activities,
-                })),
-                placeholder: dataMainActivity.find(
-                  (item) =>
-                    item.id_master_main_activities ===
-                    formik.values.id_master_main_activities
-                )?.name,
-                onChange: (item) => {
-                  setIsFocus(false);
-                  formik.setFieldValue("id_master_main_activities", item.value);
-                  console.log(item);
-                },
-              }}
-            />
-            {/* <View
+            <View style={[styles.Kotak]}>
+              <Text style={[styles.Header1, { marginBottom: -10 }]}>
+                Resources Update
+              </Text>
+            </View>
+          </View>
+          <View style={[styles.Content]}>
+            <Text
               style={{
-                flexDirection: "row",
-                flex: 1,
-                backgroundColor: "white",
-                borderRadius: 10,
-                height: 50,
-                borderColor: "black",
-                marginTop: 10,
-                marginBottom: 50,
+                color: "#007AFF",
+                fontSize: 18,
+                fontFamily: "Poppins-Medium",
+                marginTop: 5,
+                marginLeft: 5,
               }}
             >
-              <View
-                style={[
-                  styles.container,
-                  {
-                    justifyContent: "center",
-                    backgroundColor: "white",
-                    flex: 1,
+              Details
+            </Text>
+            <View style={[styles.MechInfo]}>
+              <DropdownComp
+                title="Company ID"
+                item={{
+                  values: dataCompany.map((company) => ({
+                    label: company.name,
+                    value: company.id_master_company,
+                  })),
+                  placeholder: dataCompany.find(
+                    (item) =>
+                      item.id_master_company === formik.values.id_master_company
+                  )?.name,
+                  onChange: (item) => {
+                    setIsFocus(false);
+                    formik.setFieldValue("id_master_company", item.value);
+                    console.log(item);
                   },
-                ]}
-              >
-                <Text style={styles.Abu}>Hour Meter - Current </Text>
-              </View>
-              <View
-                style={[
-                  styles.container,
-                  { marginLeft: 22 },
-                  { backgroundColor: "white" },
-                ]}
-              >
-                <Input
-                  item={{
-                    placeholder: "XXX.XX",
-                  }}
-                />
-              </View>
-            </View> */}
-             <InputData
-              Title="Hour Meter - Current"
-              item={{
-                placeholder: "40",
-                value: formik.values.hm_current,
-                Input: { height: 45 },
-              }}
-              buttonStyle={{
-                borderColor: "#DDDDDD",
-              }}
-            />
+                  Dropdown: {
+                    marginHorizontal: 10,
+                    marginVertical: 10,
+                  },
+                }}
+              />
+              {formik.errors.id_master_company
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_company}
+                    </Text>;
+                  }
+                : null}
+              <InputData
+                Title="Brand"
+                onChangeText={formik.handleChange("brand")}
+                item={{
+                  placeholder: "KOMATSU",
+                  value: formik.values.brand,
+                  Input: {
+                    // borderWidth: 0.5,
+                    // borderColor: "#88888D",
+                    marginHorizontal: 10,
+                    height: 45,
+                  },
+                }}
+              />
+              <InputData
+                Title="Equipment Class (TON)"
+                onChangeText={formik.handleChange("class")}
+                item={{
+                  placeholder: "30",
+                  value: formik.values.class,
+                  Input: {
+                    // borderWidth: 0.5,
+                    // borderColor: "#88888D",
+                    marginHorizontal: 10,
+                    height: 45,
+                  },
+                }}
+              />
+              <InputData
+                Title="Machine ID"
+                onChangeText={formik.handleChange("machine_id")}
+                item={{
+                  placeholder: "MCH_301",
+                  value: formik.values.machine_id,
+                  Input: {
+                    marginHorizontal: 10,
+                    height: 45,
+                  },
+                }}
+              />
+              {formik.errors.id_master_estate
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_estate}
+                    </Text>;
+                  }
+                : null}
+
+              <DropdownComp
+                title="Machine Type"
+                item={{
+                  values: dataMachineType.map((type) => ({
+                    label: type.name,
+                    value: type.id_master_machine_types,
+                  })),
+                  placeholder: dataMachineType.find(
+                    (item) =>
+                      item.id_master_machine_types ===
+                      formik.values.id_master_machine_types
+                  )?.name,
+                  onChange: (item) => {
+                    setIsFocus(false);
+                    formik.setFieldValue("id_master_machine_types", item.value);
+                    console.log(item);
+                  },
+                  Dropdown: {
+                    marginHorizontal: 10,
+                    marginVertical: 10,
+                  },
+                }}
+              />
+              {formik.errors.id_master_machine_types
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_machine_types}
+                    </Text>;
+                  }
+                : null}
+              <DropdownComp
+                title="Main Activity"
+                item={{
+                  values: dataMainActivity.map((mainActivity) => ({
+                    label: mainActivity.name,
+                    value: mainActivity.id_master_main_activities,
+                  })),
+                  placeholder: dataMainActivity.find(
+                    (item) =>
+                      item.id_master_main_activities ===
+                      formik.values.id_master_main_activities
+                  )?.name,
+                  onChange: (item) => {
+                    setIsFocus(false);
+                    formik.setFieldValue(
+                      "id_master_main_activities",
+                      item.value
+                    );
+                    console.log(item);
+                  },
+                  Dropdown: {
+                    marginHorizontal: 10,
+                    marginVertical: 10,
+                  },
+                }}
+              />
+              {formik.errors.id_master_main_activities
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.id_master_main_activities}
+                    </Text>;
+                  }
+                : null}
+
+              <InputData
+                Title="HM Current"
+                onChangeText={formik.handleChange("hm_current")}
+                item={{
+                  placeholder: "XXX",
+                  value: formik.values.hm_current,
+                  Input: {
+                    marginHorizontal: 10,
+                    height: 45,
+                  },
+                }}
+                buttonStyle={{
+                  borderColor: "#DDDDDD",
+                }}
+              />
+              {formik.errors.hm_current
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.hm_current}
+                    </Text>;
+                  }
+                : null}
+            </View>
+            <View style={[styles.container, { paddingVertical: 10 }]}></View>
           </View>
           <View
             style={{
               flex: 1,
-              marginLeft: 20,
               justifyContent: "center",
-              alignContent: "center",
+              marginTop: 10,
               marginBottom: 20,
-              marginTop:10
+              marginHorizontal: 20,
             }}
           >
             <Button
@@ -306,16 +336,14 @@ const Register = () => {
                 title: "Submit",
                 backgroundcolor: "#8296FF",
                 textcolor: "#FFFFFF",
-                width: "95%",
-                // height:50,
-                // onPress: () =>(Home),
-                onPress: () => navigation.navigate(""),
+                width: "100%",
+                justifyContent: "center",
+                onPress: () => formik.handleSubmit(),
               }}
             />
           </View>
-        </View>
-      </ScrollView>
-      {/* </RefreshControl> */}
+        </ScrollView>
+      </RefreshControl>
     </SafeAreaView>
   );
 };
@@ -323,8 +351,27 @@ const Register = () => {
 export default Register;
 
 const { width, height } = Dimensions.get("screen");
-
 const styles = StyleSheet.create({
+  Header: {
+    backgroundColor: "#FAFAFA",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: 14,
+    marginVertical: 6,
+    shadowColor: "#000",
+    height: 200,
+    width: width - 24,
+    marginHorizontal: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+
+    elevation: 10,
+  },
   Header1: {
     marginLeft: 10,
     marginTop: 15,
@@ -341,76 +388,51 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 20,
   },
+
   Content: {
     flexDirection: "column",
     marginLeft: 10,
-    justifyContent: "center",
-    alignContent: "center",
+    flex: 1,
   },
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    marginHorizontal: 8,
+  },
+  MechInfo: {
+    flex: 1,
+    width: "98%",
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+    flexDirection: "column",
+    // marginLeft: 4,
+  },
+
+  containerInput: {
+    borderRadius: 10,
+    borderWidth: 0.5,
+    width: "95%",
+    height: 100,
+    borderColor: "#8888D",
+    alignItems: "center",
+    opacity: 0.4,
+  },
+
   container: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "center",
     marginHorizontal: 10,
   },
-  containerInput1: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    marginHorizontal: 10,
-  },
-  MechInfo: {
-    flex: 1,
-    width: "90%",
-    borderRadius: 10,
-    alignItems: "center",
-    flexDirection: "column",
-    marginHorizontal: 10,
-  },
-  dropdown: {
-    height: 40,
-    backgroundColor: "white",
-    opacity: 0.4,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  label: {
-    position: "absolute",
-    backgroundColor: "white",
-    left: 22,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  atas: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    backgroundColor: "white",
-    marginTop: 8,
-    paddingVertical: 10,
-    backgroundColor: "white",
-  },
-  title: {
-    fontSize: 16,
-  },
-  containerInput: {
-    width: "100%",
-    paddingHorizontal: 24,
-    marginVertical: 50,
-  },
   Abu: {
     color: "#88888D",
+  },
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    marginHorizontal: 10,
   },
 });

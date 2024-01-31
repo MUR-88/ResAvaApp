@@ -27,8 +27,8 @@ const Login = ({ navigation }) => {
 
   const formik = useFormik({
     validationSchema: schema,
-    // initialValues: { SAP: "123456", password: "12345678" },
-    initialValues: { SAP: "", password: "" },
+    initialValues: { SAP: "123456", password: "12345678" },
+    // initialValues: { SAP: "", password: "" },
     onSubmit: async (values) => {
       try {
         setIsLoading(true);

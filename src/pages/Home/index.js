@@ -320,6 +320,8 @@ const Home = ({ navigation }) => {
                         <Text>Name: {item.master_company_id}</Text>
                         <Text>Brand: {item.brand}</Text>
                         <Text>Sync: {item.isSync}</Text>
+                        <Text>HM: {item.current_hour_meter}</Text>
+
                         <Text>
                           Create:{" "}
                           {dayjs(item.date)
@@ -338,7 +340,7 @@ const Home = ({ navigation }) => {
                           { fontSize: 10, marginVertical: 2 },
                         ]}
                       >
-                        {dayjs(item.last_pulled_at*1000)
+                        {dayjs(item.last_pulled_at)
                           .locale("id")
                           .format("DD/MMM/YYYY ")}
                       </Text>
@@ -358,6 +360,10 @@ const Home = ({ navigation }) => {
                           backgroundcolor: "#D6E8FD",
                           alginSelf: "center",
                           // width:20
+                          onPress : () => navigation.navigate("Edit", 
+                          // {id: item.id}
+                          
+                          )
                         }}
                       />
                     </View>

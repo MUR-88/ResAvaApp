@@ -12,7 +12,6 @@ import {
 
 export default class MasterCompany extends Model {
   static table = "master_company";
-  
   static associations = {
     masterLogActivities: {
       type: "has_many",
@@ -27,6 +26,7 @@ export default class MasterCompany extends Model {
       key: "user_id",
     },
   };
+  @children("master_log_activities") master_log_activities;
   @field("id_master_company") id_master_company;
   @field("name") name;
   @field("isSync") isSync;

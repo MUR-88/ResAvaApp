@@ -1,5 +1,5 @@
 import { Model } from "@nozbe/watermelondb";
-import { date, field, text, immutableRelation  } from '@nozbe/watermelondb/decorators'
+import { date, field, text, immutableRelation, children  } from '@nozbe/watermelondb/decorators'
 
 export default class MasterLogActivity extends Model {
   static table = "master_log_activities";
@@ -37,15 +37,18 @@ export default class MasterLogActivity extends Model {
   };
   @field('id') id
   @field('id_master_log_activity') idMasterLogActivity
-  @field('master_company_id') masterCompanyId
-  @field('master_sector_id') masterSectorId
-  @field('master_estate_id') masterEstateId
+  @children('id_master_log_activity') idMasterLogActivity
+  @field('master_company_id') master_company_id
+  @field('master_sector_id') master_sector_id
+  @field('master_estate_id') master_estate_id
   @field('brand') brand
-  @field('master_machine_id') masterMachineId
-  @field('master_machine_type_id') masterMachineTypeId
-  @field('master_main_activity_id') masterMainActivityId
-  @field('current_hour_meter') currentHourMeter
-  @field('last_hour_meter') lastHourMeter
+  @field('master_machine_id') master_machine_id
+  @field('master_machine_types_id') master_machine_types_id
+  @field('compartement_id') compartement_id
+  @field('master_main_activity_id') master_main_activity_id
+  @field('current_hour_meter') current_hour_meter
+  @field('last_hour_meter') last_hour_meter
+  @field('class') class
   @field('keterangan') keterangan
   @field('isSync') isSync
   @field('isConnected') isConnected

@@ -16,6 +16,7 @@ import { Logo } from "../../assets/icon";
 import { ScrollView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 const Splash = ({ navigation }) => {
   // make use effect to get token from async storage
@@ -24,23 +25,23 @@ const Splash = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   //imoorting fetching
-  const { fetching: fatchingCompany } = useMasterCompany({ isGetData: false });
-  const { fetching: fatchingSector } = useMasterSector({ isGetData: false });
   const { fetching: fatchingEstate } = useMasterEstate({ isGetData: false });
   const { fetching: fatchingMachineType } = useMasterMachineType({ isGetData: false, });
   const { fetching: fatchingMachine } = useMasterMachine({ isGetData: false });
   const { fetching: fatchingMainActivity } = useMasterMainActivity({ isGetData: false, });
+  const { fetching: fatchingCompany } = useMasterCompany({ isGetData: false });
+  const { fetching: fatchingSector } = useMasterSector({ isGetData: false });
   const { fetching: fatchingLog } = useMasterLog({ isGetData: false });
   useEffect(() => {
     (async () => {
       try {
         setIsLoading(true);
-        await fatchingCompany();
-        await fatchingMachine();
-        await fatchingSector();
         await fatchingEstate();
         await fatchingMachineType();
+        await fatchingMachine();
         await fatchingMainActivity();
+        await fatchingCompany();
+        await fatchingSector();
         await fatchingLog();
         setIsLoading(false);
       } catch (error) {

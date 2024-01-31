@@ -7,6 +7,7 @@ import Report from './Report'
 import Status from './Status'
 import NewForm from './NewForm'
 import Splash from './Splash'
+import Edit from './Edit'
 // import PilihTanggal from './PilihTanggal'
 
 export{
@@ -21,6 +22,7 @@ export{
     Profile,
     Report,
     Status,
-    NewForm
+    NewForm,
+    Edit
     // PilihTanggal
 }

@@ -17,7 +17,7 @@ export const useMasterLog = ({ isGetData }) => {
     await synchronize({
       database,
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-        console.log("last pull at", lastPulledAt)
+        console.log("last pull at masater Log", lastPulledAt)
         const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
           JSON.stringify(migration)
           )}`;
@@ -28,7 +28,7 @@ export const useMasterLog = ({ isGetData }) => {
               `Request failed with status ${response.status}`
               );
             }
-            const timestamp =  dayjs().locale('id').unix();
+            const timestamp =  dayjs().locale('id').unix()*1000;
             
             console.log("last_pull_at", timestamp)
             return { changes: response.data, timestamp: timestamp };

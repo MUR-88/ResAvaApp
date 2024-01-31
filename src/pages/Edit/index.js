@@ -38,23 +38,22 @@ import MasterLogActivity from "../../assets/Model/master_log_activity";
 import dayjs from "dayjs";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { API } from "../../function";
-// import { Alert } from "react-native-web";
 
-const AddNew = ({ navigation }) => {
+const Edit = ({ navigation }) => {
   let schema = yup.object().shape({
-    // hm_current: yup.number().required("Mohon masukkan format yang benar"),
-    // compartement_id: yup
-    //   .string()
-    //   .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
-    //   .min(1)
-    //   .required("Masukkan Compartement ID"),
-    // // Date: yup.date().required("Required"),
-    // id_master_sector: yup.string().required("Pilih Sector"),
-    // id_master_company: yup.string().required("Pilih Company"),
-    // // id_master_machine: yup.string().required("Pilih Machine ID"),
-    // id_master_estate: yup.string().required("Pilih Estate"),
-    // id_master_machine_types: yup.string().required("Pilih Machine Type"),
-    // id_master_main_activities: yup.string().required("Pilih Main Activity"),
+    hm_current: yup.number().required("Mohon masukkan format yang benar"),
+    compartement_id: yup
+      .string()
+      .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
+      .min(1)
+      .required("Masukkan Compartement ID"),
+    // Date: yup.date().required("Required"),
+    id_master_sector: yup.string().required("Pilih Sector"),
+    id_master_company: yup.string().required("Pilih Company"),
+    // id_master_machine: yup.string().required("Pilih Machine ID"),
+    id_master_estate: yup.string().required("Pilih Estate"),
+    id_master_machine_types: yup.string().required("Pilih Machine Type"),
+    id_master_main_activities: yup.string().required("Pilih Main Activity"),
   });
 
   const {
@@ -103,7 +102,7 @@ const AddNew = ({ navigation }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  // console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log(JSON.stringify(dataMasterLog, null, 2));
   console.log("data Log", dataMasterLog.length);
 
   const [selectedDate, setSelectedDate] = useState("");
@@ -119,150 +118,6 @@ const AddNew = ({ navigation }) => {
   const [isFocus, setIsFocus] = useState(true);
   const [date, setDate] = useState(undefined);
   const [showTime, setShowTime] = useState(false);
-
-  const mySync = async () => {
-    try {
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(`master_company/sync?${urlParams}`);
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(`master_sector/sync?${urlParams}`);
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(
-            `master_machine_type/sync?${urlParams}`
-          );
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(`master_machine/sync?${urlParams}`);
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(
-            `master_main_activity/sync?${urlParams}`
-          );
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      // // Membuat data baru
-      // const newLog = await database.write(async () => {
-      //   const masterLog = await database
-      //     .get(MasterLogActivity.table)
-      //     .create((item) => {
-      //       item.keterangan = "Bas";
-      //       // sector.isSynced = true;
-      //       // sector.isConnected = true;
-      //     });
-
-      //   return masterLog;
-      // });
-
-      // console.log("Log created:", newLog);
-
-      // Mendapatkan semua data dari tabel
-      // const allLog = await database
-      //   .get(MasterLogActivity.table)
-      //   .query()
-      //   .fetch();
-
-      // console.log("All Log:", allLog);
-
-      // setMasterLog(allSector.map((masterSector) => masterSector._raw));
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-  const showLog = async () => {
-    // console.log(JSON.stringify(dataMasterLog, null, 2));
-    console.log("data Log", dataMasterLog.length);
-  };
-
-  function handleOnPress() {
-    setOpen(!open);
-  }
-
-  function handleChangeDate(date) {
-    // setShowTime(!showTime );
-    console.log("tanggal pilih", date);
-    setDate(date);
-  }
 
   const toggleSwitch = () => {
     try {
@@ -283,7 +138,6 @@ const AddNew = ({ navigation }) => {
       id_master_sector: "",
       id_master_company: "",
       id_master_machine: "",
-      master_machine_id: "",
       id_master_estate: "",
       compartement_id: "",
       id_master_machine_types: "",
@@ -300,40 +154,24 @@ const AddNew = ({ navigation }) => {
         await database.write(async () => {
           const masterLog = await database
             .get(MasterLogActivity.table)
-            .create((item) => {
-              item.master_sector_id = values.id_master_sector;
-              item.master_company_id = values.id_master_company;
-              item.master_machine_id = values.id_master_machine;
-              item.master_estate_id = values.id_master_estate;
-              item.compartement_id = values.compartement_id;
-              item.master_machine_types_id = values.id_master_machine_types;
-              item.master_main_activity_id = values.id_master_main_activities;
-              item.brand = "KOMATSU";
-              item.current_hour_meter = values.hm_current;
-              item.keterangan = values.keterangan;
-              item.isSynced = false;
-              item.isConnected = false;
-              item.date = dayjs(values.date).unix() * 1000;
-
-              // item.master_sector_id = 5;
-              // item.master_company_id = 5;
-              // item.master_machine_id = 5;
-              // item.master_estate_id = 5;
-              // item.compartement_id = 5;
-              // item.master_machine_types_id = 5;
-              // item.master_main_activity_id = 5;
-              // item.current_hour_meter = 5;
-              // item.brand = "KOMATSU";
-              // item.last_hour_meter = 5;
-              // item.class = 20;
-              // item.keterangan = "5";
-              // item.isSync = true;
-              // item.date = dayjs(values.date).unix()*1000;
-              // item.isConnected = true;
+            .create((master_log_activities) => {
+              master_log_activities.keterangan = "bas";
+              // master_log_activities.master_sector_id = values.id_master_sector;
+              // master_log_activities.master_company_id = values.id_master_company;
+              // master_log_activities.master_machine_id = values.id_master_machine;
+              // master_log_activities.master_estate_id = values.id_master_estate;
+              // master_log_activities.compartement_id = values.compartement_id;
+              // master_log_activities.master_machine_types_id = values.id_master_machine_types;
+              // master_log_activities.master_main_activities_id = values.id_master_main_activities;
+              // master_log_activities.current_hour_meter = values.hm_current;
+              // master_log_activities.keterangan = values.keterangan;
+              // master_log_activities.isSynced = false;
+              // master_log_activities.isConnected = false;
+              // master_log_activities.date = dayjs(values.date).unix()*1000;
             });
 
-          // console.log(JSON.stringify(MasterLogActivity, null, 2));
-          // console.log(JSON.stringify(masterLog, null, 2));
+          console.log(JSON.stringify(MasterLogActivity, null, 2));
+          console.log(JSON.stringify(masterLog, null, 2));
           console.log("masterLog", database);
           return masterLog;
         });
@@ -345,12 +183,13 @@ const AddNew = ({ navigation }) => {
           text1: error.message,
         });
         console.log(database);
+        // console.log(error);
       }
     },
   });
-  // console.log(formik.errors);
+  console.log(formik.errors);
   console.log("value", formik.values);
-
+  // console.log(formik.masterLog);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
@@ -365,7 +204,7 @@ const AddNew = ({ navigation }) => {
           >
             <View style={[styles.Kotak]}>
               <Text style={[styles.Header1, { marginBottom: -10 }]}>
-                Resources Update
+                Edit Data Log
               </Text>
             </View>
           </View>
@@ -381,12 +220,6 @@ const AddNew = ({ navigation }) => {
               Details
             </Text>
             <View style={[styles.Details1]}>
-              <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
-                <Text>Sync</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={showLog} style={{ marginVertical: 5 }}>
-                <Text>Log</Text>
-              </TouchableOpacity>
               <View style={[styles.button_waktu]}>
                 <Modal
                   animationType="slide"
@@ -488,24 +321,6 @@ const AddNew = ({ navigation }) => {
                     </Text>;
                   }
                 : null}
-              <View style={[styles.button_waktu1]}>
-                <Button
-                  buttonStyle={{
-                    borderRadius: 20,
-                    marginHorizontal: 10,
-                    marginBottom: 10,
-                  }}
-                  item={{
-                    title: "Check Status Machine",
-                    height: 40,
-                    textcolor: "#007AFF",
-                    // marginTop: 10,
-                    backgroundcolor: "#DEEBFF",
-                    alginSelf: "center",
-                    onPress: () => navigation.navigate("Status"),
-                  }}
-                />
-              </View>
             </View>
             <View
               style={{
@@ -536,15 +351,15 @@ const AddNew = ({ navigation }) => {
                 item={{
                   values: dataMachine.map((machine) => ({
                     label: machine.machine_id,
-                    value: machine.master_machine_id,
+                    value: machine.id_master_machine,
                   })),
                   placeholder: dataMachine.find(
                     (item) =>
-                      item.master_machine_id === formik.values.master_machine_id
-                  )?.machine_id,
+                      item.id_master_machine === formik.values.id_master_machine
+                  )?.name,
                   onChange: (item) => {
                     setIsFocus(false);
-                    formik.setFieldValue("master_machine_id", item.value);
+                    formik.setFieldValue("machine_id", item.value);
                     console.log(item);
                   },
                   Dropdown: {
@@ -555,19 +370,17 @@ const AddNew = ({ navigation }) => {
                   },
                 }}
               />
-              {formik.errors.master_machine_id
+              {formik.errors.id_master_machine
                 ? () => {
                     <Text style={globalStyles.textError}>
-                      {formik.errors.master_machine_id}
+                      {formik.errors.id_master_machine}
                     </Text>;
                   }
                 : null}
               <DropdownComp
                 title="Estate"
                 item={{
-                  values: dataEstate.filter((selected)=> {
-                    selected.id_master_sectors === formik.values.id_master_sector
-                  }).map((estate) => ({
+                  values: dataEstate.map((estate) => ({
                     label: estate.name,
                     value: estate.id_master_estate,
                   })),
@@ -859,9 +672,10 @@ const AddNew = ({ navigation }) => {
   );
 };
 
-export default AddNew;
+export default Edit;
 
 const { width, height } = Dimensions.get("screen");
+
 const styles = StyleSheet.create({
   Header: {
     backgroundColor: "#FAFAFA",

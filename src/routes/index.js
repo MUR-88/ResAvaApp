@@ -8,7 +8,18 @@ import {
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import AutoHeightImage from "react-native-auto-height-image";
 import { StyleSheet } from "react-native";
-import { Home, AddNew, Register, Report, Login, PilihTanggal, Status, NewForm, Splash } from "../pages";
+import {
+  Home,
+  AddNew,
+  Register,
+  Report,
+  Login,
+  PilihTanggal,
+  Status,
+  NewForm,
+  Splash,
+  Edit,
+} from "../pages";
 import {
   Add_Active,
   Add,
@@ -196,7 +207,7 @@ function Mytabs({ navigation }) {
           },
         }}
       />
-      {/* History */}
+      {/* Register */}
       <BottomTab.Screen
         name="Register"
         component={Register}
@@ -243,7 +254,7 @@ function Mytabs({ navigation }) {
         listeners={{
           tabPress: (e) => {
             // Prevent default action
-            setActiveTabs("AddNew");
+            setActiveTabs("Register");
           },
         }}
       />
@@ -294,10 +305,11 @@ function Mytabs({ navigation }) {
         listeners={{
           tabPress: (e) => {
             // Prevent default action
-            setActiveTabs("AddNew");
+            setActiveTabs("Report");
           },
         }}
       />
+      {/* Report */}
     </BottomTab.Navigator>
   );
 }
@@ -313,11 +325,11 @@ export default function Route() {
         }}
       >
         <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen name="Edit" component={Edit} />
         <Stack.Screen name="Mytabs" component={Mytabs} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Status" component={Status} />
         <Stack.Screen name="NewForm" component={NewForm} />
-
 
         {/* <Stack.Screen name="PilihTanggal" component={PilihTanggal} /> */}
       </Stack.Navigator>
