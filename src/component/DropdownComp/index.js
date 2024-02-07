@@ -20,6 +20,7 @@ const index = ({ title, item }) => {
           maxHeight={item.height}
           search
           searchPlaceholder="Seacrh..."
+          defaultValue={item.defaultValue}
           width={20}
           labelField="label"
           valueField="value"

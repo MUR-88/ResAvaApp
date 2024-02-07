@@ -1,12 +1,78 @@
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Header } from "../../component";
+import { DropdownComp, Header } from "../../component";
 import AutoHeightImage from "react-native-auto-height-image";
 import { Profile_Set, PanahKiri } from "../../assets/icon";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useMasterCompany, useMasterLog, useMasterMachine } from "../../hooks";
+import { Formik, useFormik } from "formik";
+import dayjs from "dayjs";
+import { Dropdown } from "react-native-element-dropdown";
 
 const Status = ({ navigation }) => {
+  const [isFocus, setIsFocus] = React.useState(false);
+
+  const formik = useFormik({
+    initialValues: {
+      date: "",
+      id_master_sectors: "",
+      id_master_company: "",
+      id_master_machine: "",
+      master_machine_id: "",
+      id_master_estate: "",
+      compartement_id: "",
+      id_master_machine_types: "",
+      id_master_main_activities: "",
+      hm_current: "",
+      keterangan: "",
+    },
+    // validationSchema: schema,
+
+    onSubmit: async (values) => {
+      try {
+        //   console.log("value", values.date);
+        //   console.log("value", dayjs(values.date).unix());
+        await database.write(async () => {
+          const masterLog = await database
+            .get(MasterLogActivity.table)
+            .create((item) => {});
+
+          console.log("masterLog", database);
+          return masterLog;
+        });
+        // navigation.replace("Mytabs");
+        // console.log("value", values.date);
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: error.message,
+        });
+        console.log(database);
+      }
+    },
+  });
+  // console.log(formik.errors);
+  console.log("value", formik.values);
+  const {
+    data: dataCompany,
+    isLoading: isLoadingCompany,
+    connected: connectedMasterCompany,
+  } = useMasterCompany({ isGetData: true });
+  console.log("data Company", dataCompany.length);
+  const {
+    data: dataMasterLog,
+    isLoading: isLoadingLog,
+    connected: connectedMasterLog,
+  } = useMasterLog({ isGetData: true });
+  console.log("data Log", dataMasterLog.length);
+  // console.log(JSON.stringify(dataMasterLog, null, 2));
+
+  const {
+    data: dataMachine,
+    isLoading: isLoadingMachine,
+    connected: connectedMasterMachine,
+  } = useMasterMachine({ isGetData: true });
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
@@ -45,28 +111,36 @@ const Status = ({ navigation }) => {
                     width={35}
                     style={{ justifyContent: "center" }}
                   />
-                  <View style={{ flexDirection: "column", marginLeft: 12 }}>
-                    <Text
-                      style={{
-                        fontWeight: "600",
-                        fontFamily: "PoppinsBold",
-                        alignItems: "center",
-                        fontSize: 12,
-                        opacity: 0.7,
+                  <View style={{ flex: 1, width: 20, marginLeft:10 }}>
+                    <Dropdown
+                      style={[styles.dropdown]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={dataCompany.map((company) => ({
+                        label: company.name,
+                        value: company.id_master_company,
+                      }))}
+                      maxHeight={300}
+                      width={20}
+                      search
+                      labelField="label"
+                      valueField="value"
+                      placeholder={
+                        dataCompany.find(
+                          (item) =>
+                            item.id_master_company ===
+                            formik.values.id_master_company
+                        )?.name
+                      }
+                      onFocus={() => setIsFocus(true)}
+                      onBlur={() => setIsFocus(false)}
+                      onChange={(item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_company", item.value);
+                        console.log(item);
                       }}
-                    >
-                      PTSI
-                    </Text>
-                    <Text
-                      style={{
-                        fontWeight: "400",
-                        alignItems: "center",
-                        fontSize: 12,
-                        opacity: 0.5,
-                      }}
-                    >
-                      26 November 2023 - Tesso West A 202
-                    </Text>
+                    />
                   </View>
                 </View>
               </View>
@@ -82,6 +156,7 @@ const Status = ({ navigation }) => {
                   marginRight: -200,
                 }}
               />
+
               <View
                 style={{
                   flexDirection: "row",
@@ -103,48 +178,56 @@ const Status = ({ navigation }) => {
                   borderBottomWidth: 1,
                   marginTop: 15,
                   marginBottom: 15,
-                  marginRight: -200,
                 }}
               />
             </View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginHorizontal: 15,
-								opacity: 0.8
-              }}
-            >
-              <Text>SL 503 </Text>
-              <Text>16/10/2023 </Text>
-              <View style={{alignContent:'center', justifyContent: 'center',backgroundColor:'red', width:20,borderRadius:40}}/>
-            </View>
-						<View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginHorizontal: 15,
-								marginVertical: 10,
-								opacity: 0.8
-              }}
-            >
-              <Text>SL 504 </Text>
-              <Text>26/11/2023 </Text>
-              <View style={{alignContent:'center', justifyContent: 'center',backgroundColor:'green', width:20,borderRadius:40}}/>
-            </View>
-						<View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginHorizontal: 15,
-								marginVertical: 10,
-								opacity: 0.8
-              }}
-            >
-              <Text>SL 502 </Text>
-              <Text>26/11/2023 </Text>
-              <View style={{alignContent:'center', justifyContent: 'center',backgroundColor:'green', width:20,borderRadius:40}}/>
-            </View>
+            {dataMasterLog
+              .filter(
+                (item) =>
+                  item.master_company_id === formik.values.id_master_company
+              )
+              .map((item, index) => (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    alignContent: "center",
+                    justifyItem: "center",
+                    marginHorizontal: 15,
+                    opacity: 0.8,
+                    // marginRight:10
+                  }}
+                >
+                  <Text style={{}}>
+                    {
+                      dataMachine.find(
+                        (select) =>
+                          select.id_master_machine === item.id_master_machine
+                      )?.machine_id
+                    }
+                  </Text>
+                  <Text style={{ marginVertical: 5, marginLeft: 10 }}>
+                    {dayjs(item.updated_at).locale("id").format("DD/MMM/YYYY ")}
+                  </Text>
+                  <View
+                    style={{
+                      alignContent: "center",
+                      justifyContent: "center",
+                      backgroundColor:
+                        dayjs(item.updated_at)
+                          .locale("id")
+                          .format("DD/MMM/YYYY") ===
+                        dayjs().format("DD/MMM/YYYY")
+                          ? "green"
+                          : "red",
+                      width: 15,
+                      height: 15,
+                      borderRadius: 40,
+                    }}
+                  />
+                </View>
+              ))}
           </View>
         </View>
       </SafeAreaView>

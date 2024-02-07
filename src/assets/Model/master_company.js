@@ -29,8 +29,6 @@ export default class MasterCompany extends Model {
   @children("master_log_activities") master_log_activities;
   @field("id_master_company") id_master_company;
   @field("name") name;
-  @field("isSync") isSync;
-  @field("isConnected") isConnected;
   @date("created_at") createdAt;
   @date("deleted_at") deletedAt;
   @date("updated_at") updatedAt;

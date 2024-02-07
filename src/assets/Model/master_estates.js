@@ -16,9 +16,7 @@ export default class MasterEstate extends Model {
   
   @field("id") id;
   @field("name") name;
-  @field("master_sector_id") masterSectorId;
-  @field("isSync") isSync;
-  @field("isConnected") isConnected;
+  @field("id_master_sectors") id_master_sectors;
   @date("created_at") createdAt;
   @date("deleted_at") deletedAt;
   @date("updated_at") updatedAt;

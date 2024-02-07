@@ -22,19 +22,20 @@ export default class MasterMachine extends Model {
     },
   };
   @field("id") id;
-  @field("master_machine_type_id") masterMachineTypeId;
-  @field("master_company_id") masterCompanyId;
+  @field("master_machine_id") master_machine_id;
+  @field("master_machine_types_id") master_machine_types_id;
+  @field("master_company_id") master_company_id;
   @field("class") class;
-  @field("machine_id") machineId;
-  @field('current_hour_meter') currentHourMeter
-  @field('last_update_hm') lastUpdateHourMeter
-  @field('working_hour') workingHour
-  @field('master_main_activity_id') mainActivityId
+  @field("machine_id") machine_id;
+  @field('current_hour_meter') current_hour_meter
+  @field('hm_current') hm_current
+  @field('working_hour') working_hour
+  @field('master_main_activity_id') master_main_activity_id
   @field('isSync') isSync
   @field('isConnected') isConnected
   @field('created_at') createdAt
   @field('deleted_at') deletedAt
   @field('updated_at') updatedAt
-  @children('master_main_activities') masterMainActivity;
-  @children('master_log_activities') masterLogActivities;
+  @children('master_main_activities') master_main_activities;
+  @children('master_log_activities') master_log_activities;
 }

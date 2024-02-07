@@ -45,6 +45,8 @@ const Register = ({ navigation }) => {
     // id_master_machine_types: yup.string().required("Pilih Machine Type"),
     // id_master_main_activities: yup.string().required("Pilih Main Activity"),
   });
+  const [isFocus, setIsFocus] = useState(true);
+
 
   const {
     data: dataCompany,
@@ -52,6 +54,12 @@ const Register = ({ navigation }) => {
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
   console.log("data Company", dataCompany.length);
+  const {
+    data: dataMachine,
+    isLoading: isLoadingMachine,
+    connected: connectedMasterMachine,
+  } = useMasterMachine({ isGetData: true });
+  console.log("data Machine", dataCompany.length);
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
@@ -69,17 +77,14 @@ const Register = ({ navigation }) => {
 
   const formik = useFormik({
     initialValues: {
-      date: "",
-      id_master_sector: "",
       id_master_company: "",
-      id_master_machine: "",
-      master_machine_id: "",
-      id_master_estate: "",
-      compartement_id: "",
+      brand: "",
+      class: "",
+      machine_id: "",
       id_master_machine_types: "",
       id_master_main_activities: "",
       hm_current: "",
-      keterangan: "",
+
     },
     validationSchema: schema,
 
@@ -91,20 +96,15 @@ const Register = ({ navigation }) => {
           const masterLog = await database
             .get(MasterMachine.table)
             .create((item) => {
-              item.master_sector_id = values.id_master_sector;
               item.master_company_id = values.id_master_company;
-              item.master_machine_id = values.id_master_machine;
-              item.master_estate_id = values.id_master_estate;
-              item.compartement_id = values.compartement_id;
+              item.brand = values.brand;
+              item.class = values.class;
+              item.machine_id = values.machine_id;
               item.master_machine_types_id = values.id_master_machine_types;
               item.master_main_activity_id = values.id_master_main_activities;
-              item.brand = "KOMATSU";
-              item.current_hour_meter = values.hm_current;
-              item.keterangan = values.keterangan;
+              item.hm_current = values.hm_current;
               item.isSynced = false;
               item.isConnected = false;
-              item.date = dayjs(values.date).unix() * 1000;
-
             });
 
           // console.log(JSON.stringify(MasterLogActivity, null, 2));
@@ -123,7 +123,7 @@ const Register = ({ navigation }) => {
       }
     },
   });
-  // console.log(formik.errors);
+  console.log(formik.errors);
   console.log("value", formik.values);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
@@ -266,7 +266,9 @@ const Register = ({ navigation }) => {
               <DropdownComp
                 title="Main Activity"
                 item={{
-                  values: dataMainActivity.map((mainActivity) => ({
+                  values: dataMainActivity.filter((selected) => {
+                   return  (selected.master_machine_types_id === formik.values.id_master_machine_types)
+                  }).map((mainActivity) => ({
                     label: mainActivity.name,
                     value: mainActivity.id_master_main_activities,
                   })),

@@ -38,8 +38,22 @@ import MasterLogActivity from "../../assets/Model/master_log_activity";
 import dayjs from "dayjs";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { API } from "../../function";
+import id from "dayjs/locale/id";
+import { useRoute } from "@react-navigation/native";
 
-const Edit = ({ navigation }) => {
+const Edit = ({ navigation, route}) => {
+
+  const { item } = route.params;
+
+  // Assuming item.defaultCompanyId contains the default company ID
+  // const defaultCompanyId = item.defaultCompanyId;
+
+  console.log(JSON.stringify(item, null, 2));
+  // const route = useRoute()
+  // const item = route.params?.item
+  // console.log(JSON.stringify(item, null, 2))
+  // console.log("id", item)
+
   let schema = yup.object().shape({
     hm_current: yup.number().required("Mohon masukkan format yang benar"),
     compartement_id: yup
@@ -102,7 +116,7 @@ const Edit = ({ navigation }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  console.log(JSON.stringify(dataMasterLog, null, 2));
+  // console.log(JSON.stringify(dataMasterLog, null, 2));
   console.log("data Log", dataMasterLog.length);
 
   const [selectedDate, setSelectedDate] = useState("");
@@ -187,9 +201,12 @@ const Edit = ({ navigation }) => {
       }
     },
   });
-  console.log(formik.errors);
-  console.log("value", formik.values);
+  // console.log(formik.errors);
+  // console.log("value", formik.values);
   // console.log(formik.masterLog);
+
+  // console.log("id", id)
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
@@ -204,7 +221,7 @@ const Edit = ({ navigation }) => {
           >
             <View style={[styles.Kotak]}>
               <Text style={[styles.Header1, { marginBottom: -10 }]}>
-                Edit Data Log
+                Resources Update
               </Text>
             </View>
           </View>
@@ -299,11 +316,11 @@ const Edit = ({ navigation }) => {
                   })),
                   placeholder: dataSector.find(
                     (item) =>
-                      item.id_master_sectors === formik.values.id_master_sector
+                      item.id_master_sectors === formik.values.id_master_sectors
                   )?.name,
                   onChange: (item) => {
                     setIsFocus(false);
-                    formik.setFieldValue("id_master_sector", item.value);
+                    formik.setFieldValue("id_master_sectors", item.value);
                     console.log(item);
                   },
                   Dropdown: {
@@ -314,13 +331,31 @@ const Edit = ({ navigation }) => {
                   },
                 }}
               />
-              {formik.errors.id_master_sector
+              {formik.errors.id_master_sectors
                 ? () => {
                     <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_sector}
+                      {formik.errors.id_master_sectors}
                     </Text>;
                   }
                 : null}
+              <View style={[styles.button_waktu1]}>
+                <Button
+                  buttonStyle={{
+                    borderRadius: 20,
+                    marginHorizontal: 10,
+                    marginBottom: 10,
+                  }}
+                  item={{
+                    title: "Check Status Machine",
+                    height: 40,
+                    textcolor: "#007AFF",
+                    // marginTop: 10,
+                    backgroundcolor: "#DEEBFF",
+                    alginSelf: "center",
+                    onPress: () => navigation.navigate("Status"),
+                  }}
+                />
+              </View>
             </View>
             <View
               style={{
@@ -349,17 +384,25 @@ const Edit = ({ navigation }) => {
               <DropdownComp
                 title="Machine ID"
                 item={{
-                  values: dataMachine.map((machine) => ({
-                    label: machine.machine_id,
-                    value: machine.id_master_machine,
-                  })),
+                  values: dataMachine
+                    .filter((selected) => {
+                      return (
+                        selected.master_company_id ===
+                        formik.values.id_master_company
+                      );
+                      // console.log("Values", selected)
+                    })
+                    .map((machine) => ({
+                      label: machine.machine_id,
+                      value: machine.master_machine_id,
+                    })),
                   placeholder: dataMachine.find(
                     (item) =>
-                      item.id_master_machine === formik.values.id_master_machine
-                  )?.name,
+                      item.master_machine_id === formik.values.master_machine_id
+                  )?.machine_id,
                   onChange: (item) => {
                     setIsFocus(false);
-                    formik.setFieldValue("machine_id", item.value);
+                    formik.setFieldValue("master_machine_id", item.value);
                     console.log(item);
                   },
                   Dropdown: {
@@ -370,20 +413,28 @@ const Edit = ({ navigation }) => {
                   },
                 }}
               />
-              {formik.errors.id_master_machine
+              {formik.errors.master_machine_id
                 ? () => {
                     <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_machine}
+                      {formik.errors.master_machine_id}
                     </Text>;
                   }
                 : null}
               <DropdownComp
                 title="Estate"
                 item={{
-                  values: dataEstate.map((estate) => ({
-                    label: estate.name,
-                    value: estate.id_master_estate,
-                  })),
+                  values: dataEstate
+                    .filter((selected) => {
+                      return (
+                        selected.id_master_sectors ===
+                        formik.values.id_master_sectors
+                      );
+                      // console.log("Values", selected)
+                    })
+                    .map((estate) => ({
+                      label: estate.name,
+                      value: estate.id_master_estate,
+                    })),
                   placeholder: dataEstate.find(
                     (item) =>
                       item.id_master_estate === formik.values.id_master_estate
@@ -467,10 +518,18 @@ const Edit = ({ navigation }) => {
               <DropdownComp
                 title="Main Activity"
                 item={{
-                  values: dataMainActivity.map((mainActivity) => ({
-                    label: mainActivity.name,
-                    value: mainActivity.id_master_main_activities,
-                  })),
+                  values: dataMainActivity
+                    .filter((selected) => {
+                      return (
+                        selected.master_machine_types_id ===
+                        formik.values.id_master_machine_types
+                      );
+                      // console.log("Values", selected)
+                    })
+                    .map((mainActivity) => ({
+                      label: mainActivity.name,
+                      value: mainActivity.id_master_main_activities,
+                    })),
                   placeholder: dataMainActivity.find(
                     (item) =>
                       item.id_master_main_activities ===
@@ -543,7 +602,17 @@ const Edit = ({ navigation }) => {
                         ]}
                       >
                         <Text style={{ fontSize: 16, color: "#88888D" }}>
-                          XXX
+                          {dataMasterLog.map((item, index) => {
+                            if (
+                              item.master_machine_id ===
+                                formik?.values?.master_machine_id &&
+                              index === dataMasterLog.length - 1
+                            ) {
+                              return item.last_hour_meter;
+                            } else {
+                              return "Pilih";
+                            }
+                          })}
                         </Text>
                       </View>
                     </View>

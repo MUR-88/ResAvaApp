@@ -38,11 +38,26 @@ import MasterLogActivity from "../../assets/Model/master_log_activity";
 import dayjs from "dayjs";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { API } from "../../function";
+import { hasUnsyncedChanges } from "@nozbe/watermelondb/sync";
+import { Q } from "@nozbe/watermelondb";
 // import { Alert } from "react-native-web";
 
 const AddNew = ({ navigation }) => {
   let schema = yup.object().shape({
-    // hm_current: yup.number().required("Mohon masukkan format yang benar"),
+    hm_current: yup
+      .number()
+      .required("Mohon masukkan format yang benar")
+      .positive("Nilai harus positif")
+      .test("max", "Nilai maksimum adalah 24", function (value) {
+        const { master_machine_id } = this.parent; // Access other fields in the form
+        const lastHourMeter = dataMasterLog
+          .filter((item) => item.master_machine_id === master_machine_id)
+          .map((item) => item.last_hour_meter)
+          .pop(); // Get the last value
+
+        // Perform the validation
+        return value <= 24 && value >= lastHourMeter;
+      }),
     // compartement_id: yup
     //   .string()
     //   .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
@@ -63,6 +78,7 @@ const AddNew = ({ navigation }) => {
     connected: connectedMasterSector,
   } = useMasterSector({ isGetData: true });
   console.log("data sector", dataSector.length);
+  // console.log(JSON.stringify(dataSector, null, 2));
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
@@ -75,7 +91,7 @@ const AddNew = ({ navigation }) => {
     connected: connectedMasterEstate,
   } = useMasterEstate({ isGetData: true });
   console.log("data Estate", dataEstate.length);
-  // console.log(JSON.stringify(dataEstate, null, 2));
+  // console.log(JSON.stringify(dataEstate, null, 2));d
 
   const {
     data: dataMachineType,
@@ -141,110 +157,179 @@ const AddNew = ({ navigation }) => {
           return { changes: response.data, timestamp: timestamp };
         },
       });
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(`master_sector/sync?${urlParams}`);
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(
-            `master_machine_type/sync?${urlParams}`
-          );
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(`master_machine/sync?${urlParams}`);
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(
-            `master_main_activity/sync?${urlParams}`
-          );
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
-      // // Membuat data baru
-      // const newLog = await database.write(async () => {
-      //   const masterLog = await database
-      //     .get(MasterLogActivity.table)
-      //     .create((item) => {
-      //       item.keterangan = "Bas";
-      //       // sector.isSynced = true;
-      //       // sector.isConnected = true;
-      //     });
-
-      //   return masterLog;
+      // await synchronize({
+      //   database,
+      //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+      //     const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+      //       JSON.stringify(migration)
+      //     )}`;
+      //     const response = await API.get(`master_sector/sync?${urlParams}`);
+      //     // Check if the request was successful
+      //     if (response.status_code !== 200) {
+      //       throw new Error(`Request failed with status ${response.status}`);
+      //     }
+      //     const timestamp = dayjs().locale("id").unix();
+      //     // const lastePulledAt = response.data.last_pulled_at;
+      //     // console.log("last_pull_at", lastPulledAt)
+      //     // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
+      //     // console.log('sync', response.data)
+      //     return { changes: response.data, timestamp: timestamp };
+      //   },
+      // });
+      // await synchronize({
+      //   database,
+      //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+      //     const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+      //       JSON.stringify(migration)
+      //     )}`;
+      //     const response = await API.get(
+      //       `master_machine_type/sync?${urlParams}`
+      //     );
+      //     // Check if the request was successful
+      //     if (response.status_code !== 200) {
+      //       throw new Error(`Request failed with status ${response.status}`);
+      //     }
+      //     const timestamp = dayjs().locale("id").unix();
+      //     // const lastePulledAt = response.data.last_pulled_at;
+      //     // console.log("last_pull_at", lastPulledAt)
+      //     // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
+      //     // console.log('sync', response.data)
+      //     return { changes: response.data, timestamp: timestamp };
+      //   },
+      // });
+      // await synchronize({
+      //   database,
+      //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+      //     const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+      //       JSON.stringify(migration)
+      //     )}`;
+      //     const response = await API.get(`master_machine/sync?${urlParams}`);
+      //     // Check if the request was successful
+      //     if (response.status_code !== 200) {
+      //       throw new Error(`Request failed with status ${response.status}`);
+      //     }
+      //     const timestamp = dayjs().locale("id").unix();
+      //     // const lastePulledAt = response.data.last_pulled_at;
+      //     // console.log("last_pull_at", lastPulledAt)
+      //     // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
+      //     // console.log('sync', response.data)
+      //     return { changes: response.data, timestamp: timestamp };
+      //   },
+      // });
+      // await synchronize({
+      //   database,
+      //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+      //     const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+      //       JSON.stringify(migration)
+      //     )}`;
+      //     const response = await API.get(
+      //       `master_main_activity/sync?${urlParams}`
+      //     );
+      //     // Check if the request was successful
+      //     if (response.status_code !== 200) {
+      //       throw new Error(`Request failed with status ${response.status}`);
+      //     }
+      //     const timestamp = dayjs().locale("id").unix();
+      //     // const lastePulledAt = response.data.last_pulled_at;
+      //     // console.log("last_pull_at", lastPulledAt)
+      //     // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
+      //     // console.log('sync', response.data)
+      //     return { changes: response.data, timestamp: timestamp };
+      //   },
       // });
 
-      // console.log("Log created:", newLog);
+      //batas sync
 
-      // Mendapatkan semua data dari tabel
-      // const allLog = await database
-      //   .get(MasterLogActivity.table)
-      //   .query()
-      //   .fetch();
+      // await synchronize({
+      //   database,
+      //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+      //     console.log("last pull at masater Log", lastPulledAt);
+      //     const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+      //       JSON.stringify(migration)
+      //     )}`;
+      //     const response = await API.get(`log_activity/sync?${urlParams}`);
+      //     // Check if the request was successful
+      //     if (response.status_code !== 200) {
+      //       throw new Error(`Request failed with status ${response.status}`);
+      //     }
+      //     const timestamp = dayjs().locale("id").unix() * 1000;
 
-      // console.log("All Log:", allLog);
+      //     console.log("last_pull_at", timestamp);
+      //     return { changes: response.data, timestamp: timestamp };
+      //   },
+      //   pushChanges: async ({ changes, lastPulledAt }) => {
+      //     const masterLogCreated = changes.master_log_activities.created.filter(
+      //       (item) => item.isSync === false
+      //     );
+      //     const masterLogUpdated = changes.master_log_activities.updated.filter(
+      //       (item) => item.isSync === false
+      //     );
 
-      // setMasterLog(allSector.map((masterSector) => masterSector._raw));
+      //     const masterMachineCreated = changes.master_machine.created.filter(
+      //       (item) => item.isSync === false
+      //     );
+      //     const masterMachineUpdated = changes.master_machine.updated.filter(
+      //       (item) => item.isSync === false
+      //     );
+
+      //     try {
+      //       const response = await API.post("push/data", {
+      //         master_log_activities: {
+      //           created: masterLogCreated,
+      //           updated: masterLogUpdated,
+      //         },
+      //         master_machine: {
+      //           created: masterMachineCreated,
+      //           updated: masterMachineUpdated,
+      //         },
+      //         last_pulled_at: lastPulledAt,
+      //       });
+
+      //       const allMasterLog = await database
+      //         .get("master_log_activities")
+      //         .query(Q.where("isSync", false))
+      //         .fetch();
+
+      //       for (let i = 0; i < allMasterLog.length; i++) {
+      //         await allMasterLog[i].update((masterLog) => {
+      //           masterLog.isSync = true;
+      //         });
+      //       }
+
+      //       const allMasterMachine = await database
+      //         .get("master_machine")
+      //         .query(Q.where("isSync", false))
+      //         .fetch();
+
+      //       for (let i = 0; i < allMasterMachine.length; i++) {
+      //         await allMasterMachine[i].update((masterMachine) => {
+      //           masterMachine.isSync = true;
+      //         });
+      //       }
+
+      //       console.log("response", response);
+      //       return Promise.resolve();
+      // } catch (e) {
+      //   console.log(e);
+      //   return Promise.reject();
+      // }
+
+      // const response = await fetch(`=${lastPulledAt}`, {
+      //   method: 'POST',
+      //   body: JSON.stringify(changes),
+      // })
+      // if (!response.ok) {
+      //   throw new Error(await response.text())
+      // }
+      // console.log("push", changes);
+      // // console.log(JSON.stringify(changes, null, 2));
+      // return Promise.reject();
+      // },
+      // migrationsEnabledAtVersion: 1,
+      // });
+
+      // const response = await hasUnsyncedChanges({ database });
+      // console.log("response changes", response);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -280,7 +365,7 @@ const AddNew = ({ navigation }) => {
   const formik = useFormik({
     initialValues: {
       date: "",
-      id_master_sector: "",
+      id_master_sectors: "",
       id_master_company: "",
       id_master_machine: "",
       master_machine_id: "",
@@ -301,7 +386,7 @@ const AddNew = ({ navigation }) => {
           const masterLog = await database
             .get(MasterLogActivity.table)
             .create((item) => {
-              item.master_sector_id = values.id_master_sector;
+              item.master_sector_id = values.id_master_sectors;
               item.master_company_id = values.id_master_company;
               item.master_machine_id = values.id_master_machine;
               item.master_estate_id = values.id_master_estate;
@@ -337,7 +422,7 @@ const AddNew = ({ navigation }) => {
           console.log("masterLog", database);
           return masterLog;
         });
-        // navigation.replace("Mytabs");
+        navigation.replace("Mytabs");
         // console.log("value", values.date);
       } catch (error) {
         Toast.show({
@@ -348,7 +433,7 @@ const AddNew = ({ navigation }) => {
       }
     },
   });
-  // console.log(formik.errors);
+  console.log(formik.errors);
   console.log("value", formik.values);
 
   return (
@@ -466,11 +551,11 @@ const AddNew = ({ navigation }) => {
                   })),
                   placeholder: dataSector.find(
                     (item) =>
-                      item.id_master_sectors === formik.values.id_master_sector
+                      item.id_master_sectors === formik.values.id_master_sectors
                   )?.name,
                   onChange: (item) => {
                     setIsFocus(false);
-                    formik.setFieldValue("id_master_sector", item.value);
+                    formik.setFieldValue("id_master_sectors", item.value);
                     console.log(item);
                   },
                   Dropdown: {
@@ -481,10 +566,10 @@ const AddNew = ({ navigation }) => {
                   },
                 }}
               />
-              {formik.errors.id_master_sector
+              {formik.errors.id_master_sectors
                 ? () => {
                     <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_sector}
+                      {formik.errors.id_master_sectors}
                     </Text>;
                   }
                 : null}
@@ -534,10 +619,18 @@ const AddNew = ({ navigation }) => {
               <DropdownComp
                 title="Machine ID"
                 item={{
-                  values: dataMachine.map((machine) => ({
-                    label: machine.machine_id,
-                    value: machine.master_machine_id,
-                  })),
+                  values: dataMachine
+                    .filter((selected) => {
+                      return (
+                        selected.master_company_id ===
+                        formik.values.id_master_company
+                      );
+                      // console.log("Values", selected)
+                    })
+                    .map((machine) => ({
+                      label: machine.machine_id,
+                      value: machine.master_machine_id,
+                    })),
                   placeholder: dataMachine.find(
                     (item) =>
                       item.master_machine_id === formik.values.master_machine_id
@@ -565,12 +658,18 @@ const AddNew = ({ navigation }) => {
               <DropdownComp
                 title="Estate"
                 item={{
-                  values: dataEstate.filter((selected)=> {
-                    selected.id_master_sectors === formik.values.id_master_sector
-                  }).map((estate) => ({
-                    label: estate.name,
-                    value: estate.id_master_estate,
-                  })),
+                  values: dataEstate
+                    .filter((selected) => {
+                      return (
+                        selected.id_master_sectors ===
+                        formik.values.id_master_sectors
+                      );
+                      // console.log("Values", selected)
+                    })
+                    .map((estate) => ({
+                      label: estate.name,
+                      value: estate.id_master_estate,
+                    })),
                   placeholder: dataEstate.find(
                     (item) =>
                       item.id_master_estate === formik.values.id_master_estate
@@ -654,10 +753,18 @@ const AddNew = ({ navigation }) => {
               <DropdownComp
                 title="Main Activity"
                 item={{
-                  values: dataMainActivity.map((mainActivity) => ({
-                    label: mainActivity.name,
-                    value: mainActivity.id_master_main_activities,
-                  })),
+                  values: dataMainActivity
+                    .filter((selected) => {
+                      return (
+                        selected.master_machine_types_id ===
+                        formik.values.id_master_machine_types
+                      );
+                      // console.log("Values", selected)
+                    })
+                    .map((mainActivity) => ({
+                      label: mainActivity.name,
+                      value: mainActivity.id_master_main_activities,
+                    })),
                   placeholder: dataMainActivity.find(
                     (item) =>
                       item.id_master_main_activities ===
@@ -730,7 +837,19 @@ const AddNew = ({ navigation }) => {
                         ]}
                       >
                         <Text style={{ fontSize: 16, color: "#88888D" }}>
-                          XXX
+                          {dataMasterLog
+                            .filter(
+                              (item) =>
+                                item.master_machine_id ===
+                                formik.values.master_machine_id
+                            )
+                            .map((item, index, array) => {
+                              if (index === array.length - 1) {
+                                return item.current_hour_meter;
+                              } else {
+                                return null;
+                              }
+                            })}
                         </Text>
                       </View>
                     </View>

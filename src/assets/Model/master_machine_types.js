@@ -16,8 +16,6 @@ export default class MasterMachineType extends Model {
   
   @field("id") id;
   @field("name") name;
-  @field("isSync") isSync;
-  @field("isConnected") isConnected;
   @date("created_at") createdAt;
   @date("deleted_at") deletedAt;
   @date("updated_at") updatedAt;

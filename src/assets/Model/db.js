@@ -16,7 +16,7 @@ LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']
 
 const adapter = new SQLiteAdapter({
   schema: schema,
-  // migrations: Migration,
+  migrations: Migration,
   dbName: 'res', // optional database name or file system path
   // migrations, // optional migrations
   experimentalUseJSI: false,

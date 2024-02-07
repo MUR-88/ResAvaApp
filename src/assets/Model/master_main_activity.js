@@ -16,8 +16,6 @@ export default class MasterMainActivities extends Model {
 
   @field("name") name;
   @field("id_master_main_activities") idMasterMainActivity;
-  @field("isSync") isSync;
-  @field("isConnected") isConnected;
   @field("created_at") createdAt;
   @field("deleted_at") deletedAt;
   @field("updated_at") updatedAt;

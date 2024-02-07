@@ -41,7 +41,6 @@ export default class MasterLogActivity extends Model {
   @field('master_company_id') master_company_id
   @field('master_sector_id') master_sector_id
   @field('master_estate_id') master_estate_id
-  @field('brand') brand
   @field('master_machine_id') master_machine_id
   @field('master_machine_types_id') master_machine_types_id
   @field('compartement_id') compartement_id

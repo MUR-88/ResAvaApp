@@ -44,27 +44,25 @@ const Home = ({ navigation }) => {
 
   async function mySync() {
     try {
-  //     await synchronize({
-  //       database,
-  //       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-  //         const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-  //           JSON.stringify(migration)
-  //         )}`;
-  //         const response = await API.get(
-  //           `master_log/sync?${urlParams}`
-  //         );
-  //         // console.log(JSON.stringify(response, null, 2));
-
-  //         // Check if the request was successful
-  //         if (response.status_code !== 200) {
-  //           throw new Error(`Request failed with status ${response.status}`);
-  //         }
-  //         const timestamp = dayjs().unix();
-
-  //         console.log("data Type", response.data.length);
-  //         return { changes: response.data, timestamp: timestamp };
-  //       },
-  //     });
+      //     await synchronize({
+      //       database,
+      //       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+      //         const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+      //           JSON.stringify(migration)
+      //         )}`;
+      //         const response = await API.get(
+      //           `master_log/sync?${urlParams}`
+      //         );
+      //         // console.log(JSON.stringify(response, null, 2));
+      //         // Check if the request was successful
+      //         if (response.status_code !== 200) {
+      //           throw new Error(`Request failed with status ${response.status}`);
+      //         }
+      //         const timestamp = dayjs().unix();
+      //         console.log("data Type", response.data.length);
+      //         return { changes: response.data, timestamp: timestamp };
+      //       },
+      //     });
     } catch (error) {
       console.log("Catch Mysync", error);
     }
@@ -99,18 +97,25 @@ const Home = ({ navigation }) => {
 
   const [masterLogActivity, setMasterLogActivity] = useState([]);
 
-  const deleteAllRecords = async () => {
-        try {
-          // Menghapus data
-          await database.write(async () => {
-            await database.get('master_log_activities').destroyPermanently();
-          });
+  const deleteAllRecords = async (id) => {
+    try {
+      // Menghapus data
+      await database.write(async () => {
+        const log = await database.get("master_log_activities").find(id);
+        if (log) {
+          // await log.destroyPermanently(); // Use destroyPermanently to immediately remove the record
+          await log.markAsDeleted(); // syncAble
+          navigation.replace("Home");
+
           console.log("Log deleted", database);
-        } catch (error) {
-          console.error("Error:", error);
+        } else {
+          console.log("Log not found");
         }
-    };
-  
+      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const runSector = async () => {
     try {
@@ -206,59 +211,72 @@ const Home = ({ navigation }) => {
   const dateNow = Date.now();
 
   const [refreshing, setRefreshing] = useState(false);
-  const onReferesh = useCallback((async) => {
+  const onRefresh = () => {
     setRefreshing(true);
-    // await Home();
-    setRefreshing(false);
-  }, []);
+    setTimeout(() => {
+      navigation.navigate("Mytabs");
+      setRefreshing(false);
+    }, 200);
+  };
 
+  // function deleteItem({id}){
+
+  // }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       <StatusBar style="light" />
-      <RefreshControl
-        style={{ flex: 1 }}
-        refreshing={refreshing}
-        onRefresh={onReferesh}
-      >
-        {isConnected ? (
-          <ScrollView style={{ flex: 1 }}>
-            <View
+      {isConnected ? (
+        <ScrollView
+          style={{ flex: 1 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View
+            style={{
+              backgroundColor: "#007AFF",
+              height: 100,
+              justifyContent: "flex_start",
+            }}
+          >
+            <View style={[styles.Kotak]}>
+              <Text style={[styles.Header1]}>Home</Text>
+              <TouchableOpacity onPress={handleLogout}>
+                <View style={[styles.Profile_Circle]}>
+                  <AutoHeightImage
+                    source={Profile_Set}
+                    width={35}
+                    style={{ justifyContent: "center" }}
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={[styles.Content]}>
+            <Text
               style={{
-                backgroundColor: "#007AFF",
-                height: 100,
-                justifyContent: "flex_start",
+                color: "#007AFF",
+                fontSize: 18,
+                fontFamily: "Poppins-Medium",
               }}
             >
-              <View style={[styles.Kotak]}>
-                <Text style={[styles.Header1]}>Home</Text>
-                <TouchableOpacity onPress={handleLogout}>
-                  <View style={[styles.Profile_Circle]}>
-                    <AutoHeightImage
-                      source={Profile_Set}
-                      width={35}
-                      style={{ justifyContent: "center" }}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={[styles.Content]}>
-              <Text
-                style={{
-                  color: "#007AFF",
-                  fontSize: 18,
-                  fontFamily: "Poppins-Medium",
-                }}
-              >
-                Today's Update
-              </Text>
-              <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
-                <Text>Sync</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={deleteAllRecords} style={{ marginVertical: 5 }}>
-                <Text>Delete</Text>
-              </TouchableOpacity>
-              {dataMasterLog.map((item, index) => (
+              Today's Update
+            </Text>
+            <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
+              <Text>Sync</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={deleteAllRecords}
+              style={{ marginVertical: 5 }}
+            >
+              <Text>Delete</Text>
+            </TouchableOpacity>
+            {dataMasterLog
+              // .filter((selected) => {
+              //   console.log("Values", selected);
+              //   return selected.master_company_id === dataMasterLog.user_id;
+              // })
+              .map((item, index) => (
                 <View style={[styles.Isi]}>
                   <View
                     style={{
@@ -276,12 +294,11 @@ const Home = ({ navigation }) => {
                         opacity: 0.6,
                       }}
                     >
-                      17 OCtober, 2023
+                      {dayjs(item.date).locale("id").format("DD/MMM/YYYY ")}
                     </Text>
                     <TouchableOpacity
                       // onPress={onDelete}
-                      onPress={''}
-
+                      onPress={() => deleteAllRecords(item.id)}
                       style={{
                         flex: 1,
                         justifyContent: "center",
@@ -324,9 +341,7 @@ const Home = ({ navigation }) => {
 
                         <Text>
                           Create:{" "}
-                          {dayjs(item.date)
-                            .locale("id")
-                            .format("DD/MMM/YYYY ")}
+                          {dayjs(item.date).locale("id").format("DD/MMM/YYYY ")}
                         </Text>
                         {/* Add more fields as needed */}
                         <Text style={[styles.IsiText, { fontWeight: 900 }]}>
@@ -340,7 +355,7 @@ const Home = ({ navigation }) => {
                           { fontSize: 10, marginVertical: 2 },
                         ]}
                       >
-                        {dayjs(item.last_pulled_at)
+                        {dayjs(item.updated_at)
                           .locale("id")
                           .format("DD/MMM/YYYY ")}
                       </Text>
@@ -360,127 +375,126 @@ const Home = ({ navigation }) => {
                           backgroundcolor: "#D6E8FD",
                           alginSelf: "center",
                           // width:20
-                          onPress : () => navigation.navigate("Edit", 
-                          // {id: item.id}
-                          
-                          )
+                          onPress: () =>
+                            navigation.navigate(
+                              "Edit", [item] 
+                            ),
                         }}
                       />
                     </View>
                   </View>
                 </View>
               ))}
-            </View>
-            <View style={[styles.Content1]}>
-              <Text
-                style={{
-                  color: "grey",
-                  fontSize: 18,
-                  fontFamily: "Poppins-Medium",
-                }}
-              >
-                30 Days History
-              </Text>
-              {query?.data?.data?.data.map((item, index) => {
-                return (
-                  <View style={[styles.Isi]}>
-                    <View
+          </View>
+          <View style={[styles.Content1]}>
+            <Text
+              style={{
+                color: "grey",
+                fontSize: 18,
+                fontFamily: "Poppins-Medium",
+              }}
+            >
+              30 Days History
+            </Text>
+            {query?.data?.data?.data.map((item, index) => {
+              return (
+                <View style={[styles.Isi]}>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      marginBottom: 5,
+                    }}
+                  >
+                    <Text
                       style={{
-                        flex: 1,
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        marginBottom: 5,
+                        color: "#3C3C43",
+                        marginVertical: 5,
+                        marginLeft: 10,
+                        opacity: 0.6,
                       }}
                     >
-                      <Text
-                        style={{
-                          color: "#3C3C43",
-                          marginVertical: 5,
-                          marginLeft: 10,
-                          opacity: 0.6,
-                        }}
-                      >
-                        {dayjs(item.created_at)
-                          .locale("id")
-                          .format("dddd, DD MMMM YYYY")}
-                      </Text>
-                      <View>
-                        <View style={{ flex: 1, flexDirection: "row" }}>
-                          <TouchableOpacity
-                            onPress={() => navigation.navigate("")}
+                      {dayjs(item.created_at)
+                        .locale("id")
+                        .format("dddd, DD MMMM YYYY")}
+                    </Text>
+                    <View>
+                      <View style={{ flex: 1, flexDirection: "row" }}>
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate("")}
+                          style={{
+                            flex: 1,
+                            justifyContent: "center",
+                            // backgroundColor: "red",
+                          }}
+                        >
+                          <Text>?</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate("")}
+                          style={{
+                            flex: 1,
+                            justifyContent: "center",
+                            marginRight: 10,
+                            opacity: 0.1,
+                          }}
+                        >
+                          <Image
+                            source={Delete}
                             style={{
-                              flex: 1,
-                              justifyContent: "center",
-                              // backgroundColor: "red",
+                              height: 20,
+                              width: 20,
+                              marginHorizontal: 8,
                             }}
-                          >
-                            <Text>?</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => navigation.navigate("")}
-                            style={{
-                              flex: 1,
-                              justifyContent: "center",
-                              marginRight: 10,
-                              opacity: 0.1,
-                            }}
-                          >
-                            <Image
-                              source={Delete}
-                              style={{
-                                height: 20,
-                                width: 20,
-                                marginHorizontal: 8,
-                              }}
-                            ></Image>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        marginHorizontal: 10,
-                        borderBottomColor: "#3C3C43",
-                        opacity: 0.3,
-                        borderBottomWidth: 1,
-                      }}
-                    />
-                    <View style={[styles.IsiContent]}>
-                      <AutoHeightImage
-                        source={Profile_Set}
-                        width={40}
-                        style={{
-                          marginLeft: 10,
-                          marginBottom: 5,
-                          marginRight: 5,
-                        }}
-                      />
-                      <View style={{ flex: 1 }}>
-                        <Text style={[styles.IsiText]}>
-                          {item.master_company.name}
-                        </Text>
-                        <Text style={[styles.IsiText2, { fontWeight: 900 }]}>
-                          {item.master_sector.name} {item.master_estate.name}-
-                          {item.compartement_id}
-                        </Text>
-                        <Text style={[styles.IsiText3]}>
-                          Updated at{" "}
-                          {dayjs(item.updated_at)
-                            .locale("id")
-                            .format(" DD MM YYYY")}
-                        </Text>
+                          ></Image>
+                        </TouchableOpacity>
                       </View>
                     </View>
                   </View>
-                );
-              })}
-            </View>
-          </ScrollView>
-        ) : (
-          <Alert.Alert title="No Internet Connection" />
-        )}
-      </RefreshControl>
+                  <View
+                    style={{
+                      flex: 1,
+                      marginHorizontal: 10,
+                      borderBottomColor: "#3C3C43",
+                      opacity: 0.3,
+                      borderBottomWidth: 1,
+                    }}
+                  />
+                  <View style={[styles.IsiContent]}>
+                    <AutoHeightImage
+                      source={Profile_Set}
+                      width={40}
+                      style={{
+                        marginLeft: 10,
+                        marginBottom: 5,
+                        marginRight: 5,
+                      }}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.IsiText]}>
+                        {item.master_company.name}
+                      </Text>
+                      <Text style={[styles.IsiText2, { fontWeight: 900 }]}>
+                        {item.master_sector.name} {item.master_estate.name}-
+                        {item.compartement_id}
+                      </Text>
+                      <Text style={[styles.IsiText3]}>
+                        Updated at{" "}
+                        {dayjs(item.updated_at)
+                          .locale("id")
+                          .format(" DD MM YYYY")}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
+      ) : (
+        <Alert.Alert title="No Internet Connection" />
+      )}
     </SafeAreaView>
   );
 };
