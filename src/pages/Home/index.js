@@ -29,58 +29,74 @@ import MasterCompany from "../../assets/Model/master_company";
 import MasterSector from "../../assets/Model/master_sectors";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { getLastPulledAt } from "@nozbe/watermelondb/sync/impl";
-import { useMasterSector } from "../../hooks/useMasterSector";
-import { useMasterLog } from "../../hooks";
-import MasterLogActivity from "../../assets/Model/master_log_activity";
+import {
+  useMasterSector,
+  useMasterCompany,
+  useMasterEstate,
+  useMasterMachineType,
+  useMasterMachine,
+  useMasterMainActivity,
+  useMasterLog,
+} from "../../hooks";
 
 const Home = ({ navigation }) => {
+  const {
+    data: dataSector,
+    isLoading: isLoadingSector,
+    connected: connectedMasterSector,
+  } = useMasterSector({ isGetData: true });
+  console.log("data sector", dataSector.length);
+  // console.log(JSON.stringify(dataSector, null, 2));
+  const {
+    data: dataCompany,
+    isLoading: isLoadingCompany,
+    connected: connectedMasterCompany,
+  } = useMasterCompany({ isGetData: true });
+  console.log("data Company", dataCompany.length);
+  // console.log(JSON.stringify(dataCompany, null, 2));
+  const {
+    data: dataEstate,
+    isLoading: isLoadingEstate,
+    connected: connectedMasterEstate,
+  } = useMasterEstate({ isGetData: true });
+  console.log("data Estate", dataEstate.length);
+  // console.log(JSON.stringify(dataEstate, null, 2));d
+
+  const {
+    data: dataMachineType,
+    isLoading: isLoadingMachineType,
+    connected: connectedMasterMachineType,
+  } = useMasterMachineType({ isGetData: true });
+  console.log("data Machine Type", dataMachineType.length);
+  // console.log(JSON.stringify(dataMachineType, null, 2));
+  const {
+    data: dataMachine,
+    isLoading: isLoadingMachine,
+    connected: connectedMasterMachine,
+  } = useMasterMachine({ isGetData: true });
+  console.log("data Machine", dataMachine.length);
+  // console.log(JSON.stringify(dataMachine, null, 2));
+  const {
+    data: dataMainActivity,
+    isLoading: isLoadingMainActivity,
+    connected: connectedMasterMainActivity,
+  } = useMasterMainActivity({ isGetData: true });
+  console.log("data Main Activity", dataMainActivity.length);
+  // console.log(JSON.stringify(dataMainActivity, null, 2));
   const {
     data: dataMasterLog,
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  console.log("data Log", dataMasterLog.length);
   // console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log("data Log", dataMasterLog.length);
 
-  async function mySync() {
-    try {
-      //     await synchronize({
-      //       database,
-      //       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-      //         const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-      //           JSON.stringify(migration)
-      //         )}`;
-      //         const response = await API.get(
-      //           `master_log/sync?${urlParams}`
-      //         );
-      //         // console.log(JSON.stringify(response, null, 2));
-      //         // Check if the request was successful
-      //         if (response.status_code !== 200) {
-      //           throw new Error(`Request failed with status ${response.status}`);
-      //         }
-      //         const timestamp = dayjs().unix();
-      //         console.log("data Type", response.data.length);
-      //         return { changes: response.data, timestamp: timestamp };
-      //       },
-      //     });
-    } catch (error) {
-      console.log("Catch Mysync", error);
-    }
-  }
-
-  const timeStamp = async () => {
-    const currentUnixTimestamp = dayjs().unix();
-    console.log(currentUnixTimestamp);
-
-    const formattedDate = dayjs
-      .unix(currentUnixTimestamp)
-      .format("YYYY-MM-DD HH:mm:ss");
-    console.log(formattedDate);
+  const getCompanyName = (master_company_id) => {
+    const company = dataCompany.find((company) => company.id === master_company_id);
+    // console.log(JSON.stringify("company", company, null, 2))
+    return company ? company.name : "Company not found";
   };
-
-  const [masterCompany, setMasterCompany] = useState([]);
-  const [masterSector, setMasterSector] = useState([]);
-
+  
   const handleLogout = async () => {
     try {
       const response = await API.post("logout");
@@ -117,47 +133,6 @@ const Home = ({ navigation }) => {
     }
   };
 
-  const runSector = async () => {
-    try {
-      // Membuat data baru
-      const newSector = await database.write(async () => {
-        const masterSector = await database
-          .get(MasterSector.table)
-          .create((sector) => {
-            sector.name = "Bas";
-            // sector.isSynced = true;
-            // sector.isConnected = true;
-          });
-
-        return masterSector;
-      });
-
-      console.log("Company created:", newSector);
-
-      // Mendapatkan semua data dari tabel
-      const allSector = await database.get(MasterSector.table).query().fetch();
-
-      console.log("All Sector:", allSector);
-
-      setMasterSector(allSector.map((masterSector) => masterSector._raw));
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  // manggil data dari hook
-
-  const onReadSector = async () => {
-    try {
-      const allCompany = await database.get(MasterSector.table).query().fetch();
-
-      console.log("All Company:", allCompany);
-
-      setMasterSector(allCompany.map((masterCompany) => masterCompany._raw));
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
 
   const [isConnected, setIsConnected] = useState(true);
 
@@ -180,19 +155,6 @@ const Home = ({ navigation }) => {
     checkInternetConnection();
   }, []);
 
-  // const [posts, setPosts] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchPosts = async () => {
-  //     const postsCollection = database.get("posts");
-  //     const allPosts = await postsCollection.query().fetch();
-  //     setPosts(allPosts);
-  //   };
-
-  //   fetchPosts();
-  // }, []);
-
-  //load data from database
 
   const queryClient = useQueryClient();
   // Queries
@@ -201,14 +163,7 @@ const Home = ({ navigation }) => {
   };
 
   const query = useQuery({ queryKey: ["history"], queryFn: getHistory });
-  // console.log(query?.data?.data?.data);
-
-  // useEffect(() => {
-  //   // Extract _raw data from allCompanies array
-  //   const masterCompany = allCompanies.map((company) => company._raw);
-  //   setRawData(masterCompany);
-  // }, []);
-  const dateNow = Date.now();
+  
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -262,20 +217,7 @@ const Home = ({ navigation }) => {
             >
               Today's Update
             </Text>
-            <TouchableOpacity onPress={mySync} style={{ marginVertical: 5 }}>
-              <Text>Sync</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={deleteAllRecords}
-              style={{ marginVertical: 5 }}
-            >
-              <Text>Delete</Text>
-            </TouchableOpacity>
             {dataMasterLog
-              // .filter((selected) => {
-              //   console.log("Values", selected);
-              //   return selected.master_company_id === dataMasterLog.user_id;
-              // })
               .map((item, index) => (
                 <View style={[styles.Isi]}>
                   <View
@@ -334,7 +276,7 @@ const Home = ({ navigation }) => {
                     <View style={{ flex: 1 }}>
                       <View>
                         <Text>ID: {item.id}</Text>
-                        <Text>Name: {item.master_company_id}</Text>
+                        <Text>{getCompanyName(item.master_company_id)}</Text>
                         <Text>Brand: {item.brand}</Text>
                         <Text>Sync: {item.isSync}</Text>
                         <Text>HM: {item.current_hour_meter}</Text>
@@ -375,10 +317,7 @@ const Home = ({ navigation }) => {
                           backgroundcolor: "#D6E8FD",
                           alginSelf: "center",
                           // width:20
-                          onPress: () =>
-                            navigation.navigate(
-                              "Edit", [item] 
-                            ),
+                          onPress: () => navigation.navigate("Edit", {masterLog: item}),
                         }}
                       />
                     </View>

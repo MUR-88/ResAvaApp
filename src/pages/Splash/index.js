@@ -10,6 +10,7 @@ import {
   useMasterMachine,
   useMasterMainActivity,
   useMasterLog,
+  useAllSync,
 } from "../../hooks";
 import AutoHeightImage from "react-native-auto-height-image";
 import { Logo } from "../../assets/icon";
@@ -25,24 +26,12 @@ const Splash = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   //imoorting fetching
-  const { fetching: fatchingEstate } = useMasterEstate({ isGetData: false });
-  const { fetching: fatchingMachineType } = useMasterMachineType({ isGetData: false, });
-  const { fetching: fatchingMachine } = useMasterMachine({ isGetData: false });
-  const { fetching: fatchingMainActivity } = useMasterMainActivity({ isGetData: false, });
-  const { fetching: fatchingCompany } = useMasterCompany({ isGetData: false });
-  const { fetching: fatchingSector } = useMasterSector({ isGetData: false });
-  const { fetching: fatchingLog } = useMasterLog({ isGetData: false });
+  const { fetching: fatchingAllSync } = useAllSync({ isGetData: false });
   useEffect(() => {
     (async () => {
       try {
         setIsLoading(true);
-        await fatchingEstate();
-        await fatchingMachineType();
-        await fatchingMachine();
-        await fatchingMainActivity();
-        await fatchingCompany();
-        await fatchingSector();
-        await fatchingLog();
+        await fatchingAllSync();
         setIsLoading(false);
       } catch (error) {
         Toast.show({

@@ -18,7 +18,7 @@ export const useMasterLog = ({ isGetData }) => {
       database,
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
         console.log("last pull at masater Log", lastPulledAt)
-        const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+        const urlParams = `last_pulled_at=${lastPulledAt ? lastPulledAt : ""}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
           JSON.stringify(migration)
           )}`;
           const response = await API.get(`log_activity/sync?${urlParams}`);

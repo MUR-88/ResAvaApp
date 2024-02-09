@@ -20,7 +20,7 @@ export const useMasterEstate = ( { isGetData} ) => {
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
         console.log("last pull master estate", lastPulledAt)
 
-        const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+        const urlParams = `last_pulled_at=${lastPulledAt ? lastPulledAt : ""}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
           JSON.stringify(migration)
         )}`;
         const response = await API.get(`master_estate/sync?${urlParams}`);

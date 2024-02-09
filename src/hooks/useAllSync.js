@@ -6,7 +6,7 @@ import API from "../function/API";
 import dayjs from "dayjs";
 import MasterCompany from "../assets/Model/master_company";
 
-export const useMasterCompany = ( { isGetData } ) => {
+export const useAllSync = ({ isGetData }) => {
   // const . cari connected atau tidak
   // setelah itu useEffect untuk ambil data dari API jika connected, jika tidak ambil data dari WatermelonDB
   const [connected, setConnected] = useState(undefined);
@@ -17,36 +17,24 @@ export const useMasterCompany = ( { isGetData } ) => {
     await synchronize({
       database,
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-        console.log("last pull master company", lastPulledAt)
-        const urlParams = `last_pulled_at=${lastPulledAt ? lastPulledAt : ""}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+        console.log("last pull All Sync", lastPulledAt);
+        const urlParams = `last_pulled_at=${
+          lastPulledAt ? lastPulledAt : ""
+        }&schema_version=${schemaVersion}&migration=${encodeURIComponent(
           JSON.stringify(migration)
         )}`;
-        const response = await API.get(`master_company/sync?${urlParams}`);
-        // console.log(JSON.stringify(response, null, 2));
+        const response = await API.get(`allSync?${urlParams}`);
+        //   console.log(JSON.stringify(response, null, 2));
 
         // Check if the request was successful
         if (response.status_code !== 200) {
           throw new Error(`Request failed with status ${response.status}`);
         }
-        const timestamp = dayjs().unix()*1000;
+        const timestamp = dayjs().unix() * 1000;
 
         return { changes: response.data, timestamp: timestamp };
       },
     });
-  }
-
-  function getAllCompany() {
-    setIsLoading(true);
-    const allCompany = database
-      .get(MasterCompany.table)
-      .query()
-      .observe()
-      .subscribe((masterCompany) => {
-        // console.log("masterCompany");
-        setData(masterCompany.map((masterCompany) => masterCompany._raw));
-        setIsLoading(false);
-      });
-    return allCompany;
   }
 
   useEffect(() => {
@@ -55,12 +43,6 @@ export const useMasterCompany = ( { isGetData } ) => {
       setConnected(netInfoState.isConnected);
     };
     checkInternetConnection();
-    if(isGetData){
-      const company = getAllCompany();
-      return () => company.unsubscribe();
-    }
-    // const company = getAllCompany();
-    // return () => company.unsubscribe();
   }, []);
 
   return { data, connected, isLoading, fetching };

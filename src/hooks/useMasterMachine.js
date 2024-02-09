@@ -18,7 +18,7 @@ export const useMasterMachine = ({ isGetData }) => {
       database,
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
         console.log("last pull master machine", lastPulledAt);
-        const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+        const urlParams = `last_pulled_at=${lastPulledAt ? lastPulledAt : ""}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
           JSON.stringify(migration)
         )}`;
         const response = await API.get(`master_machine/sync?${urlParams}`);

@@ -138,25 +138,25 @@ const AddNew = ({ navigation }) => {
 
   const mySync = async () => {
     try {
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(`master_company/sync?${urlParams}`);
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix();
-          // const lastePulledAt = response.data.last_pulled_at;
-          // console.log("last_pull_at", lastPulledAt)
-          // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
-          // console.log('sync', response.data)
-          return { changes: response.data, timestamp: timestamp };
-        },
-      });
+      // await synchronize({
+      //   database,
+      //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+      //     const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+      //       JSON.stringify(migration)
+      //     )}`;
+      //     const response = await API.get(`master_company/sync?${urlParams}`);
+      //     // Check if the request was successful
+      //     if (response.status_code !== 200) {
+      //       throw new Error(`Request failed with status ${response.status}`);
+      //     }
+      //     const timestamp = dayjs().locale("id").unix();
+      //     // const lastePulledAt = response.data.last_pulled_at;
+      //     // console.log("last_pull_at", lastPulledAt)
+      //     // return { changes: response.data, timestamp: timestamp, last_pulled_at : lastePulledAt };
+      //     // console.log('sync', response.data)
+      //     return { changes: response.data, timestamp: timestamp };
+      //   },
+      // });
       // await synchronize({
       //   database,
       //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
@@ -240,96 +240,96 @@ const AddNew = ({ navigation }) => {
 
       //batas sync
 
-      // await synchronize({
-      //   database,
-      //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-      //     console.log("last pull at masater Log", lastPulledAt);
-      //     const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-      //       JSON.stringify(migration)
-      //     )}`;
-      //     const response = await API.get(`log_activity/sync?${urlParams}`);
-      //     // Check if the request was successful
-      //     if (response.status_code !== 200) {
-      //       throw new Error(`Request failed with status ${response.status}`);
-      //     }
-      //     const timestamp = dayjs().locale("id").unix() * 1000;
+      await synchronize({
+        database,
+        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
+          console.log("last pull at masater Log", lastPulledAt);
+          const urlParams = `last_pulled_at=${lastPulledAt}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
+            JSON.stringify(migration)
+          )}`;
+          const response = await API.get(`log_activity/sync?${urlParams}`);
+          // Check if the request was successful
+          if (response.status_code !== 200) {
+            throw new Error(`Request failed with status ${response.status}`);
+          }
+          const timestamp = dayjs().locale("id").unix() * 1000;
 
-      //     console.log("last_pull_at", timestamp);
-      //     return { changes: response.data, timestamp: timestamp };
-      //   },
-      //   pushChanges: async ({ changes, lastPulledAt }) => {
-      //     const masterLogCreated = changes.master_log_activities.created.filter(
-      //       (item) => item.isSync === false
-      //     );
-      //     const masterLogUpdated = changes.master_log_activities.updated.filter(
-      //       (item) => item.isSync === false
-      //     );
+          console.log("last_pull_at", timestamp);
+          return { changes: response.data, timestamp: timestamp };
+        },
+        pushChanges: async ({ changes, lastPulledAt }) => {
+          const masterLogCreated = changes.master_log_activities.created.filter(
+            (item) => item.isSync === false
+          );
+          const masterLogUpdated = changes.master_log_activities.updated.filter(
+            (item) => item.isSync === false
+          );
 
-      //     const masterMachineCreated = changes.master_machine.created.filter(
-      //       (item) => item.isSync === false
-      //     );
-      //     const masterMachineUpdated = changes.master_machine.updated.filter(
-      //       (item) => item.isSync === false
-      //     );
+          const masterMachineCreated = changes.master_machine.created.filter(
+            (item) => item.isSync === false
+          );
+          const masterMachineUpdated = changes.master_machine.updated.filter(
+            (item) => item.isSync === false
+          );
 
-      //     try {
-      //       const response = await API.post("push/data", {
-      //         master_log_activities: {
-      //           created: masterLogCreated,
-      //           updated: masterLogUpdated,
-      //         },
-      //         master_machine: {
-      //           created: masterMachineCreated,
-      //           updated: masterMachineUpdated,
-      //         },
-      //         last_pulled_at: lastPulledAt,
-      //       });
+          try {
+            const response = await API.post("push/data", {
+              master_log_activities: {
+                created: masterLogCreated,
+                updated: masterLogUpdated,
+              },
+              master_machine: {
+                created: masterMachineCreated,
+                updated: masterMachineUpdated,
+              },
+              last_pulled_at: lastPulledAt,
+            });
 
-      //       const allMasterLog = await database
-      //         .get("master_log_activities")
-      //         .query(Q.where("isSync", false))
-      //         .fetch();
+            const allMasterLog = await database
+              .get("master_log_activities")
+              .query(Q.where("isSync", false))
+              .fetch();
 
-      //       for (let i = 0; i < allMasterLog.length; i++) {
-      //         await allMasterLog[i].update((masterLog) => {
-      //           masterLog.isSync = true;
-      //         });
-      //       }
+            for (let i = 0; i < allMasterLog.length; i++) {
+              await allMasterLog[i].update((masterLog) => {
+                masterLog.isSync = true;
+              });
+            }
 
-      //       const allMasterMachine = await database
-      //         .get("master_machine")
-      //         .query(Q.where("isSync", false))
-      //         .fetch();
+            const allMasterMachine = await database
+              .get("master_machine")
+              .query(Q.where("isSync", false))
+              .fetch();
 
-      //       for (let i = 0; i < allMasterMachine.length; i++) {
-      //         await allMasterMachine[i].update((masterMachine) => {
-      //           masterMachine.isSync = true;
-      //         });
-      //       }
+            for (let i = 0; i < allMasterMachine.length; i++) {
+              await allMasterMachine[i].update((masterMachine) => {
+                masterMachine.isSync = true;
+              });
+            }
 
-      //       console.log("response", response);
-      //       return Promise.resolve();
-      // } catch (e) {
-      //   console.log(e);
-      //   return Promise.reject();
-      // }
+            console.log("response", response);
+            return Promise.resolve();
+      } catch (e) {
+        console.log(e);
+        return Promise.reject();
+      }
 
-      // const response = await fetch(`=${lastPulledAt}`, {
-      //   method: 'POST',
-      //   body: JSON.stringify(changes),
-      // })
-      // if (!response.ok) {
-      //   throw new Error(await response.text())
-      // }
-      // console.log("push", changes);
-      // // console.log(JSON.stringify(changes, null, 2));
-      // return Promise.reject();
-      // },
-      // migrationsEnabledAtVersion: 1,
-      // });
+      const response = await fetch(`=${lastPulledAt}`, {
+        method: 'POST',
+        body: JSON.stringify(changes),
+      })
+      if (!response.ok) {
+        throw new Error(await response.text())
+      }
+      console.log("push", changes);
+      // console.log(JSON.stringify(changes, null, 2));
+      return Promise.reject();
+      },
+      migrationsEnabledAtVersion: 1,
+      });
 
-      // const response = await hasUnsyncedChanges({ database });
-      // console.log("response changes", response);
+      const response = await hasUnsyncedChanges({ database });
+      console.log("response changes", response);
     } catch (error) {
       console.error("Error:", error);
     }

@@ -55,4 +55,5 @@ export default class MasterLogActivity extends Model {
   @field('date') date
   @field('deleted_at') deletedAt
   @field('updated_at') updatedAt
+  // @immutableRelation("master_company", "master_company_id") masterCompany; // Add this line
 }

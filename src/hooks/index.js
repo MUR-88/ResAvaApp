@@ -10,7 +10,7 @@ import { useMasterMachineType } from "./useMasterMachineType";
 import { useMasterMachine } from "./useMasterMachine";
 import { useMasterMainActivity } from "./useMasterMainActivity";
 import { useMasterLog } from "./useMasterLog";
-
+import { useAllSync } from "./useAllSync";
 export {
   useToastErrorDispatch,
   useToastSuccessDispatch,
@@ -21,5 +21,6 @@ export {
   useMasterEstate,
   useMasterMachineType,
   useMasterMainActivity,
-  useMasterLog
+  useMasterLog,
+  useAllSync
 };

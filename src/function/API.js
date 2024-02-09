@@ -7,7 +7,6 @@ const API_URL = "http://192.168.115.219:8000/api/";
 
 // const API_URL = "http://192.168.100.21:8000/api/";
 
-
 // const API_URL = "https://api.lapor-mas.id/v1";
 
 class Api {
@@ -24,14 +23,13 @@ class Api {
   }
 
   resetToken() {
-
     this.token = null;
   }
 
   getToken() {
     return this.token;
   }
-  
+
   async request(path, options = {}) {
     const headers = new Headers();
     headers.append("Authorization", `Bearer ${this.getToken()}`);
@@ -52,17 +50,21 @@ class Api {
       const response = await fetch(`${API_URL}${path}`, requestOptions);
       // console.log("API Await.Get", await response.text());
       // console.log("API .Get",res);
-      
+
       if (!response.ok) {
         const error = await response.text();
 
         throw new Error(error || response.statusText);
       }
-      
-      const res = await response.json();
+
+      console.log("Test API.js : ", API_URL + path, requestOptions);
+      const text = await response.text();
+      console.log("Test API.js : ", text);
+      const res = text ? JSON.parse(text) : {};
       return res;
     } catch (error) {
-      // console.error("Error API.js", error.message);
+      console.log("Error API.js", API_URL + path, requestOptions);
+      console.log("Error API.js", error);
       return Promise.reject({
         ...error,
         message: error.message,
