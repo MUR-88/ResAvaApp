@@ -11,16 +11,22 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import { Button, DropdownComp, Input, InputData } from "../../component";
+import {
+  Button,
+  DropdownComp,
+  Input,
+  InputData,
+  PilihTanggal,
+} from "../../component";
 import {
   RefreshControl,
   ScrollView,
   TouchableOpacity,
 } from "react-native-gesture-handler";
 // import {color} from "../..variabel";
-import "dayjs/locale/id";
 import * as yup from "yup";
 import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
+import dayjs from "dayjs";
 import {
   useMasterSector,
   useMasterCompany,
@@ -35,20 +41,20 @@ import { database } from "../../assets/Model/db";
 import Toast from "react-native-toast-message";
 import { globalStyles } from "../../styles";
 import MasterLogActivity from "../../assets/Model/master_log_activity";
-import dayjs from "dayjs";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { API } from "../../function";
-import id from "dayjs/locale/id";
 import { useRoute } from "@react-navigation/native";
+import { Q } from "@nozbe/watermelondb";
+import MasterMachine from "../../assets/Model/master_machine";
 
 const Edit = ({ navigation }) => {
   const route = useRoute();
   const masterLog = route.params.masterLog;
-  console.log(JSON.stringify(masterLog, null, 2));
-  console.log("id", masterLog.master_company_id);
 
   let schema = yup.object().shape({
-    hm_current: yup.number().required("Mohon masukkan format yang benar"),
+    current_hour_meter: yup
+      .number()
+      .required("Mohon masukkan format yang benar"),
     compartement_id: yup
       .string()
       .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
@@ -57,10 +63,12 @@ const Edit = ({ navigation }) => {
     // Date: yup.date().required("Required"),
     id_master_sector: yup.string().required("Pilih Sector"),
     id_master_company: yup.string().required("Pilih Company"),
-    // id_master_machine: yup.string().required("Pilih Machine ID"),
     id_master_estate: yup.string().required("Pilih Estate"),
     id_master_machine_types: yup.string().required("Pilih Machine Type"),
     id_master_main_activities: yup.string().required("Pilih Main Activity"),
+    master_machine_id: yup.string().required("Pilih Machine ID"),
+
+    compartement_id: yup.string().required("Masukkan Compartement ID"),
   });
 
   const {
@@ -75,6 +83,7 @@ const Edit = ({ navigation }) => {
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
   console.log("data Company", dataCompany.length);
+  // console.log(JSON.stringify(dataCompany, null, 2));
   const {
     data: dataEstate,
     isLoading: isLoadingEstate,
@@ -145,64 +154,76 @@ const Edit = ({ navigation }) => {
       date: dayjs(masterLog.date).toDate(),
       id_master_sector: masterLog.master_sector_id,
       id_master_company: masterLog.master_company_id,
-      id_master_machine: masterLog.master_machine_id,
+      master_machine_id: masterLog.master_machine_id,
       id_master_estate: masterLog.master_estate_id,
       compartement_id: masterLog.compartement_id,
       id_master_machine_types: masterLog.master_machine_types_id,
       id_master_main_activities: masterLog.master_main_activity_id,
-      hm_current: masterLog.current_hour_meter,
+      current_hour_meter: masterLog.current_hour_meter,
       keterangan: masterLog.keterangan,
     },
     validationSchema: schema,
 
     onSubmit: async (values) => {
       try {
-        //   console.log("value", values.date);
-        //   console.log("value", dayjs(values.date).unix());
+        const taskId = masterLog.id;
+        console.log("taskid", taskId);
         await database.write(async () => {
-          const masterLog = await database
-            .get(MasterLogActivity.table)
-            .create((master_log_activities) => {
-              master_log_activities.keterangan = "bas";
-              // master_log_activities.master_sector_id = values.id_master_sector;
-              // master_log_activities.master_company_id = values.id_master_company;
-              // master_log_activities.master_machine_id = values.id_master_machine;
-              // master_log_activities.master_estate_id = values.id_master_estate;
-              // master_log_activities.compartement_id = values.compartement_id;
-              // master_log_activities.master_machine_types_id = values.id_master_machine_types;
-              // master_log_activities.master_main_activities_id = values.id_master_main_activities;
-              // master_log_activities.current_hour_meter = values.hm_current;
-              // master_log_activities.keterangan = values.keterangan;
-              // master_log_activities.isSynced = false;
-              // master_log_activities.isConnected = false;
-              // master_log_activities.date = dayjs(values.date).unix()*1000;
-            });
-
-          console.log(JSON.stringify(MasterLogActivity, null, 2));
-          console.log(JSON.stringify(masterLog, null, 2));
-          console.log("masterLog", database);
-          return masterLog;
+          const updateLog = await database
+            .get("master_log_activities")
+            .find(taskId);
+          await updateLog.update(() => {
+            // updateLog.isConnected = true;
+            updateLog.master_sector_id = values.id_master_sector;
+            updateLog.master_company_id = values.id_master_company;
+            updateLog.master_machine_id = values.master_machine_id;
+            updateLog.master_estate_id = values.id_master_estate;
+            updateLog.compartement_id = values.compartement_id;
+            updateLog.master_machine_types_id = values.id_master_machine_types;
+            updateLog.master_main_activity_id =
+              values.id_master_main_activities;
+            updateLog.current_hour_meter = values.current_hour_meter;
+            updateLog.keterangan = values.keterangan;
+            updateLog.isSynced = false;
+            updateLog.isConnected = false;
+            updateLog.date = dayjs(values.date).unix() * 1000;
+          });
         });
-        // navigation.replace("Mytabs");
+
+        Toast.show({
+          // visibilityTime: 1000,
+          type: "success",
+          text1: "Yeay, Berhasil!",
+          text2: "Data Log Activity Berhasil Diupdate!",
+        });
+        navigation.replace("Mytabs");
         // console.log("value", values.date);
       } catch (error) {
         Toast.show({
+          // visibilityTime: 1000,
           type: "error",
           text1: error.message,
         });
-        console.log(database);
-        // console.log(error);
+        console.log("error", error.message), console.log(database);
       }
     },
   });
-  // console.log(formik.errors);
-  // console.log("value", formik.values);
-  // console.log(formik.masterLog);
+
+  function handleChangeDate(date) {
+    console.log("tanggal pilih", Date);
+    setDate(Date);
+    console.log("tanggal pilih", date);
+    setDate(date);
+  }
+
+  console.log(formik.errors);
+  console.log("value", formik.values);
+  console.log("id", masterLog.id);
+  console.log(formik.masterLog);
 
   // console.log("id", id)
 
   //to do buat component tanggal
-
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
@@ -270,7 +291,18 @@ const Edit = ({ navigation }) => {
                   style={[styles.button, styles.buttonOpen]}
                   onPress={() => setModalVisible(true)}
                 >
-                  <Text style={styles.textStyle}>Pilih Tanggal</Text>
+                  <Text
+                    style={[
+                      styles.textStyle,
+                      { color: formik.setFieldValue ? "#88888D" : "black" },
+                    ]}
+                  >
+                    {formik.values.date
+                      ? dayjs(formik.values.date)
+                          .locale("id")
+                          .format("DD/MMM/YYYY ")
+                      : "pilih tanggal"}
+                  </Text>
                 </Pressable>
               </View>
               <DropdownComp
@@ -395,11 +427,11 @@ const Edit = ({ navigation }) => {
                       label: machine.machine_id,
                       value: machine.master_machine_id,
                     })),
-                  value: formik.values.id_master_machine,
-                  // placeholder: dataMachine.find(
-                  //   (item) =>
-                  //     item.master_machine_id === formik.values.master_machine_id
-                  // )?.machine_id,
+                  value: formik.values.master_machine_id,
+                  placeholder: dataMachine.find(
+                    (item) =>
+                      item.master_machine_id === formik.values.master_machine_id
+                  )?.machine_id,
                   onChange: (item) => {
                     setIsFocus(false);
                     formik.setFieldValue("master_machine_id", item.value);
@@ -413,7 +445,6 @@ const Edit = ({ navigation }) => {
                   },
                 }}
               />
-              <Text>{formik.values.id_master_machine}</Text>
               {formik.errors.id_master_machine
                 ? () => {
                     <Text style={globalStyles.textError}>
@@ -478,7 +509,7 @@ const Edit = ({ navigation }) => {
                   borderColor: "#DDDDDD",
                 }}
               />
-              <Text>{formik.values.compartement_id}</Text>
+              {/* <Text>{formik.values.compartement_id}</Text> */}
               {formik.errors.compartement_id
                 ? () => {
                     <Text style={globalStyles.textError}>
@@ -512,7 +543,7 @@ const Edit = ({ navigation }) => {
                   },
                 }}
               />
-              <Text>{formik.values.master_machine_types_id}</Text>
+              {/* <Text>{formik.values.master_machine_types_id}</Text> */}
               {formik.errors.id_master_machine_types
                 ? () => {
                     <Text style={globalStyles.textError}>
@@ -557,7 +588,7 @@ const Edit = ({ navigation }) => {
                   },
                 }}
               />
-              <Text>{formik.values.id_master_main_activities}</Text>
+              {/* <Text>{formik.values.id_master_main_activities}</Text> */}
               {formik.errors.id_master_main_activities
                 ? () => {
                     <Text style={globalStyles.textError}>
@@ -609,19 +640,30 @@ const Edit = ({ navigation }) => {
                         ]}
                       >
                         <Text style={{ fontSize: 16, color: "#88888D" }}>
-                          {formik.values.hm_current}
-                          {/* //todo: get last hm from database */}
+                          {dataMasterLog
+                            .filter(
+                              (item) =>
+                                item.master_machine_id ===
+                                formik.values.master_machine_id
+                            )
+                            .map((item, index, array) => {
+                              if (index === array.length - 1) {
+                                return item.current_hour_meter;
+                              } else {
+                                return null;
+                              }
+                            })}
                         </Text>
                       </View>
                     </View>
                   </View>
                   <InputData
                     Title="HM Current"
-                    onChangeText={formik.handleChange("hm_current")}
+                    onChangeText={formik.handleChange("current_hour_meter")}
                     item={{
                       placeholder: "XXX",
-                      value: formik.values.hm_current,
-                      values: formik.values.hm_current.toString(),
+                      value: formik.values.current_hour_meter,
+                      values: formik.values.current_hour_meter.toString(),
                       Input: {
                         borderWidth: 0.5,
                         borderColor: "#88888D",
@@ -633,10 +675,10 @@ const Edit = ({ navigation }) => {
                       borderColor: "#DDDDDD",
                     }}
                   />
-                  {formik.errors.hm_current
+                  {formik.errors.current_hour_meter
                     ? () => {
                         <Text style={globalStyles.textError}>
-                          {formik.errors.hm_current}
+                          {formik.errors.current_hour_meter}
                         </Text>;
                       }
                     : null}

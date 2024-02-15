@@ -4,7 +4,7 @@ import Button from './Button';
 import Input from './Input'
 import DropdownComp from './DropdownComp';
 import InputData from './InputData'
-
+import PilihTanggal from './PilihTanggal'
 
 export  {
     Text,
@@ -12,5 +12,6 @@ export  {
     Header,
     Button,
     DropdownComp,
-    InputData
+    InputData,
+    PilihTanggal
 }

@@ -9,14 +9,22 @@ import {
   Touchable,
 } from "react-native";
 import Constants from "expo-constants";
-import { Delete, Profile_Set, delete_icon } from "../../assets/icon";
+import {
+  Delete,
+  NoSync,
+  Profile_Set,
+  Sync,
+  delete_icon,
+} from "../../assets/icon";
 import AutoHeightImage from "react-native-auto-height-image";
-import { Button, Input } from "../../component";
+import { Button, Input, PilihTanggal } from "../../component";
 import {
   RefreshControl,
   ScrollView,
   TouchableOpacity,
 } from "react-native-gesture-handler";
+import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
+
 import { StatusBar } from "expo-status-bar";
 import API from "../../function/API";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
@@ -38,6 +46,14 @@ import {
   useMasterMainActivity,
   useMasterLog,
 } from "../../hooks";
+// Todo
+// tombol sync
+// tombol status di home
+// simbol sync bulat hijau & dark grey
+// isi value warna Hitam
+// estate hilangin
+// comparttement di pindah ke bawah sector
+// Sync belum masuk
 
 const Home = ({ navigation }) => {
   const {
@@ -45,21 +61,21 @@ const Home = ({ navigation }) => {
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
   } = useMasterSector({ isGetData: true });
-  console.log("data sector", dataSector.length);
+  // console.log("data sector", dataSector.length);
   // console.log(JSON.stringify(dataSector, null, 2));
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
-  console.log("data Company", dataCompany.length);
+  // console.log("data Company", dataCompany.length);
   // console.log(JSON.stringify(dataCompany, null, 2));
   const {
     data: dataEstate,
     isLoading: isLoadingEstate,
     connected: connectedMasterEstate,
   } = useMasterEstate({ isGetData: true });
-  console.log("data Estate", dataEstate.length);
+  // console.log("data Estate", dataEstate.length);
   // console.log(JSON.stringify(dataEstate, null, 2));d
 
   const {
@@ -67,49 +83,40 @@ const Home = ({ navigation }) => {
     isLoading: isLoadingMachineType,
     connected: connectedMasterMachineType,
   } = useMasterMachineType({ isGetData: true });
-  console.log("data Machine Type", dataMachineType.length);
+  // console.log("data Machine Type", dataMachineType.length);
   // console.log(JSON.stringify(dataMachineType, null, 2));
   const {
     data: dataMachine,
     isLoading: isLoadingMachine,
     connected: connectedMasterMachine,
   } = useMasterMachine({ isGetData: true });
-  console.log("data Machine", dataMachine.length);
+  // console.log("data Machine", dataMachine.length);
   // console.log(JSON.stringify(dataMachine, null, 2));
   const {
     data: dataMainActivity,
     isLoading: isLoadingMainActivity,
     connected: connectedMasterMainActivity,
   } = useMasterMainActivity({ isGetData: true });
-  console.log("data Main Activity", dataMainActivity.length);
+  // console.log("data Main Activity", dataMainActivity.length);
   // console.log(JSON.stringify(dataMainActivity, null, 2));
   const {
     data: dataMasterLog,
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  // console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log(JSON.stringify(dataMasterLog, null, 2));
   console.log("data Log", dataMasterLog.length);
 
-  const getCompanyName = (master_company_id) => {
-    const company = dataCompany.find((company) => company.id === master_company_id);
-    // console.log(JSON.stringify("company", company, null, 2))
-    return company ? company.name : "Company not found";
-  };
-  
+ 
   const handleLogout = async () => {
     try {
       const response = await API.post("logout");
-      // API.resetToken(response.token.plainTextToken);
       navigation.replace("Login"); // Assuming 'Login' is the login screen route name
       console.log(response);
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
-  // const masterCompanies = database.collections.get("master_company");
-  // const database = database(MasterCompany.table);
-  // main.js
 
   const [masterLogActivity, setMasterLogActivity] = useState([]);
 
@@ -121,18 +128,29 @@ const Home = ({ navigation }) => {
         if (log) {
           // await log.destroyPermanently(); // Use destroyPermanently to immediately remove the record
           await log.markAsDeleted(); // syncAble
-          navigation.replace("Home");
-
-          console.log("Log deleted", database);
+          // navigation.replace("Home");
+          // console.log("Log deleted", database);
+          Toast.show({
+            visibilityTime: 100,
+            type: "success",
+            text1: "Yeay, Berhasil!",
+            text2: "Data Log Activity Berhasil Ditambahkan",
+          });
         } else {
           console.log("Log not found");
         }
       });
     } catch (error) {
+      Toast.show({
+        visibilityTime: 100,
+        type: "error",
+        text1: error.message,
+        text2: "Data Log Activity Berhasil Dihapus",
+
+      });
       console.error("Error:", error);
     }
   };
-
 
   const [isConnected, setIsConnected] = useState(true);
 
@@ -155,7 +173,6 @@ const Home = ({ navigation }) => {
     checkInternetConnection();
   }, []);
 
-
   const queryClient = useQueryClient();
   // Queries
   const getHistory = () => {
@@ -163,7 +180,6 @@ const Home = ({ navigation }) => {
   };
 
   const query = useQuery({ queryKey: ["history"], queryFn: getHistory });
-  
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -173,10 +189,8 @@ const Home = ({ navigation }) => {
       setRefreshing(false);
     }, 200);
   };
+  const today = new Date();
 
-  // function deleteItem({id}){
-
-  // }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       <StatusBar style="light" />
@@ -218,6 +232,7 @@ const Home = ({ navigation }) => {
               Today's Update
             </Text>
             {dataMasterLog
+              .sort((a, b) => dayjs(b.created_at) - dayjs(a.created_at) )
               .map((item, index) => (
                 <View style={[styles.Isi]}>
                   <View
@@ -236,27 +251,46 @@ const Home = ({ navigation }) => {
                         opacity: 0.6,
                       }}
                     >
-                      {dayjs(item.date).locale("id").format("DD/MMM/YYYY ")}
+                      {dayjs(item.updated_at)
+                        .locale("id")
+                        .format("DD/MMM/YYYY ")}
                     </Text>
-                    <TouchableOpacity
-                      // onPress={onDelete}
-                      onPress={() => deleteAllRecords(item.id)}
+                    <View
                       style={{
                         flex: 1,
-                        justifyContent: "center",
-                        marginRight: 5,
-                        opacity: 0.4,
+                        flexDirection: "row",
+                        justifyContent: "flex-end",
+                        alignContent: "center",
                       }}
                     >
                       <Image
-                        source={Delete}
+                        source={item.isSync ? Sync : NoSync}
                         style={{
                           height: 24,
                           width: 24,
                           marginHorizontal: 8,
                         }}
-                      ></Image>
-                    </TouchableOpacity>
+                      />
+                      <TouchableOpacity
+                        // onPress={onDelete}
+                        onPress={() => deleteAllRecords(item.id)}
+                        style={{
+                          flex: 1,
+                          justifyContent: "center",
+                          marginRight: 5,
+                          opacity: 0.4,
+                        }}
+                      >
+                        <Image
+                          source={Delete}
+                          style={{
+                            height: 24,
+                            width: 24,
+                            marginHorizontal: 8,
+                          }}
+                        ></Image>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                   <View
                     style={{
@@ -275,12 +309,36 @@ const Home = ({ navigation }) => {
                     />
                     <View style={{ flex: 1 }}>
                       <View>
-                        <Text>ID: {item.id}</Text>
-                        <Text>{getCompanyName(item.master_company_id)}</Text>
-                        <Text>Brand: {item.brand}</Text>
-                        <Text>Sync: {item.isSync}</Text>
-                        <Text>HM: {item.current_hour_meter}</Text>
+                        <Text>{item.id_master_log_activity}</Text>
+                        <Text>
+                          Company:{" "}
+                          {dataCompany
+                            .filter(
+                              (select) =>
+                                select.id_master_company ===
+                                item.master_company_id
+                            )
+                            .map((matchedCompany) => {
+                              // console.log(matchedCompany.name);
+                              return matchedCompany.name;
+                            })}
+                        </Text>
+                        {/* to do get data from other tables */}
 
+                        <Text>
+                          Brand:{" "}
+                          {dataMachine
+                            .filter(
+                              (select) =>
+                                select.master_machine_id ===
+                                item.master_machine_id
+                            )
+                            .map((matchedMachine) => {
+                              // console.log(matchedMachine.brand);
+                              return matchedMachine.brand;
+                            })}
+                        </Text>
+                        <Text>HM: {item.current_hour_meter}</Text>
                         <Text>
                           Create:{" "}
                           {dayjs(item.date).locale("id").format("DD/MMM/YYYY ")}
@@ -309,17 +367,22 @@ const Home = ({ navigation }) => {
                         justifyContent: "center",
                       }}
                     >
-                      <Button
-                        buttonStyle={{ borderRadius: 20 }}
-                        item={{
-                          title: "Edit",
-                          textcolor: "#007AFF",
-                          backgroundcolor: "#D6E8FD",
-                          alginSelf: "center",
-                          // width:20
-                          onPress: () => navigation.navigate("Edit", {masterLog: item}),
-                        }}
-                      />
+                      {/* {dayjs(item.created_at)
+                        .locale("id")
+                        .format("DD/MMM/YYYY ") <=
+                      getFormatedDate(today.setDate(today.getDate() - 2)) ? ( */}
+                        <Button
+                          buttonStyle={{ borderRadius: 20 }}
+                          item={{
+                            title: "Edit",
+                            textcolor: "#007AFF",
+                            backgroundcolor: "#D6E8FD",
+                            alginSelf: "center",
+                            onPress: () =>
+                              navigation.navigate("Edit", { masterLog: item }),
+                          }}
+                        />
+                      {/* ) : null} */}
                     </View>
                   </View>
                 </View>

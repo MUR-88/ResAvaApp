@@ -31,22 +31,21 @@ import dayjs from "dayjs";
 import MasterMachine from "../../assets/Model/master_machine";
 const Register = ({ navigation }) => {
   let schema = yup.object().shape({
-    // hm_current: yup.number().required("Mohon masukkan format yang benar"),
-    // compartement_id: yup
-    //   .string()
-    //   .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
-    //   .min(1)
-    //   .required("Masukkan Compartement ID"),
-    // // Date: yup.date().required("Required"),
-    // id_master_sector: yup.string().required("Pilih Sector"),
-    // id_master_company: yup.string().required("Pilih Company"),
-    // // id_master_machine: yup.string().required("Pilih Machine ID"),
-    // id_master_estate: yup.string().required("Pilih Estate"),
-    // id_master_machine_types: yup.string().required("Pilih Machine Type"),
-    // id_master_main_activities: yup.string().required("Pilih Main Activity"),
+    hm_current: yup.number().required("Mohon masukkan format yang benar"),
+    compartement_id: yup
+      .string()
+      .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
+      .min(1)
+      .required("Masukkan Compartement ID"),
+    // Date: yup.date().required("Required"),
+    id_master_sector: yup.string().required("Pilih Sector"),
+    id_master_company: yup.string().required("Pilih Company"),
+    // id_master_machine: yup.string().required("Pilih Machine ID"),
+    id_master_estate: yup.string().required("Pilih Estate"),
+    id_master_machine_types: yup.string().required("Pilih Machine Type"),
+    id_master_main_activities: yup.string().required("Pilih Main Activity"),
   });
   const [isFocus, setIsFocus] = useState(true);
-
 
   const {
     data: dataCompany,
@@ -60,6 +59,7 @@ const Register = ({ navigation }) => {
     connected: connectedMasterMachine,
   } = useMasterMachine({ isGetData: true });
   console.log("data Machine", dataCompany.length);
+  console.log(JSON.stringify(dataMachine, null, 2));
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
@@ -84,7 +84,6 @@ const Register = ({ navigation }) => {
       id_master_machine_types: "",
       id_master_main_activities: "",
       hm_current: "",
-
     },
     validationSchema: schema,
 
@@ -93,9 +92,10 @@ const Register = ({ navigation }) => {
         //   console.log("value", values.date);
         //   console.log("value", dayjs(values.date).unix());
         await database.write(async () => {
-          const masterLog = await database
+          const masterMachine = await database
             .get(MasterMachine.table)
             .create((item) => {
+              item.master_machine_id = dataMachine.length + 1;
               item.master_company_id = values.id_master_company;
               item.brand = values.brand;
               item.class = values.class;
@@ -106,14 +106,16 @@ const Register = ({ navigation }) => {
               item.isSynced = false;
               item.isConnected = false;
             });
-
-          // console.log(JSON.stringify(MasterLogActivity, null, 2));
-          // console.log(JSON.stringify(masterLog, null, 2));
-          console.log("masterLog", database);
-          return masterLog;
+          console.log("masterMachine", database);
+          return masterMachine;
         });
-        // navigation.replace("Mytabs");
-        // console.log("value", values.date);
+        Toast.show({
+          visibilityTime: 10000,
+          type: "success",
+          text1: "Yeay, Berhasil!",
+          text2: "Data Mesin Berhasil Ditambahkan",
+        });
+        navigation.replace("Mytabs");
       } catch (error) {
         Toast.show({
           type: "error",
@@ -155,6 +157,11 @@ const Register = ({ navigation }) => {
             >
               Details
             </Text>
+            {/* {dataMachine.map((item, index, array) => {
+              if (index === array.length - 1) {
+                console.log("item", item);
+              }
+            })} */}
             <View style={[styles.MechInfo]}>
               <DropdownComp
                 title="Company ID"
@@ -266,12 +273,17 @@ const Register = ({ navigation }) => {
               <DropdownComp
                 title="Main Activity"
                 item={{
-                  values: dataMainActivity.filter((selected) => {
-                   return  (selected.master_machine_types_id === formik.values.id_master_machine_types)
-                  }).map((mainActivity) => ({
-                    label: mainActivity.name,
-                    value: mainActivity.id_master_main_activities,
-                  })),
+                  values: dataMainActivity
+                    .filter((selected) => {
+                      return (
+                        selected.master_machine_types_id ===
+                        formik.values.id_master_machine_types
+                      );
+                    })
+                    .map((mainActivity) => ({
+                      label: mainActivity.name,
+                      value: mainActivity.id_master_main_activities,
+                    })),
                   placeholder: dataMainActivity.find(
                     (item) =>
                       item.id_master_main_activities ===

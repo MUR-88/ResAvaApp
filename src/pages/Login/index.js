@@ -25,6 +25,9 @@ const Login = ({ navigation }) => {
 
   //hook
 
+  // todo satus error hilangkan hanya message saja
+  // 
+
   const formik = useFormik({
     validationSchema: schema,
     initialValues: { SAP: "123456", password: "12345678" },
@@ -40,7 +43,7 @@ const Login = ({ navigation }) => {
       } catch (error) {
         Toast.show({
           type: "error",
-          text1: error.message,
+          text1: "Silahkan Masukkan SAP dan Password dengan benar",
         });
         console.log(error);
       }

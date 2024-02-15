@@ -15,6 +15,8 @@ import Logo from "./logo_1.png";
 import Fiber from "./FIBER SUPPLY.png";
 import Delete from "./delete.png";
 import PanahKiri from "./Panah-kiri.png";
+import NoSync from "./no_sync.png";
+import Sync from "./sync.png";
 
 
 export {
@@ -34,5 +36,7 @@ export {
   Report_Active,
   Home_Icon,
   Home_Active,
-  PanahKiri
+  PanahKiri,
+  NoSync,
+  Sync,
 };
