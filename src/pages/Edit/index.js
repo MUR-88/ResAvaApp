@@ -182,7 +182,7 @@ const Edit = ({ navigation }) => {
             updateLog.master_machine_types_id = values.id_master_machine_types;
             updateLog.master_main_activity_id =
               values.id_master_main_activities;
-            updateLog.current_hour_meter = values.current_hour_meter;
+            updateLog.current_hour_meter = parseInt(values.current_hour_meter);
             updateLog.keterangan = values.keterangan;
             updateLog.isSynced = false;
             updateLog.isConnected = false;
@@ -197,7 +197,7 @@ const Edit = ({ navigation }) => {
           text2: "Data Log Activity Berhasil Diupdate!",
         });
         navigation.replace("Mytabs");
-        // console.log("value", values.date);
+        console.log("value", values);
       } catch (error) {
         Toast.show({
           // visibilityTime: 1000,

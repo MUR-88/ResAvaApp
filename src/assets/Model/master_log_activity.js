@@ -21,7 +21,7 @@ export default class MasterLogActivity extends Model {
       type: "belongs_to",
       key: "master_estate_id",
     },
-    masterMachine: {
+    master_machine: {
       type: "belongs_to",
       key: "master_machine_id",
     },

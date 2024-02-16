@@ -52,7 +52,7 @@ export default schemaMigrations({
             { name: "master_machine_id", type: "number",  },
             { name: "master_machine_types_id", type: "number",  },
             { name: "master_main_activity_id", type: "number",  },
-            { name: "compartement_id", type : "number", },
+            { name: "compartement_id", type : "string", },
             { name: "class", type: "number" },
             { name: "current_hour_meter", type: "number" },
             { name: "last_hour_meter", type: "number" },

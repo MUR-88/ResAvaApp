@@ -11,7 +11,9 @@ const Button = ({ item, buttonStyle }) => {
         styles.Button,
         buttonStyle,
         { backgroundColor: item.backgroundcolor },
-        { width: item.width },
+        { width: item.width ? item.width : "100%"},
+        { height: item.height ? item.height : 30},
+        { borderRadius: item.borderRadius ? item.borderRadius : 10}
       ]}
     >
       <Text style={[styles.ButtonText, { color: item.textcolor }]}>
@@ -29,10 +31,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 30,
     width: "100%",
-    borderRadius: 10,
-    // opacity:0.4,
+    // borderRadius: 10,
     justifyContent: "center",
-    // height:30
   },
 
   ButtonText: {

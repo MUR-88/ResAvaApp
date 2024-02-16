@@ -47,13 +47,16 @@ import {
   useMasterLog,
 } from "../../hooks";
 // Todo
-// tombol sync
-// tombol status di home
-// simbol sync bulat hijau & dark grey
-// isi value warna Hitam
-// estate hilangin
-// comparttement di pindah ke bawah sector
-// Sync belum masuk
+// tombol sync = done
+// tombol status di home = done
+// simbol sync bulat hijau & dark grey = done
+// isi value warna Hitam 
+// estate hilangin = done
+// comparttement di pindah ke bawah sector = done
+// Sync belum masuk = done
+
+// Push changes di lanjutkan 
+// Fix get Data from other tables
 
 const Home = ({ navigation }) => {
   const {
@@ -104,10 +107,9 @@ const Home = ({ navigation }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  console.log(JSON.stringify(dataMasterLog, null, 2));
+  // console.log(JSON.stringify(dataMasterLog, null, 2));
   console.log("data Log", dataMasterLog.length);
 
- 
   const handleLogout = async () => {
     try {
       const response = await API.post("logout");
@@ -146,7 +148,6 @@ const Home = ({ navigation }) => {
         type: "error",
         text1: error.message,
         text2: "Data Log Activity Berhasil Dihapus",
-
       });
       console.error("Error:", error);
     }
@@ -173,13 +174,13 @@ const Home = ({ navigation }) => {
     checkInternetConnection();
   }, []);
 
-  const queryClient = useQueryClient();
-  // Queries
-  const getHistory = () => {
-    return API.get("history");
-  };
+  // const queryClient = useQueryClient();
+  // // Queries
+  // const getHistory = () => {
+  //   return API.get("history");
+  // };
 
-  const query = useQuery({ queryKey: ["history"], queryFn: getHistory });
+  // const query = useQuery({ queryKey: ["history"], queryFn: getHistory });
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
@@ -221,18 +222,68 @@ const Home = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={[styles.Content]}>
-            <Text
-              style={{
-                color: "#007AFF",
-                fontSize: 18,
-                fontFamily: "Poppins-Medium",
-              }}
-            >
-              Today's Update
-            </Text>
+          <View style={[styles.Content2, { marginHorizontal: 10 }]}>
+            <View style={{ flexDirection: "row", marginTop: 5, flex: 1 }}>
+              <View>
+                <Text
+                  style={{
+                    color: "#007AFF",
+                    fontSize: 18,
+                    fontFamily: "Poppins-Medium",
+                  }}
+                >
+                  Today's Update
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  marginRight: -30,
+                }}
+              >
+                <View style={{ flex: 1, marginLeft: 50 }}>
+                  <Button
+                    buttonStyle={{
+                      borderRadius: 20,
+                    }}
+                    item={{
+                      title: "Status",
+                      height: 25,
+                      width: "100%",
+                      textcolor: "#007AFF",
+                      backgroundcolor: "#DEEBFF",
+                      alginSelf: "center",
+                      borderRadius: 20,
+                      onPress: () => navigation.navigate("Status"),
+                    }}
+                  />
+                </View>
+                <View style={{ flex: 1, marginLeft: 20 }}>
+                  <Button
+                    buttonStyle={{
+                      borderRadius: 20,
+                    }}
+                    item={{
+                      title: "Sync",
+                      height: 25,
+                      width: "60%",
+                      textcolor: "#007AFF",
+                      backgroundcolor: "#DEEBFF",
+                      borderRadius: 20,
+                      alginSelf: "center",
+                      // onPress: () => navigation.navigate("Status"),
+                    }}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+          <View style={{ flex: 1, marginHorizontal: 10 }}>
             {dataMasterLog
-              .sort((a, b) => dayjs(b.created_at) - dayjs(a.created_at) )
+              .sort((a, b) => dayjs(b.created_at) - dayjs(a.created_at))
               .map((item, index) => (
                 <View style={[styles.Isi]}>
                   <View
@@ -263,12 +314,14 @@ const Home = ({ navigation }) => {
                         alignContent: "center",
                       }}
                     >
-                      <Image
-                        source={item.isSync ? Sync : NoSync}
+                      <View
                         style={{
-                          height: 24,
-                          width: 24,
-                          marginHorizontal: 8,
+                          backgroundColor: item.isSync ? "#6BBC3B" : "#BCBCBC",
+                          width: 15,
+                          justifyContent: "center",
+                          borderRadius: 50,
+                          height: 15,
+                          marginTop:5
                         }}
                       />
                       <TouchableOpacity
@@ -371,23 +424,26 @@ const Home = ({ navigation }) => {
                         .locale("id")
                         .format("DD/MMM/YYYY ") <=
                       getFormatedDate(today.setDate(today.getDate() - 2)) ? ( */}
-                        <Button
-                          buttonStyle={{ borderRadius: 20 }}
-                          item={{
-                            title: "Edit",
-                            textcolor: "#007AFF",
-                            backgroundcolor: "#D6E8FD",
-                            alginSelf: "center",
-                            onPress: () =>
-                              navigation.navigate("Edit", { masterLog: item }),
-                          }}
-                        />
+                      <Button
+                        buttonStyle={{ borderRadius: 20 }}
+                        item={{
+                          title: "Edit",
+                          textcolor: "#007AFF",
+                          backgroundcolor: "#D6E8FD",
+                          alginSelf: "center",
+                          onPress: () =>
+                            navigation.navigate("Edit", {
+                              masterLog: item,
+                            }),
+                        }}
+                      />
                       {/* ) : null} */}
                     </View>
                   </View>
                 </View>
               ))}
           </View>
+
           <View style={[styles.Content1]}>
             <Text
               style={{
@@ -398,7 +454,8 @@ const Home = ({ navigation }) => {
             >
               30 Days History
             </Text>
-            {query?.data?.data?.data.map((item, index) => {
+
+            {/* {query?.data?.data?.data.map((item, index) => {
               return (
                 <View style={[styles.Isi]}>
                   <View
@@ -491,7 +548,7 @@ const Home = ({ navigation }) => {
                   </View>
                 </View>
               );
-            })}
+            })} */}
           </View>
         </ScrollView>
       ) : (
@@ -556,6 +613,10 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginLeft: 10,
     marginRight: 10,
+  },
+  Content2: {
+    flex: 1,
+    flexDirection: "column",
   },
   Content1: {
     marginTop: 20,

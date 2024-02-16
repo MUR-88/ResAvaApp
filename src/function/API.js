@@ -4,7 +4,7 @@
 // const API_URL = "http://192.168.8.100:8000/api/";
 // const API_URL = "http://192.168.68.219:8000/api/";
 // const API_URL = "http://192.168.115.219:8000/api/";
-const API_URL = "http://192.168.128.219:8000/api/";
+const API_URL = "http://192.168.119.219:8000/api/";
 
 
 // const API_URL = "http://192.168.100.21:8000/api/";
@@ -59,9 +59,9 @@ class Api {
         throw new Error(error || response.statusText);
       }
 
-      console.log("Test API.js : ", API_URL + path, requestOptions);
+      // console.log("Test API.js : ", API_URL + path, requestOptions);
       const text = await response.text();
-      console.log("Test API.js : ", text);
+      // console.log("Test API.js : ", text);
       const res = text ? JSON.parse(text) : {};
       return res;
     } catch (error) {

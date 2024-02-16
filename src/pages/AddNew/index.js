@@ -225,7 +225,7 @@ const AddNew = ({ navigation }) => {
     }
   };
   // let schema = yup.object().shape({
-  //   // hm_current: yup.number().when("filteredData", {
+  //   // current_hour_meter: yup.number().when("filteredData", {
   //   //   is: (filteredData) => filteredData && filteredData.length > 0,
   //   //   then: yup
   //   //     .number()
@@ -256,7 +256,6 @@ const AddNew = ({ navigation }) => {
   //   id_master_main_activities: yup.number().required("Pilih Main Activity"),
   // });
 
-  
   const formik = useFormik({
     initialValues: {
       date: "",
@@ -267,7 +266,7 @@ const AddNew = ({ navigation }) => {
       compartement_id: "",
       id_master_machine_types: "",
       id_master_main_activities: "",
-      hm_current: "",
+      current_hour_meter: "",
       keterangan: "",
     },
     validationSchema: schema,
@@ -275,6 +274,9 @@ const AddNew = ({ navigation }) => {
     onSubmit: async (values) => {
       try {
         // todo buat safety input hm <24 jam
+        // Tambahkan Label Input 24 jam
+        // install filament
+
         await database.write(async () => {
           const masterLog = await database
             .get(MasterLogActivity.table)
@@ -287,7 +289,7 @@ const AddNew = ({ navigation }) => {
               item.compartement_id = values.compartement_id;
               item.master_machine_types_id = values.id_master_machine_types;
               item.master_main_activity_id = values.id_master_main_activities;
-              item.current_hour_meter = values.hm_current;
+              item.current_hour_meter = parseInt(values.current_hour_meter);
               item.keterangan = values.keterangan;
               item.isSynced = false;
               item.isConnected = false;
@@ -305,21 +307,21 @@ const AddNew = ({ navigation }) => {
         });
         navigation.replace("Mytabs");
       } catch (error) {
-        visibilityTime:500,
-        Toast.show({
-          type: "error",
-          text1: error.message,
-        });
+        visibilityTime: 500,
+          Toast.show({
+            type: "error",
+            text1: error.message,
+          });
         console.log(database);
       }
     },
   });
 
   let schema = yup.object().shape({
-    hm_current: yup.number().required("Mohon masukkan format yang benar"),
+    current_hour_meter: yup.number().max(24, "tidak lebih dari 24 jam").required("Mohon masukkan format yang benar"),
     compartement_id: yup
       .string()
-      .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
+      .matches(/^[A-Za-z]{1,2}\d{1,3}$/, "Input must follow the format AB003")
       .min(1)
       .required("Masukkan Compartement ID"),
     // Date: yup.date().required("Required"),
@@ -335,8 +337,6 @@ const AddNew = ({ navigation }) => {
   console.log(formik.errors);
   console.log("value", formik.values);
 
-
-  // todo Compartement
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
@@ -482,24 +482,31 @@ const AddNew = ({ navigation }) => {
                     </Text>;
                   }
                 : null}
-              <View style={[styles.button_waktu1]}>
-                <Button
-                  buttonStyle={{
-                    borderRadius: 20,
+
+              <InputData
+                Title="Compartement ID"
+                onChangeText={formik.handleChange("compartement_id")}
+                item={{
+                  placeholder: "Ex : AB001",
+                  value: formik.values.compartement_id,
+                  Input: {
+                    borderWidth: 0.5,
+                    borderColor: "#88888D",
                     marginHorizontal: 10,
-                    marginBottom: 10,
-                  }}
-                  item={{
-                    title: "Check Status Machine",
-                    height: 40,
-                    textcolor: "#007AFF",
-                    // marginTop: 10,
-                    backgroundcolor: "#DEEBFF",
-                    alginSelf: "center",
-                    onPress: () => navigation.navigate("Status"),
-                  }}
-                />
-              </View>
+                    height: 45,
+                  },
+                }}
+                buttonStyle={{
+                  borderColor: "#DDDDDD",
+                }}
+              />
+              {formik.errors.compartement_id
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.compartement_id}
+                    </Text>;
+                  }
+                : null}
             </View>
             <View
               style={{
@@ -595,30 +602,7 @@ const AddNew = ({ navigation }) => {
                     </Text>;
                   }
                 : null}
-              <InputData
-                Title="Compartement ID"
-                onChangeText={formik.handleChange("compartement_id")}
-                item={{
-                  placeholder: "Ex : 001",
-                  value: formik.values.compartement_id,
-                  Input: {
-                    borderWidth: 0.5,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    height: 45,
-                  },
-                }}
-                buttonStyle={{
-                  borderColor: "#DDDDDD",
-                }}
-              />
-              {formik.errors.compartement_id
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.compartement_id}
-                    </Text>;
-                  }
-                : null}
+
               <DropdownComp
                 title="Machine Type"
                 item={{
@@ -757,10 +741,10 @@ const AddNew = ({ navigation }) => {
                   </View>
                   <InputData
                     Title="HM Current"
-                    onChangeText={formik.handleChange("hm_current")}
+                    onChangeText={formik.handleChange("current_hour_meter")}
                     item={{
                       placeholder: "XXX",
-                      value: formik.values.hm_current,
+                      value: formik.values.current_hour_meter,
                       Input: {
                         borderWidth: 0.5,
                         borderColor: "#88888D",
@@ -772,9 +756,9 @@ const AddNew = ({ navigation }) => {
                       borderColor: "#DDDDDD",
                     }}
                   />
-                  {formik.errors.hm_current ? (
+                  {formik.errors.current_hour_meter ? (
                     <Text style={globalStyles.textError}>
-                      {formik.errors.hm_current}
+                      {formik.errors.current_hour_meter}
                     </Text>
                   ) : null}
                 </>
