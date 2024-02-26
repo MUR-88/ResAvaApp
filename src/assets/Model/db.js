@@ -4,7 +4,6 @@ import schema from "./schema";
 import { AppRegistry, LogBox } from 'react-native';
 import App from "../../../App";
 import MasterCompany from "./master_company";
-import MasterEstate from "./master_estates";
 import MasterSector from "./master_sectors";
 import MasterLogActivity from "./master_log_activity";
 import MasterMachine from "./master_machine";
@@ -27,7 +26,6 @@ export const database = new Database({
   modelClasses: [
     MasterCompany,
     MasterSector,
-    MasterEstate,
     MasterLogActivity,
     MasterMachine,
     MasterMachineType,

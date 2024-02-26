@@ -7,8 +7,9 @@ import {
   Dimensions,
   Image,
   Touchable,
+  Alert,
 } from "react-native";
-import Constants from "expo-constants";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   Delete,
   NoSync,
@@ -23,93 +24,42 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native-gesture-handler";
-import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 
 import { StatusBar } from "expo-status-bar";
 import API from "../../function/API";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import NetInfo from "@react-native-community/netinfo";
 import { database } from "../../assets/Model/db";
-import { Q } from "@nozbe/watermelondb";
-import { writer } from "@nozbe/watermelondb/decorators";
-import MasterCompany from "../../assets/Model/master_company";
-import MasterSector from "../../assets/Model/master_sectors";
-import { synchronize } from "@nozbe/watermelondb/sync";
-import { getLastPulledAt } from "@nozbe/watermelondb/sync/impl";
 import {
   useMasterSector,
   useMasterCompany,
-  useMasterEstate,
   useMasterMachineType,
   useMasterMachine,
   useMasterMainActivity,
   useMasterLog,
 } from "../../hooks";
+import Toast from "react-native-toast-message";
+import { getFormatedDate } from "react-native-modern-datepicker";
 // Todo
 // tombol sync = done
 // tombol status di home = done
 // simbol sync bulat hijau & dark grey = done
-// isi value warna Hitam 
+// isi value warna Hitam
 // estate hilangin = done
 // comparttement di pindah ke bawah sector = done
 // Sync belum masuk = done
+// Register data already recorded = done
+// Delete date ada 3 = done delete 1
+// Restrict to HM = done
 
 // Push changes di lanjutkan 
-// Fix get Data from other tables
+// Fix get Data from other tables = priority to fix
+// Fix sync update data
+// Filament fix the data create
+// fix lagg issue
+// delete estate table db = on going
 
 const Home = ({ navigation }) => {
-  const {
-    data: dataSector,
-    isLoading: isLoadingSector,
-    connected: connectedMasterSector,
-  } = useMasterSector({ isGetData: true });
-  // console.log("data sector", dataSector.length);
-  // console.log(JSON.stringify(dataSector, null, 2));
-  const {
-    data: dataCompany,
-    isLoading: isLoadingCompany,
-    connected: connectedMasterCompany,
-  } = useMasterCompany({ isGetData: true });
-  // console.log("data Company", dataCompany.length);
-  // console.log(JSON.stringify(dataCompany, null, 2));
-  const {
-    data: dataEstate,
-    isLoading: isLoadingEstate,
-    connected: connectedMasterEstate,
-  } = useMasterEstate({ isGetData: true });
-  // console.log("data Estate", dataEstate.length);
-  // console.log(JSON.stringify(dataEstate, null, 2));d
-
-  const {
-    data: dataMachineType,
-    isLoading: isLoadingMachineType,
-    connected: connectedMasterMachineType,
-  } = useMasterMachineType({ isGetData: true });
-  // console.log("data Machine Type", dataMachineType.length);
-  // console.log(JSON.stringify(dataMachineType, null, 2));
-  const {
-    data: dataMachine,
-    isLoading: isLoadingMachine,
-    connected: connectedMasterMachine,
-  } = useMasterMachine({ isGetData: true });
-  // console.log("data Machine", dataMachine.length);
-  // console.log(JSON.stringify(dataMachine, null, 2));
-  const {
-    data: dataMainActivity,
-    isLoading: isLoadingMainActivity,
-    connected: connectedMasterMainActivity,
-  } = useMasterMainActivity({ isGetData: true });
-  // console.log("data Main Activity", dataMainActivity.length);
-  // console.log(JSON.stringify(dataMainActivity, null, 2));
-  const {
-    data: dataMasterLog,
-    isLoading: isLoadingLog,
-    connected: connectedMasterLog,
-  } = useMasterLog({ isGetData: true });
-  // console.log(JSON.stringify(dataMasterLog, null, 2));
-  console.log("data Log", dataMasterLog.length);
-
   const handleLogout = async () => {
     try {
       const response = await API.post("logout");
@@ -119,8 +69,6 @@ const Home = ({ navigation }) => {
       console.error("Error logging out:", error);
     }
   };
-
-  const [masterLogActivity, setMasterLogActivity] = useState([]);
 
   const deleteAllRecords = async (id) => {
     try {
@@ -136,7 +84,7 @@ const Home = ({ navigation }) => {
             visibilityTime: 100,
             type: "success",
             text1: "Yeay, Berhasil!",
-            text2: "Data Log Activity Berhasil Ditambahkan",
+            text2: "Data Log Activity Berhasil Dihapus",
           });
         } else {
           console.log("Log not found");
@@ -147,7 +95,6 @@ const Home = ({ navigation }) => {
         visibilityTime: 100,
         type: "error",
         text1: error.message,
-        text2: "Data Log Activity Berhasil Dihapus",
       });
       console.error("Error:", error);
     }
@@ -174,14 +121,6 @@ const Home = ({ navigation }) => {
     checkInternetConnection();
   }, []);
 
-  // const queryClient = useQueryClient();
-  // // Queries
-  // const getHistory = () => {
-  //   return API.get("history");
-  // };
-
-  // const query = useQuery({ queryKey: ["history"], queryFn: getHistory });
-
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
     setRefreshing(true);
@@ -191,6 +130,58 @@ const Home = ({ navigation }) => {
     }, 200);
   };
   const today = new Date();
+
+  const {
+    data: dataSector,
+    isLoading: isLoadingSector,
+    connected: connectedMasterSector,
+  } = useMasterSector({ isGetData: true });
+  console.log("data sector", dataSector.length);
+  // console.log(JSON.stringify(dataSector, null, 2));
+  const {
+    data: dataCompany,
+    isLoading: isLoadingCompany,
+    connected: connectedMasterCompany,
+  } = useMasterCompany({ isGetData: true });
+  console.log("data Company", dataCompany.length);
+
+  const {
+    data: dataMachineType,
+    isLoading: isLoadingMachineType,
+    connected: connectedMasterMachineType,
+  } = useMasterMachineType({ isGetData: true });
+  console.log("data Machine Type", dataMachineType.length);
+  // console.log(JSON.stringify(dataMachineType, null, 2));
+  const {
+    data: dataMachine,
+    isLoading: isLoadingMachine,
+    connected: connectedMasterMachine,
+  } = useMasterMachine({ isGetData: true });
+  console.log("data Machine", dataMachine.length);
+  // console.log(JSON.stringify(dataMachine, null, 2));
+  const {
+    data: dataMainActivity,
+    isLoading: isLoadingMainActivity,
+    connected: connectedMasterMainActivity,
+  } = useMasterMainActivity({ isGetData: true });
+  console.log("data Main Activity", dataMainActivity.length);
+  // console.log(JSON.stringify(dataMainActivity, null, 2));
+  const {
+    data: dataMasterLog,
+    isLoading: isLoadingLog,
+    connected: connectedMasterLog,
+  } = useMasterLog({ isGetData: true });
+  console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log("data Log", dataMasterLog.length);
+
+  const queryClient = useQueryClient();
+  // Queries
+  const getHistory = () => {
+    return API.get("history");
+  };
+
+  const query = useQuery({ queryKey: ["history"], queryFn: getHistory });
+  // console.log(query?.data?.data?.data);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
@@ -274,7 +265,7 @@ const Home = ({ navigation }) => {
                       backgroundcolor: "#DEEBFF",
                       borderRadius: 20,
                       alginSelf: "center",
-                      // onPress: () => navigation.navigate("Status"),
+                      onPress: () => navigation.navigate("Splash"),
                     }}
                   />
                 </View>
@@ -316,12 +307,12 @@ const Home = ({ navigation }) => {
                     >
                       <View
                         style={{
-                          backgroundColor: item.isSync ? "#6BBC3B" : "#BCBCBC",
+                          backgroundColor: item.isSync === true ? "#6BBC3B" : "#BCBCBC",
                           width: 15,
                           justifyContent: "center",
                           borderRadius: 50,
                           height: 15,
-                          marginTop:5
+                          marginTop: 5,
                         }}
                       />
                       <TouchableOpacity
@@ -361,10 +352,8 @@ const Home = ({ navigation }) => {
                       style={{ marginLeft: 10, marginBottom: 5 }}
                     />
                     <View style={{ flex: 1 }}>
-                      <View>
-                        <Text>{item.id_master_log_activity}</Text>
-                        <Text>
-                          Company:{" "}
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.IsiText]}>
                           {dataCompany
                             .filter(
                               (select) =>
@@ -372,14 +361,11 @@ const Home = ({ navigation }) => {
                                 item.master_company_id
                             )
                             .map((matchedCompany) => {
-                              // console.log(matchedCompany.name);
                               return matchedCompany.name;
-                            })}
+                            })
+                            }
                         </Text>
-                        {/* to do get data from other tables */}
-
-                        <Text>
-                          Brand:{" "}
+                        <Text style={[styles.IsiText2]}>
                           {dataMachine
                             .filter(
                               (select) =>
@@ -387,31 +373,30 @@ const Home = ({ navigation }) => {
                                 item.master_machine_id
                             )
                             .map((matchedMachine) => {
-                              // console.log(matchedMachine.brand);
-                              return matchedMachine.brand;
-                            })}
+                              return matchedMachine.machine_id;
+                            })}{" "}
+                          -{item.compartement_id}
                         </Text>
-                        <Text>HM: {item.current_hour_meter}</Text>
-                        <Text>
-                          Create:{" "}
-                          {dayjs(item.date).locale("id").format("DD/MMM/YYYY ")}
+                        <Text style={[styles.IsiText2, { fontWeight: 900 }]}>
+                          HM : {item.current_hour_meter}
                         </Text>
-                        {/* Add more fields as needed */}
-                        <Text style={[styles.IsiText, { fontWeight: 900 }]}>
-                          {/* {company.name} */}
+                        <Text style={[styles.IsiText3]}>
+                          Create :{" "}
+                          {dayjs(item.created_at)
+                            .locale("id")
+                            .format(" DD/MM/YYYY,  HH:mm [WIB]")}
                         </Text>
                       </View>
-
-                      <Text
+                      {/* <Text
                         style={[
                           styles.IsiText,
                           { fontSize: 10, marginVertical: 2 },
                         ]}
                       >
-                        {dayjs(item.updated_at)
+                        {dayjs(item.created_at)
                           .locale("id")
                           .format("DD/MMM/YYYY ")}
-                      </Text>
+                      </Text> */}
                     </View>
                     <View
                       style={{
@@ -420,24 +405,24 @@ const Home = ({ navigation }) => {
                         justifyContent: "center",
                       }}
                     >
-                      {/* {dayjs(item.created_at)
+                      {dayjs(item.created_at)
                         .locale("id")
-                        .format("DD/MMM/YYYY ") <=
-                      getFormatedDate(today.setDate(today.getDate() - 2)) ? ( */}
-                      <Button
-                        buttonStyle={{ borderRadius: 20 }}
-                        item={{
-                          title: "Edit",
-                          textcolor: "#007AFF",
-                          backgroundcolor: "#D6E8FD",
-                          alginSelf: "center",
-                          onPress: () =>
-                            navigation.navigate("Edit", {
-                              masterLog: item,
-                            }),
-                        }}
-                      />
-                      {/* ) : null} */}
+                        .format("DD/MMM/YYYY ") >=
+                      getFormatedDate(today.setDate(today.getDate() - 2)) ? (
+                        <Button
+                          buttonStyle={{ borderRadius: 20 }}
+                          item={{
+                            title: "Edit",
+                            textcolor: "#007AFF",
+                            backgroundcolor: "#D6E8FD",
+                            alginSelf: "center",
+                            onPress: () =>
+                              navigation.navigate("Edit", {
+                                masterLog: item,
+                              }),
+                          }}
+                        />
+                      ) : null}
                     </View>
                   </View>
                 </View>
@@ -455,7 +440,7 @@ const Home = ({ navigation }) => {
               30 Days History
             </Text>
 
-            {/* {query?.data?.data?.data.map((item, index) => {
+            {query?.data?.data?.data.map((item, index) => {
               return (
                 <View style={[styles.Isi]}>
                   <View
@@ -479,36 +464,33 @@ const Home = ({ navigation }) => {
                         .format("dddd, DD MMMM YYYY")}
                     </Text>
                     <View>
-                      <View style={{ flex: 1, flexDirection: "row" }}>
-                        <TouchableOpacity
-                          onPress={() => navigation.navigate("")}
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("")}
+                        style={{
+                          flex: 1,
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text>?</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("")}
+                        style={{
+                          flex: 1,
+                          justifyContent: "center",
+                          marginRight: 10,
+                          opacity: 0.1,
+                        }}
+                      >
+                        <Image
+                          source={Delete}
                           style={{
-                            flex: 1,
-                            justifyContent: "center",
-                            // backgroundColor: "red",
+                            height: 20,
+                            width: 20,
+                            marginHorizontal: 8,
                           }}
-                        >
-                          <Text>?</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => navigation.navigate("")}
-                          style={{
-                            flex: 1,
-                            justifyContent: "center",
-                            marginRight: 10,
-                            opacity: 0.1,
-                          }}
-                        >
-                          <Image
-                            source={Delete}
-                            style={{
-                              height: 20,
-                              width: 20,
-                              marginHorizontal: 8,
-                            }}
-                          ></Image>
-                        </TouchableOpacity>
-                      </View>
+                        ></Image>
+                      </TouchableOpacity>
                     </View>
                   </View>
                   <View
@@ -535,8 +517,7 @@ const Home = ({ navigation }) => {
                         {item.master_company.name}
                       </Text>
                       <Text style={[styles.IsiText2, { fontWeight: 900 }]}>
-                        {item.master_sector.name} {item.master_estate.name}-
-                        {item.compartement_id}
+                        Bas EA002
                       </Text>
                       <Text style={[styles.IsiText3]}>
                         Updated at{" "}
@@ -548,7 +529,7 @@ const Home = ({ navigation }) => {
                   </View>
                 </View>
               );
-            })} */}
+            })}
           </View>
         </ScrollView>
       ) : (
@@ -652,8 +633,9 @@ const styles = StyleSheet.create({
   IsiText: {
     fontSize: 12,
     fontWeight: "bold",
-    opacity: 0.4,
+    // opacity: 0.4,
     fontFamily: "Poppins",
+    fontWeight: "900",
   },
   IsiText2: {
     fontSize: 14,

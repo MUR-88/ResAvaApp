@@ -3,13 +3,6 @@ import React, { useEffect, useState } from "react";
 import { API } from "../../function";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  useMasterCompany,
-  useMasterSector,
-  useMasterEstate,
-  useMasterMachineType,
-  useMasterMachine,
-  useMasterMainActivity,
-  useMasterLog,
   useAllSync,
 } from "../../hooks";
 import AutoHeightImage from "react-native-auto-height-image";

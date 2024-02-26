@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -17,6 +17,7 @@ import {
   Input,
   InputData,
   PilihTanggal,
+  Label,
 } from "../../component";
 import {
   RefreshControl,
@@ -30,7 +31,6 @@ import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 import {
   useMasterSector,
   useMasterCompany,
-  useMasterEstate,
   useMasterMachineType,
   useMasterMachine,
   useMasterMainActivity,
@@ -46,9 +46,120 @@ import { synchronize } from "@nozbe/watermelondb/sync";
 import { API } from "../../function";
 import { hasUnsyncedChanges } from "@nozbe/watermelondb/sync";
 import { Q } from "@nozbe/watermelondb";
-// import { Alert } from "react-native-web";
 
-const AddNew = ({ navigation }) => {
+const AddNew = ({ navigation, title }) => {
+  const [selectedDate, setSelectedDate] = useState("");
+  const today = new Date();
+
+  const startDate = getFormatedDate(today.setDate(today.getDate() - 2));
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isEnable, setIsEnable] = useState(true);
+  const [text, setText] = useState("Computer On Or Off ?");
+  const [isFocus, setIsFocus] = useState(true);
+  const [date, setDate] = useState(undefined);
+
+  const toggleSwitch = () => {
+    try {
+      if (isEnable) {
+        setText("Active");
+      } else {
+        setText("Inactive");
+      }
+      setIsEnable((previouvsState) => !previouvsState);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const [loading, setLoading] = useState(false);
+
+  const formik = useFormik({
+    initialValues: {
+      date: "",
+      id_master_sectors: "",
+      id_master_company: "",
+      master_machine_id: "",
+      compartement_id: "",
+      id_master_machine_types: "",
+      id_master_main_activities: "",
+      current_hour_meter: "",
+      keterangan: "",
+    },
+    validationSchema: schema,
+
+    onSubmit: async (values) => {
+      setLoading(true);
+      try {
+        // todo buat safety input hm <24 jam
+        // Tambahkan Label Input 24 jam = done
+        // install filament = done 
+        // Capslock Data Entry = done
+        // Data HM dari register = done
+        // Data Estate dihapus DB = done
+        // Check status di edit  hapus = done
+        // Sync indicator tidk jalan
+        // Machine Type & Activity di kasih tombol untuk ganti activity sesuai di field
+
+        await database.write(async () => {
+          const masterLog = await database
+            .get(MasterLogActivity.table)
+            .create((item) => {
+              item.id_master_log_activity = dataMasterLog.length + 1;
+              item.master_sector_id = values.id_master_sectors;
+              item.master_company_id = values.id_master_company;
+              item.master_machine_id = values.master_machine_id;
+              item.compartement_id = values.compartement_id;
+              item.master_machine_types_id = values.id_master_machine_types;
+              item.master_main_activity_id = values.id_master_main_activities;
+              item.current_hour_meter = parseInt(values.current_hour_meter);
+              item.keterangan = values.keterangan;
+              item.isSynced = false;
+              item.isConnected = false;
+              item.date = dayjs(values.date).unix() * 1000;
+            });
+          Toast.show({
+            visibilityTime: 500,
+            type: "success",
+            text1: "Yeay, Berhasil!",
+            text2: "Data Log Activity Berhasil Ditambahkan",
+          });
+          // console.log("masterLog", database);
+          return masterLog;
+          setLoading(false);
+        });
+        navigation.replace("Mytabs");
+      } catch (error) {
+        visibilityTime: 500,
+          Toast.show({
+            type: "error",
+            text1: error.message,
+          });
+        // console.log(database);
+      }
+    },
+  });
+
+  let schema = yup.object().shape({
+    current_hour_meter: yup
+      .number()
+      .max(24, "tidak lebih dari 24 jam")
+      .required("Mohon masukkan format yang benar"),
+    master_machine_id: yup
+      .string()
+      .matches(/^[A-Za-z]{1,2}\d{1,3}$/, "Input must follow the format AB003")
+      .min(1)
+      .required("Masukkan Machine Id"),
+    id_master_sectors: yup.string().required("Pilih Sector"),
+    id_master_company: yup.string().required("Pilih Company"),
+    master_machine_id: yup.string().required("Pilih Machine ID"),
+    id_master_machine_types: yup.string().required("Pilih Machine Type"),
+    id_master_main_activities: yup.string().required("Pilih Main Activity"),
+  });
+
+  // console.log(formik.errors);
+  // console.log("value", formik.values);
+
   const {
     data: dataSector,
     isLoading: isLoadingSector,
@@ -62,14 +173,6 @@ const AddNew = ({ navigation }) => {
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
   console.log("data Company", dataCompany.length);
-  const {
-    data: dataEstate,
-    isLoading: isLoadingEstate,
-    connected: connectedMasterEstate,
-  } = useMasterEstate({ isGetData: true });
-  console.log("data Estate", dataEstate.length);
-  // console.log(JSON.stringify(dataEstate, null, 2));d
-
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
@@ -99,243 +202,19 @@ const AddNew = ({ navigation }) => {
   // console.log(JSON.stringify(dataMasterLog, null, 2));
   // console.log("data Log", dataMasterLog.length);
 
-  const [selectedDate, setSelectedDate] = useState("");
-  const today = new Date();
+  const [hm, setHm] = useState(0);
 
-  const startDate = getFormatedDate(today.setDate(today.getDate() - 2));
+  useEffect(() => {
+    const hmArray = dataMasterLog
+      .filter(
+        (item) => item.master_machine_id === formik.values.master_machine_id
+      )
+      .map((item, index, array) =>
+        index === array.length - 1 ? item.current_hour_meter : null
+      );
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isEnable, setIsEnable] = useState(true);
-  const [text, setText] = useState("Computer On Or Off ?");
-  const [isFocus, setIsFocus] = useState(true);
-  const [date, setDate] = useState(undefined);
-
-  const mySync = async () => {
-    try {
-      //batas sync
-
-      await synchronize({
-        database,
-        pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-          console.log("last pull at masater Log", lastPulledAt);
-          const urlParams = `last_pulled_at=${
-            lastPulledAt ? lastPulledAt : ""
-          }&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-            JSON.stringify(migration)
-          )}`;
-          const response = await API.get(`log_activity/sync?${urlParams}`);
-          // Check if the request was successful
-          if (response.status_code !== 200) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
-          const timestamp = dayjs().locale("id").unix() * 1000;
-
-          console.log("last_pull_at", timestamp);
-          return { changes: response.data, timestamp: timestamp };
-        },
-        pushChanges: async ({ changes, lastPulledAt }) => {
-          const masterLogCreated = changes.master_log_activities.created.filter(
-            (item) => item.isSync === false
-          );
-          const masterLogUpdated = changes.master_log_activities.updated.filter(
-            (item) => item.isSync === false
-          );
-
-          const masterMachineCreated = changes.master_machine.created.filter(
-            (item) => item.isSync === false
-          );
-          const masterMachineUpdated = changes.master_machine.updated.filter(
-            (item) => item.isSync === false
-          );
-
-          try {
-            const response = await API.post("push/data", {
-              master_log_activities: {
-                created: masterLogCreated,
-                updated: masterLogUpdated,
-              },
-              master_machine: {
-                created: masterMachineCreated,
-                updated: masterMachineUpdated,
-              },
-              last_pulled_at: lastPulledAt,
-            });
-
-            const allMasterLog = await database
-              .get("master_log_activities")
-              .query(Q.where("isSync", false))
-              .fetch();
-
-            for (let i = 0; i < allMasterLog.length; i++) {
-              await allMasterLog[i].update((masterLog) => {
-                masterLog.isSync = true;
-              });
-            }
-
-            const allMasterMachine = await database
-              .get("master_machine")
-              .query(Q.where("isSync", false))
-              .fetch();
-
-            for (let i = 0; i < allMasterMachine.length; i++) {
-              await allMasterMachine[i].update((masterMachine) => {
-                masterMachine.isSync = true;
-              });
-            }
-
-            console.log("response", response);
-            return Promise.resolve();
-          } catch (e) {
-            console.log(e);
-            return Promise.reject();
-          }
-
-          const response = await fetch(`=${lastPulledAt}`, {
-            method: "POST",
-            body: JSON.stringify(changes),
-          });
-          if (!response.ok) {
-            throw new Error(await response.text());
-          }
-          console.log("push", changes);
-          // console.log(JSON.stringify(changes, null, 2));
-          return Promise.reject();
-        },
-        migrationsEnabledAtVersion: 1,
-      });
-
-      const response = await hasUnsyncedChanges({ database });
-      console.log("response changes", response);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const toggleSwitch = () => {
-    try {
-      if (isEnable) {
-        setText("Active");
-      } else {
-        setText("Inactive");
-      }
-      setIsEnable((previouvsState) => !previouvsState);
-      console.log(isEnable);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  // let schema = yup.object().shape({
-  //   // current_hour_meter: yup.number().when("filteredData", {
-  //   //   is: (filteredData) => filteredData && filteredData.length > 0,
-  //   //   then: yup
-  //   //     .number()
-  //   //     .required("Mohon masukkan format yang benar")
-  //   //     .positive("Nilai harus positif")
-  //   //     .max(24, "Nilai maksimum adalah 24")
-  //   //     .test({
-  //   //       name: "notMoreThanLastHM",
-  //   //       exclusive: true,
-  //   //       message: "Nilai tidak boleh lebih besar dari nilai terakhir",
-  //   //       test: (value) => value <= getLastHM,
-  //   //     }),
-  //   //   else: yup.number(),
-  //   // }),
-
-  //   // Perform the validation
-  //   // compartement_id: yup
-  //   //   .string()
-  //   //   .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
-  //   //   .min(1)
-  //   //   .required("Masukkan Compartement ID"),
-  //   // // Date: yup.date().required("Required"),
-  //   id_master_sector: yup.number().required("Pilih Sector"),
-  //   id_master_company: yup.number().required("Pilih Company"),
-  //   id_master_machine: yup.number().required("Pilih Machine ID"),
-  //   id_master_estate: yup.number().required("Pilih Estate"),
-  //   id_master_machine_types: yup.number().required("Pilih Machine Type"),
-  //   id_master_main_activities: yup.number().required("Pilih Main Activity"),
-  // });
-
-  const formik = useFormik({
-    initialValues: {
-      date: "",
-      id_master_sectors: "",
-      id_master_company: "",
-      master_machine_id: "",
-      id_master_estate: "",
-      compartement_id: "",
-      id_master_machine_types: "",
-      id_master_main_activities: "",
-      current_hour_meter: "",
-      keterangan: "",
-    },
-    validationSchema: schema,
-
-    onSubmit: async (values) => {
-      try {
-        // todo buat safety input hm <24 jam
-        // Tambahkan Label Input 24 jam
-        // install filament
-
-        await database.write(async () => {
-          const masterLog = await database
-            .get(MasterLogActivity.table)
-            .create((item) => {
-              item.id_master_log_activity = dataMasterLog.length + 1;
-              item.master_sector_id = values.id_master_sectors;
-              item.master_company_id = values.id_master_company;
-              item.master_machine_id = values.master_machine_id;
-              item.master_estate_id = values.id_master_estate;
-              item.compartement_id = values.compartement_id;
-              item.master_machine_types_id = values.id_master_machine_types;
-              item.master_main_activity_id = values.id_master_main_activities;
-              item.current_hour_meter = parseInt(values.current_hour_meter);
-              item.keterangan = values.keterangan;
-              item.isSynced = false;
-              item.isConnected = false;
-              item.date = dayjs(values.date).unix() * 1000;
-            });
-          // console.log(JSON.stringify(masterLog, null, 2));
-          Toast.show({
-            visibilityTime: 500,
-            type: "success",
-            text1: "Yeay, Berhasil!",
-            text2: "Data Log Activity Berhasil Ditambahkan",
-          });
-          console.log("masterLog", database);
-          return masterLog;
-        });
-        navigation.replace("Mytabs");
-      } catch (error) {
-        visibilityTime: 500,
-          Toast.show({
-            type: "error",
-            text1: error.message,
-          });
-        console.log(database);
-      }
-    },
-  });
-
-  let schema = yup.object().shape({
-    current_hour_meter: yup.number().max(24, "tidak lebih dari 24 jam").required("Mohon masukkan format yang benar"),
-    compartement_id: yup
-      .string()
-      .matches(/^[A-Za-z]{1,2}\d{1,3}$/, "Input must follow the format AB003")
-      .min(1)
-      .required("Masukkan Compartement ID"),
-    // Date: yup.date().required("Required"),
-    id_master_sectors: yup.string().required("Pilih Sector"),
-    id_master_company: yup.string().required("Pilih Company"),
-    master_machine_id: yup.string().required("Pilih Machine ID"),
-    id_master_estate: yup.string().required("Pilih Estate"),
-    id_master_machine_types: yup.string().required("Pilih Machine Type"),
-    id_master_main_activities: yup.string().required("Pilih Main Activity"),
-    compartement_id: yup.string().required("Masukkan Compartement ID"),
-  });
-
-  console.log(formik.errors);
-  console.log("value", formik.values);
+    setHm(hmArray.length > 0 ? hmArray[0] : 0);
+  }, [formik.values.master_machine_id, dataMasterLog]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
@@ -366,9 +245,6 @@ const AddNew = ({ navigation }) => {
             >
               Details
             </Text>
-            <TouchableOpacity>
-              <Text onPress={mySync}>Sync</Text>
-            </TouchableOpacity>
             <View style={[styles.Details1]}>
               <View style={[styles.button_waktu]}>
                 <Modal
@@ -572,38 +448,6 @@ const AddNew = ({ navigation }) => {
                   }
                 : null}
               <DropdownComp
-                title="Estate"
-                item={{
-                  values: dataEstate.map((estate) => ({
-                    label: estate.name,
-                    value: estate.id_master_estate,
-                  })),
-                  placeholder: dataEstate.find(
-                    (item) =>
-                      item.id_master_estate === formik.values.id_master_estate
-                  )?.name,
-                  onChange: (item) => {
-                    setIsFocus(false);
-                    formik.setFieldValue("id_master_estate", item.value);
-                    console.log(item);
-                  },
-                  Dropdown: {
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                  },
-                }}
-              />
-              {formik.errors.id_master_estate
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_estate}
-                    </Text>;
-                  }
-                : null}
-
-              <DropdownComp
                 title="Machine Type"
                 item={{
                   values: dataMachineType.map((type) => ({
@@ -618,7 +462,7 @@ const AddNew = ({ navigation }) => {
                   onChange: (item) => {
                     setIsFocus(false);
                     formik.setFieldValue("id_master_machine_types", item.value);
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     borderWidth: 0.4,
@@ -661,7 +505,7 @@ const AddNew = ({ navigation }) => {
                       "id_master_main_activities",
                       item.value
                     );
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     borderWidth: 0.4,
@@ -756,6 +600,28 @@ const AddNew = ({ navigation }) => {
                       borderColor: "#DDDDDD",
                     }}
                   />
+                  {/* <Label title="Mohon masukkan HM tidak lebih dari 24" /> */}
+                  {formik.values.current_hour_meter - hm > 24 ? (
+                    <View
+                      style={[styles.Label]}
+                    >
+                      <Text style={globalStyles.textError}>
+                        HM tidak boleh lebih dari 24 jam
+                      </Text>
+                    </View>
+                  ) : null}
+                  <View
+                    style={[ styles.Label]}
+                  >
+                    <Text
+                      style={[
+                        styles.Abu,
+                        { fontStyle: "italic", alignItems: "flex-end" },
+                      ]}
+                    >
+                      * Masukkan HM tidak lebih dari 24 jam
+                    </Text>
+                  </View>
                   {formik.errors.current_hour_meter ? (
                     <Text style={globalStyles.textError}>
                       {formik.errors.current_hour_meter}
@@ -1041,10 +907,19 @@ const styles = StyleSheet.create({
   Abu: {
     color: "#88888D",
   },
+  Abu1: {
+    color: "black",
+  },
   container: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "center",
     marginHorizontal: 10,
   },
+  Label : {
+    flex: 1,
+    alignItems: "flex-end",
+    marginRight: 40,
+    width: "100%",
+  }
 });

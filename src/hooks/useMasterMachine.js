@@ -13,29 +13,6 @@ export const useMasterMachine = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  async function fetching() {
-    await synchronize({
-      database,
-      pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-        console.log("last pull master machine", lastPulledAt);
-        const urlParams = `last_pulled_at=${lastPulledAt ? lastPulledAt : ""}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-          JSON.stringify(migration)
-        )}`;
-        const response = await API.get(`master_machine/sync?${urlParams}`);
-      
-        // console.log(JSON.stringify(response, null, 2));
-
-        // Check if the request was successful
-        if (response.status_code !== 200) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-        const timestamp = dayjs().unix()*1000;
-
-        return { changes: response.data, timestamp: timestamp };
-      },
-    });
-  }
-
   function getAllMachine() {
     setIsLoading(true);
     const getAllMachine = database
@@ -64,5 +41,5 @@ export const useMasterMachine = ({ isGetData }) => {
     // return () => masterMachine.unsubscribe();
   }, []);
 
-  return { data, connected, isLoading, fetching };
+  return { data, connected, isLoading,  };
 };

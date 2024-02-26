@@ -325,13 +325,12 @@ export default function Route() {
         }}
       >
         <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen name="Edit" component={Edit} />
-        <Stack.Screen name="Mytabs" component={Mytabs} />
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Mytabs" component={Mytabs} />
         <Stack.Screen name="Status" component={Status} />
+        <Stack.Screen name="Edit" component={Edit} />
         <Stack.Screen name="NewForm" component={NewForm} />
 
-        {/* <Stack.Screen name="PilihTanggal" component={PilihTanggal} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

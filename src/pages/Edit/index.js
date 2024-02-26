@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
   SafeAreaView,
   StyleSheet,
   Dimensions,
-  Image,
   StatusBar,
   Switch,
   Modal,
@@ -23,14 +22,12 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native-gesture-handler";
-// import {color} from "../..variabel";
 import * as yup from "yup";
 import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 import dayjs from "dayjs";
 import {
   useMasterSector,
   useMasterCompany,
-  useMasterEstate,
   useMasterMachineType,
   useMasterMachine,
   useMasterMainActivity,
@@ -60,10 +57,8 @@ const Edit = ({ navigation }) => {
       .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
       .min(1)
       .required("Masukkan Compartement ID"),
-    // Date: yup.date().required("Required"),
     id_master_sector: yup.string().required("Pilih Sector"),
     id_master_company: yup.string().required("Pilih Company"),
-    id_master_estate: yup.string().required("Pilih Estate"),
     id_master_machine_types: yup.string().required("Pilih Machine Type"),
     id_master_main_activities: yup.string().required("Pilih Main Activity"),
     master_machine_id: yup.string().required("Pilih Machine ID"),
@@ -84,14 +79,6 @@ const Edit = ({ navigation }) => {
   } = useMasterCompany({ isGetData: true });
   console.log("data Company", dataCompany.length);
   // console.log(JSON.stringify(dataCompany, null, 2));
-  const {
-    data: dataEstate,
-    isLoading: isLoadingEstate,
-    connected: connectedMasterEstate,
-  } = useMasterEstate({ isGetData: true });
-  console.log("data Estate", dataEstate.length);
-  // console.log(JSON.stringify(dataEstate, null, 2));
-
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
@@ -119,7 +106,7 @@ const Edit = ({ navigation }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  console.log(JSON.stringify(dataMasterLog, null, 2));
+  // console.log(JSON.stringify(dataMasterLog, null, 2));
   console.log("data Log", dataMasterLog.length);
 
   const [selectedDate, setSelectedDate] = useState("");
@@ -155,7 +142,6 @@ const Edit = ({ navigation }) => {
       id_master_sector: masterLog.master_sector_id,
       id_master_company: masterLog.master_company_id,
       master_machine_id: masterLog.master_machine_id,
-      id_master_estate: masterLog.master_estate_id,
       compartement_id: masterLog.compartement_id,
       id_master_machine_types: masterLog.master_machine_types_id,
       id_master_main_activities: masterLog.master_main_activity_id,
@@ -167,17 +153,14 @@ const Edit = ({ navigation }) => {
     onSubmit: async (values) => {
       try {
         const taskId = masterLog.id;
-        console.log("taskid", taskId);
         await database.write(async () => {
           const updateLog = await database
             .get("master_log_activities")
             .find(taskId);
           await updateLog.update(() => {
-            // updateLog.isConnected = true;
             updateLog.master_sector_id = values.id_master_sector;
             updateLog.master_company_id = values.id_master_company;
             updateLog.master_machine_id = values.master_machine_id;
-            updateLog.master_estate_id = values.id_master_estate;
             updateLog.compartement_id = values.compartement_id;
             updateLog.master_machine_types_id = values.id_master_machine_types;
             updateLog.master_main_activity_id =
@@ -220,10 +203,21 @@ const Edit = ({ navigation }) => {
   console.log("value", formik.values);
   console.log("id", masterLog.id);
   console.log(formik.masterLog);
-
-  // console.log("id", id)
-
   //to do buat component tanggal
+
+  const [hm, setHm] = useState(0);
+
+  useEffect(() => {
+    const hmArray = dataMasterLog
+      .filter(
+        (item) => item.master_machine_id === formik.values.master_machine_id
+      )
+      .map((item, index, array) =>
+        index === array.length - 1 ? item.current_hour_meter : null
+      );
+
+    setHm(hmArray.length > 0 ? hmArray[0] : 0);
+  }, [formik.values.master_machine_id, dataMasterLog]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
@@ -347,11 +341,11 @@ const Edit = ({ navigation }) => {
                   value: formik.values.id_master_sector,
                   placeholder: dataSector.find(
                     (item) =>
-                      item.id_master_sectors === formik.values.id_master_sectors
+                      item.id_master_sectors === formik.values.id_master_sector
                   )?.name,
                   onChange: (item) => {
                     setIsFocus(false);
-                    formik.setFieldValue("id_master_sectors", item.value);
+                    formik.setFieldValue("id_master_sector", item.value);
                     console.log(item);
                   },
                   Dropdown: {
@@ -452,46 +446,6 @@ const Edit = ({ navigation }) => {
                     </Text>;
                   }
                 : null}
-              <DropdownComp
-                title="Estate"
-                item={{
-                  values: dataEstate
-                    .filter((selected) => {
-                      return (
-                        selected.id_master_sectors ===
-                        formik.values.id_master_sectors
-                      );
-                      // console.log("Values", selected)
-                    })
-                    .map((estate) => ({
-                      label: estate.name,
-                      value: estate.id_master_estate,
-                    })),
-                  value: formik.values.id_master_estate,
-                  placeholder: dataEstate.find(
-                    (item) =>
-                      item.id_master_estate === formik.values.id_master_estate
-                  )?.name,
-                  onChange: (item) => {
-                    setIsFocus(false);
-                    formik.setFieldValue("id_master_estate", item.value);
-                    console.log(item);
-                  },
-                  Dropdown: {
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                  },
-                }}
-              />
-              {formik.errors.id_master_estate
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_estate}
-                    </Text>;
-                  }
-                : null}
               <InputData
                 Title="Compartement ID"
                 onChangeText={formik.handleChange("compartement_id")}
@@ -555,13 +509,13 @@ const Edit = ({ navigation }) => {
                 title="Main Activity"
                 item={{
                   values: dataMainActivity
-                    // .filter((selected) => {
-                    //   return (
-                    //     selected.master_machine_types_id ===
-                    //     formik.values.id_master_machine_types
-                    //   );
-                    //   // console.log("Values", selected)
-                    // })
+                    .filter((selected) => {
+                      return (
+                        selected.master_machine_types_id ===
+                        formik.values.id_master_machine_types
+                      );
+                      // console.log("Values", selected)
+                    })
                     .map((mainActivity) => ({
                       label: mainActivity.name,
                       value: mainActivity.id_master_main_activities,
@@ -588,7 +542,6 @@ const Edit = ({ navigation }) => {
                   },
                 }}
               />
-              {/* <Text>{formik.values.id_master_main_activities}</Text> */}
               {formik.errors.id_master_main_activities
                 ? () => {
                     <Text style={globalStyles.textError}>
@@ -650,7 +603,7 @@ const Edit = ({ navigation }) => {
                               if (index === array.length - 1) {
                                 return item.current_hour_meter;
                               } else {
-                                return null;
+                                return 0;
                               }
                             })}
                         </Text>
@@ -675,13 +628,13 @@ const Edit = ({ navigation }) => {
                       borderColor: "#DDDDDD",
                     }}
                   />
-                  {formik.errors.current_hour_meter
-                    ? () => {
-                        <Text style={globalStyles.textError}>
-                          {formik.errors.current_hour_meter}
-                        </Text>;
-                      }
-                    : null}
+                  {formik.values.current_hour_meter - hm > 24 ? (
+                    <View style={[styles.Label]}>
+                      <Text style={globalStyles.textError}>
+                        HM tidak boleh lebih dari 24 jam
+                      </Text>
+                    </View>
+                  ) : null}
                 </>
               ) : null}
               <View
@@ -751,6 +704,7 @@ const Edit = ({ navigation }) => {
                     value: formik.values.keterangan,
                     backgroundColor: "red",
                   }}
+                  value={formik.values.keterangan}
                   input={{ backgroundColor: "black" }}
                 />
               </View>
@@ -969,5 +923,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     marginHorizontal: 10,
+  },
+  Label: {
+    flex: 1,
+    alignItems: "flex-end",
+    marginRight: 40,
+    width: "100%",
   },
 });

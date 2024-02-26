@@ -21,12 +21,9 @@ const InputData = ({
           flexDirection: "row",
           justifyContent: "center",
           flex: 1,
-          // borderWidth: 0.5,
-          // borderColor: "#88888D",
           backgroundColor: "white",
           borderRadius: 10,
           marginBottom: 5,
-          // marginHorizontal: 10,
           marginTop: 10,
         },
       ]}
@@ -60,6 +57,7 @@ const InputData = ({
             <TextInput
               secureTextEntry={secureTextEntry}
               placeholder={item.placeholder}
+              autoCapitalize="characters"
               style={[styles.input, buttonStyle]}
               // style={[styles.input, {height:50, textAlignVertical: 'top', paddingVertical:8, paddingHorizontal:6}, buttonStyle]}
               keyboardType={keyboardType}
@@ -111,7 +109,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   Abu: {
-    color: "#88888D",
+    color: "black",
   },
   container: {
     flex: 1,

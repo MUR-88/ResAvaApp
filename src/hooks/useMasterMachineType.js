@@ -14,28 +14,6 @@ export const useMasterMachineType = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  async function fetching() {
-    await synchronize({
-      database,
-      pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-        console.log("last pull master machine type", lastPulledAt);
-        const urlParams = `last_pulled_at=${lastPulledAt ? lastPulledAt : ""}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-          JSON.stringify(migration)
-        )}`;
-        const response = await API.get(`master_machine_type/sync?${urlParams}`);
-        // Check if the request was successful
-        if (response.status_code !== 200) {
-          throw new Error(
-            `Request failed with status ${response.status}`
-          );
-        }
-        const timestamp =  dayjs().unix()*1000;
-
-        return { changes: response.data, timestamp: timestamp };
-      },
-    })
-  }
-
   function getAllMachineType() {
     setIsLoading(true);
     const allMachineType = database
@@ -64,5 +42,5 @@ export const useMasterMachineType = ({ isGetData }) => {
     // return () => masterMachineType.unsubscribe();
   }, []);
 
-  return { data, connected, isLoading, fetching };
+  return { data, connected, isLoading,  };
 };

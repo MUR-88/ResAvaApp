@@ -19,7 +19,7 @@ const index = ({ title, item }) => {
           data={item.values}
           maxHeight={item.height}
           search
-          searchPlaceholder="Seacrh..."
+          searchPlaceholder="Search..."
           width={20}
           labelField="label"
           valueField="value"
@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     justifyContent: "center",
     backgroundColor: "white",
+    borderRadius: 8,
     flex: 1,
   },
   dropdown: {
@@ -69,15 +70,17 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 16,
+    color: 'black'
   },
   selectedTextStyle: {
     fontSize: 16,
+    color: 'black'
   },
   iconStyle: {
     width: 20,
     height: 20,
   },
   Abu: {
-    color: "#88888D",
+    // color: "black",
   },
 });

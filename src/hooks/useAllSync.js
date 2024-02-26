@@ -14,30 +14,10 @@ export const useAllSync = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  
   async function fetching() {
-    // await synchronize({
-    //   database,
-    //   pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-    //     console.log("last pull All Sync", lastPulledAt);
-    //     const urlParams = `last_pulled_at=${
-    //       lastPulledAt ? lastPulledAt : ""
-    //     }&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-    //       JSON.stringify(migration)
-    //     )}`;
-    //     const response = await API.get(`allSync?${urlParams}`);
-    //     //   console.log(JSON.stringify(response, null, 2));
-
-    //     // Check if the request was successful
-    //     if (response.status_code !== 200) {
-    //       throw new Error(`Request failed with status ${response.status}`);
-    //     }
-    //     const timestamp = dayjs().unix() * 1000;
-
-    //     return { changes: response.data, timestamp: timestamp };
-    //   },
-    // });
-
-    synchronize({
+    const isFirstSync = response;
+    const response = await synchronize({
       database,
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
         console.log("last pull All Sync", lastPulledAt);
@@ -55,8 +35,14 @@ export const useAllSync = ({ isGetData }) => {
         }
         const timestamp = dayjs().unix() * 1000;
 
-        return { changes: response.data, timestamp: timestamp };
+        if (isFirstSync) {
+          const syncJson = JSON.stringify(response.data);
+          return { syncJson };
+        } else {
+          return { changes: response.data, timestamp: timestamp };
+        }
       },
+
       pushChanges: async ({ changes, lastPulledAt }) => {
         const masterLogCreated = changes.master_log_activities.created.filter(
           (item) => item.isSync === false
@@ -72,7 +58,9 @@ export const useAllSync = ({ isGetData }) => {
           (item) => item.isSync === false
         );
 
-        console.log("Kontol", JSON.stringify(masterLogCreated, null, 2));
+        console.log("Created", JSON.stringify(masterLogCreated, null, 2));
+        console.log("Updated", JSON.stringify(masterLogUpdated, null, 2));
+
         try {
           const pushDataResponse = await API.post("push/data", {
             master_log_activities: {
@@ -90,6 +78,7 @@ export const useAllSync = ({ isGetData }) => {
 
           const syncAndUpdate = async (items, updateFunction) => {
             await database.write(async () => {
+              console.log("Test", JSON.stringify(items, null, 2));
               const allItems = await database
                 .get(items)
                 .query(Q.where("isSync", false))
@@ -116,10 +105,12 @@ export const useAllSync = ({ isGetData }) => {
         }
       },
       migrationsEnabledAtVersion: 1,
+      unsafeTurbo: isFirstSync,
     });
 
     const unsyncedChangesResponse = await hasUnsyncedChanges({ database });
     console.log("unsyncedChangesResponse", unsyncedChangesResponse);
+    
   }
 
   useEffect(() => {

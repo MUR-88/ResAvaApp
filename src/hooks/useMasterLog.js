@@ -12,33 +12,10 @@ export const useMasterLog = ({ isGetData }) => {
   // setelah itu useEffect untuk ambil data dari API jika connected, jika tidak ambil data dari WatermelonDB'
 
   // todo
-  // 
+  //
   const [connected, setConnected] = useState(undefined);
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  async function fetching() {
-    await synchronize({
-      database,
-      pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-        console.log("last pull at masater Log", lastPulledAt);
-        const urlParams = `last_pulled_at=${
-          lastPulledAt ? lastPulledAt : ""
-        }&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-          JSON.stringify(migration)
-        )}`;
-        const response = await API.get(`log_activity/sync?${urlParams}`);
-        // Check if the request was successful
-        if (response.status_code !== 200) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-        const timestamp = dayjs().locale("id").unix() * 1000;
-
-        console.log("last_pull_at", timestamp);
-        return { changes: response.data, timestamp: timestamp };
-      },
-    });
-  }
 
   function getAllLog() {
     setIsLoading(true);
@@ -47,15 +24,15 @@ export const useMasterLog = ({ isGetData }) => {
       .query(Q.experimentalJoinTables(["master_machine"]))
       .observe()
       .subscribe((masterLog) => {
-        // console.log("MasterLog", masterLog, null, 2);
-        // console.log("masterLog", );
+        // When changes occur, update the data and set loading state to false
         setData(masterLog.map((masterLog) => masterLog._raw));
         setIsLoading(false);
       });
-      return allLogActivity;
+    return allLogActivity;
   }
 
   useEffect(() => {
+    // const subscription = getAllLog();
     const checkInternetConnection = async () => {
       const netInfoState = await NetInfo.fetch();
       setConnected(netInfoState.isConnected);
@@ -67,5 +44,5 @@ export const useMasterLog = ({ isGetData }) => {
     }
   }, []);
 
-  return { data, connected, isLoading, fetching };
+  return { data, connected, isLoading };
 };

@@ -26,7 +26,6 @@ const Input = ({
         multiline={multiline}
         onFocus={onFocus}
         editable={editable}
-        
       />
 
         </View>

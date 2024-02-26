@@ -1,8 +1,7 @@
 import { StyleSheet, View } from 'react-native'
 import React from 'react'
 import AutoHeightImage from 'react-native-auto-height-image'
-import { Fiber, Logo, Profile_Set, RAPP, PanahKiri } from "../../assets/icon";
-import { TouchableOpacity } from 'react-native-gesture-handler'
+import {  PanahKiri } from "../../assets/icon";
 import { useNavigation } from '@react-navigation/native'
 import Text from '../Text'
 

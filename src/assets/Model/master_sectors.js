@@ -8,10 +8,6 @@ export default class MasterSector extends Model {
       type: 'hasmany',
       key: 'master_sector_id',
     },
-    masterEstates: { 
-      type: 'belongs_to', 
-      foreignKey: 'master_sector_id' 
-    },
     masterLogActivities: { 
       type: 'belongs_to', 
       foreignKey: 'master_sectos_id' 
@@ -22,6 +18,5 @@ export default class MasterSector extends Model {
   @field("deleted_at") deletedAt;
   @field("updated_at") updatedAt;
   @field("last_pull_at") last_pull_at;
-  @children('master_estates') masterEstates;
   @children('master_log_activities') masterLogActivities;
 }

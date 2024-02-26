@@ -17,10 +17,6 @@ export default class MasterLogActivity extends Model {
       type: "belongs_to",
       key: "master_sector_id",
     },
-    masterEstate: {
-      type: "belongs_to",
-      key: "master_estate_id",
-    },
     master_machine: {
       type: "belongs_to",
       key: "master_machine_id",
@@ -40,7 +36,6 @@ export default class MasterLogActivity extends Model {
   @children('id_master_log_activity') idMasterLogActivity
   @field('master_company_id') master_company_id
   @field('master_sector_id') master_sector_id
-  @field('master_estate_id') master_estate_id
   @field('master_machine_id') master_machine_id
   @field('master_machine_types_id') master_machine_types_id
   @field('compartement_id') compartement_id

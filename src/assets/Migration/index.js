@@ -21,17 +21,17 @@ export default schemaMigrations({
             { name: "updated_at", type: "number" },
           ],
         }),
-        createTable({
-          name: "master_estates",
-          columns: [
-            { name: "id_master_estate", type: "string", isIndexed: true },
-            { name: "id_master_sectors", type: "string" },
-            { name: "name", type: "string" },
-            { name: "created_at", type: "number" },
-            { name: "deleted_at", type: "number" },
-            { name: "updated_at", type: "number" },
-          ],
-        }),
+        // createTable({
+        //   name: "master_estates",
+        //   columns: [
+        //     { name: "id_master_estate", type: "string", isIndexed: true },
+        //     { name: "id_master_sectors", type: "string" },
+        //     { name: "name", type: "string" },
+        //     { name: "created_at", type: "number" },
+        //     { name: "deleted_at", type: "number" },
+        //     { name: "updated_at", type: "number" },
+        //   ],
+        // }),
         createTable({
           name: "master_sectors",
           columns: [
@@ -48,7 +48,7 @@ export default schemaMigrations({
             { name: "id_master_log_activity", type: "number", isIndexed: true },
             { name: "master_company_id", type: "number" },
             { name: "master_sector_id", type: "number",  },
-            { name: "master_estate_id", type: "number",  },
+            // { name: "master_estate_id", type: "number",  },
             { name: "master_machine_id", type: "number",  },
             { name: "master_machine_types_id", type: "number",  },
             { name: "master_main_activity_id", type: "number",  },
@@ -75,9 +75,7 @@ export default schemaMigrations({
             { name: "class", type: "number" },
             { name: "machine_id", type: "string" },
             { name: "current_hour_meter", type: "number" },
-            { name: "hm_current", type: "number" },
             { name: "master_main_activity_id", type: "number"  },
-            { name: "working_hour", type: "number" },
             { name: "isSync", type: "boolean" },
             { name: "isConnected", type: "boolean" },
             { name: "created_at", type: "number" },

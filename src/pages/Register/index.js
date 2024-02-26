@@ -30,21 +30,6 @@ import MasterLogActivity from "../../assets/Model/master_log_activity";
 import dayjs from "dayjs";
 import MasterMachine from "../../assets/Model/master_machine";
 const Register = ({ navigation }) => {
-  let schema = yup.object().shape({
-    hm_current: yup.number().required("Mohon masukkan format yang benar"),
-    compartement_id: yup
-      .string()
-      .matches(/^\d{1,3}$/, "Input must be a number with 1 to 3 digits")
-      .min(1)
-      .required("Masukkan Compartement ID"),
-    // Date: yup.date().required("Required"),
-    id_master_sector: yup.string().required("Pilih Sector"),
-    id_master_company: yup.string().required("Pilih Company"),
-    // id_master_machine: yup.string().required("Pilih Machine ID"),
-    id_master_estate: yup.string().required("Pilih Estate"),
-    id_master_machine_types: yup.string().required("Pilih Machine Type"),
-    id_master_main_activities: yup.string().required("Pilih Main Activity"),
-  });
   const [isFocus, setIsFocus] = useState(true);
 
   const {
@@ -58,7 +43,7 @@ const Register = ({ navigation }) => {
     isLoading: isLoadingMachine,
     connected: connectedMasterMachine,
   } = useMasterMachine({ isGetData: true });
-  console.log("data Machine", dataCompany.length);
+  console.log("data Machine", dataMachine.length);
   console.log(JSON.stringify(dataMachine, null, 2));
   const {
     data: dataMachineType,
@@ -75,15 +60,27 @@ const Register = ({ navigation }) => {
   console.log("data Main Activity", dataMainActivity.length);
   // console.log(JSON.stringify(dataMainActivity, null, 2));
 
+  let schema = yup.object().shape({
+    current_hour_meter: yup
+      .number()
+      .required("Mohon masukkan format HM yang benar"),
+    id_master_company: yup.string().required("Pilih Company"),
+    id_master_machine: yup.string().required("Masukkan Machine ID"),
+    id_master_machine_types: yup.string().required("Pilih Machine Type"),
+    id_master_main_activities: yup.string().required("Pilih Main Activity"),
+    brand: yup.string().required("Masukkan Brand"),
+    class: yup.number().required("Masukkan Class"),
+  });
   const formik = useFormik({
     initialValues: {
       id_master_company: "",
+      master_machine_id: "",
+      current_hour_meter: "",
       brand: "",
       class: "",
-      machine_id: "",
+      id_master_machine: "",
       id_master_machine_types: "",
       id_master_main_activities: "",
-      hm_current: "",
     },
     validationSchema: schema,
 
@@ -98,11 +95,14 @@ const Register = ({ navigation }) => {
               item.master_machine_id = dataMachine.length + 1;
               item.master_company_id = values.id_master_company;
               item.brand = values.brand;
-              item.class = values.class;
-              item.machine_id = values.machine_id;
+              item.class = parseInt(values.class);
+              item.current_hour_meter = parseInt(values.current_hour_meter);
+              // item.brand = "Komatsu";
+              // item.current_hour_meter = 50;
+              // item.class = 30;
+              item.machine_id = values.id_master_machine;
               item.master_machine_types_id = values.id_master_machine_types;
               item.master_main_activity_id = values.id_master_main_activities;
-              item.hm_current = values.hm_current;
               item.isSynced = false;
               item.isConnected = false;
             });
@@ -177,7 +177,7 @@ const Register = ({ navigation }) => {
                   onChange: (item) => {
                     setIsFocus(false);
                     formik.setFieldValue("id_master_company", item.value);
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     marginHorizontal: 10,
@@ -199,33 +199,60 @@ const Register = ({ navigation }) => {
                   placeholder: "KOMATSU",
                   value: formik.values.brand,
                   Input: {
-                    // borderWidth: 0.5,
-                    // borderColor: "#88888D",
                     marginHorizontal: 10,
                     height: 45,
                   },
                 }}
               />
+              {formik.errors.brand
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.brand}
+                    </Text>;
+                  }
+                : null}
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: "flex-end",
+                  marginRight: 40,
+                  width: "100%",
+                }}
+              >
+                <Text
+                  style={[
+                    styles.Abu,
+                    { fontStyle: "italic", alignItems: "flex-end" },
+                  ]}
+                >
+                  * Masukkan Full Brand Name
+                </Text>
+              </View>
               <InputData
-                Title="Equipment Class (TON)"
+                Title="Equipment Class"
                 onChangeText={formik.handleChange("class")}
                 item={{
-                  placeholder: "30",
+                  placeholder: "30 (Ton)",
                   value: formik.values.class,
                   Input: {
-                    // borderWidth: 0.5,
-                    // borderColor: "#88888D",
                     marginHorizontal: 10,
                     height: 45,
                   },
                 }}
               />
+              {formik.errors.class
+                ? () => {
+                    <Text style={globalStyles.textError}>
+                      {formik.errors.class}
+                    </Text>;
+                  }
+                : null}
               <InputData
                 Title="Machine ID"
-                onChangeText={formik.handleChange("machine_id")}
+                onChangeText={formik.handleChange("id_master_machine")}
                 item={{
-                  placeholder: "MCH_301",
-                  value: formik.values.machine_id,
+                  placeholder: "MCH001",
+                  value: formik.values.id_master_machine,
                   Input: {
                     marginHorizontal: 10,
                     height: 45,
@@ -255,7 +282,7 @@ const Register = ({ navigation }) => {
                   onChange: (item) => {
                     setIsFocus(false);
                     formik.setFieldValue("id_master_machine_types", item.value);
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     marginHorizontal: 10,
@@ -295,7 +322,7 @@ const Register = ({ navigation }) => {
                       "id_master_main_activities",
                       item.value
                     );
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     marginHorizontal: 10,
@@ -313,23 +340,20 @@ const Register = ({ navigation }) => {
 
               <InputData
                 Title="HM Current"
-                onChangeText={formik.handleChange("hm_current")}
+                onChangeText={formik.handleChange("current_hour_meter")}
                 item={{
-                  placeholder: "XXX",
-                  value: formik.values.hm_current,
+                  placeholder: "XXXX",
+                  value: formik.values.current_hour_meter,
                   Input: {
                     marginHorizontal: 10,
                     height: 45,
                   },
                 }}
-                buttonStyle={{
-                  borderColor: "#DDDDDD",
-                }}
               />
-              {formik.errors.hm_current
+              {formik.errors.current_hour_meter
                 ? () => {
                     <Text style={globalStyles.textError}>
-                      {formik.errors.hm_current}
+                      {formik.errors.current_hour_meter}
                     </Text>;
                   }
                 : null}

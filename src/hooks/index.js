@@ -5,7 +5,6 @@ import {
 } from "./useToastDispatch";
 import { useMasterCompany } from "./useMasterCompany";
 import { useMasterSector } from "./useMasterSector";
-import { useMasterEstate } from "./useMasterEstate";
 import { useMasterMachineType } from "./useMasterMachineType";
 import { useMasterMachine } from "./useMasterMachine";
 import { useMasterMainActivity } from "./useMasterMainActivity";
@@ -18,7 +17,6 @@ export {
   useMasterCompany,
   useMasterMachine,
   useMasterSector,
-  useMasterEstate,
   useMasterMachineType,
   useMasterMainActivity,
   useMasterLog,

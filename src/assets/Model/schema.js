@@ -18,20 +18,6 @@ export default mySchema = appSchema({
         sql.replace(/create table [^)]+\)/, "$& without rowid"),
     }),
     tableSchema({
-      name: "master_estates",
-      columns: [
-        { name: "id_master_sectors", type: "number" },
-        { name: "id_master_estate", type: "number", isIndexed: true },
-        { name: "name", type: "string" },
-        { name: "created_at", type: "number" },
-        { name: "deleted_at", type: "number" },
-        { name: "updated_at", type: "number" },
-      ],
-      unsafeSql: (sql) =>
-        sql.replace(/create table [^)]+\)/, "$& without rowid"),
-    }),
-    //
-    tableSchema({
       name: "master_machine_types",
       columns: [
         { name: "id_master_machine_types", type: "number", isIndexed: true },
@@ -40,6 +26,8 @@ export default mySchema = appSchema({
         { name: "deleted_at", type: "number" },
         { name: "updated_at", type: "number" },
       ],
+      unsafeSql: (sql) =>
+      sql.replace(/create table [^)]+\)/, "$& without rowid"),
     }),
     tableSchema({
       name: "master_machine",
@@ -51,15 +39,15 @@ export default mySchema = appSchema({
         { name: "class", type: "number" },
         { name: "machine_id", type: "string" },
         { name: "current_hour_meter", type: "number" },
-        { name: "hm_current", type: "number" },
         { name: "master_main_activity_id", type: "number"  },
-        { name: "working_hour", type: "number" },
         { name: "isConnected", type: "boolean" },
         { name: "isSync", type: "boolean" },
         { name: "created_at", type: "number" },
         { name: "deleted_at", type: "number" },
         { name: "updated_at", type: "number" },
       ],
+      unsafeSql: (sql) =>
+      sql.replace(/create table [^)]+\)/, "$& without rowid"),
     }),
     tableSchema({
       name: "master_main_activities",
@@ -71,6 +59,8 @@ export default mySchema = appSchema({
         { name: "deleted_at", type: "number" },
         { name: "updated_at", type: "number" },
       ],
+      unsafeSql: (sql) =>
+      sql.replace(/create table [^)]+\)/, "$& without rowid"),
     }),
     tableSchema({
       name: "master_sectors",
@@ -91,7 +81,6 @@ export default mySchema = appSchema({
         { name: "id_master_log_activity", type: "number", isIndexed: true },
         { name: "master_company_id", type: "number" },
         { name: "master_sector_id", type: "number" },
-        { name: "master_estate_id", type: "number" },
         { name: "master_machine_id", type: "number" },
         { name: "master_machine_types_id", type: "number" },
         { name: "master_main_activity_id", type: "number" },
@@ -107,22 +96,8 @@ export default mySchema = appSchema({
         { name: "deleted_at", type: "number" },
         { name: "updated_at", type: "number" },
       ],
+      unsafeSql: (sql) =>
+      sql.replace(/create table [^)]+\)/, "$& without rowid"),
     }),
-    
-    // tableSchema({
-    //   name: "users",
-    //   columns: [
-    //     { name: "id_users", type: "string", isIndexed: true },
-    //     { name: "name", type: "string" },
-    //     { name: "SAP", type: "number" },
-    //     { name: "email", type: "string" },
-    //     { name: "password", type: "string" },
-    //     { name: "isSync", type: "boolean" },
-    //     { name: "isConnected", type: "boolean" },
-    //     { name: "created_at", type: "number" },
-    //     { name: "deleted_at", type: "number" },
-    //     { name: "updated_at", type: "number" },
-    //   ],
-    // }),
   ],
 });

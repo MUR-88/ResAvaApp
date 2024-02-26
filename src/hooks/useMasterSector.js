@@ -13,28 +13,6 @@ export const useMasterSector = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  async function fetching() {
-    await synchronize({
-      database,
-      pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-        console.log("last pull master sector", lastPulledAt);
-        const urlParams = `last_pulled_at=${lastPulledAt ? lastPulledAt : ""}&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-          JSON.stringify(migration)
-        )}`;
-        const response = await API.get(`master_sector/sync?${urlParams}`);
-        // Check if the request was successful
-        if (response.status_code !== 200) {
-          throw new Error(
-            `Request failed with status ${response.status}`
-          );
-        }
-        const timestamp =  dayjs().unix()*1000;
-
-        return { changes: response.data, timestamp: timestamp };
-      },
-    })
-  }
-
   function getAllSector() {
     setIsLoading(true);
     const allSector = database
@@ -61,5 +39,5 @@ export const useMasterSector = ({ isGetData }) => {
     }
   }, []);
 
-  return { data, connected, isLoading, fetching };
+  return { data, connected, isLoading,  };
 };
