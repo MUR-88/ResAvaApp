@@ -14,18 +14,15 @@ export const useMasterMainActivity = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-
-  function getAllMainActivity() {
+  async function getAllMainActivity() {
     setIsLoading(true);
-    const allMainActivity = database
+    const allMainActivity = await database
       .get(MasterMainActivities.table)
       .query()
-      .observe()
-      .subscribe((mainActivity) => {
-        // console.log("mainActivity", );
-        setData(mainActivity.map((mainActivity) => mainActivity._raw));
-        setIsLoading(false);
-      });
+      .fetch();
+
+    setData(allMainActivity.map((mainActivity) => mainActivity._raw));
+    setIsLoading(false);
     return allMainActivity;
   }
 
@@ -35,11 +32,11 @@ export const useMasterMainActivity = ({ isGetData }) => {
       setConnected(netInfoState.isConnected);
     };
     checkInternetConnection();
-    if(isGetData){
+    if (isGetData) {
       const mainActivity = getAllMainActivity();
-      return () => mainActivity.unsubscribe();
+      return () => mainActivity;
     }
   }, []);
 
-  return { data, connected, isLoading,  };
+  return { data, connected, isLoading };
 };

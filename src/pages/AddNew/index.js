@@ -10,6 +10,7 @@ import {
   Switch,
   Modal,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import {
   Button,
@@ -85,6 +86,7 @@ const AddNew = ({ navigation, title }) => {
       id_master_main_activities: "",
       current_hour_meter: "",
       keterangan: "",
+      id_master_log_activity:"",
     },
     validationSchema: schema,
 
@@ -93,12 +95,12 @@ const AddNew = ({ navigation, title }) => {
       try {
         // todo buat safety input hm <24 jam
         // Tambahkan Label Input 24 jam = done
-        // install filament = done 
+        // install filament = done
         // Capslock Data Entry = done
         // Data HM dari register = done
         // Data Estate dihapus DB = done
         // Check status di edit  hapus = done
-        // Sync indicator tidk jalan
+        // Sync indicator tidk jalan = done
         // Machine Type & Activity di kasih tombol untuk ganti activity sesuai di field
 
         await database.write(async () => {
@@ -116,19 +118,23 @@ const AddNew = ({ navigation, title }) => {
               item.keterangan = values.keterangan;
               item.isSynced = false;
               item.isConnected = false;
+              item.created_at = dayjs(values.date).unix() * 1000;
               item.date = dayjs(values.date).unix() * 1000;
             });
-          Toast.show({
+            
+            Toast.show({
             visibilityTime: 500,
             type: "success",
             text1: "Yeay, Berhasil!",
             text2: "Data Log Activity Berhasil Ditambahkan",
           });
           // console.log("masterLog", database);
+          console.log("date", dayjs(values.date).unix() * 1000);
           return masterLog;
-          setLoading(false);
+          // setLoading(false);
         });
-        navigation.replace("Mytabs");
+        // navigation.replace("Mytabs");
+        formik.resetForm();
       } catch (error) {
         visibilityTime: 500,
           Toast.show({
@@ -139,6 +145,24 @@ const AddNew = ({ navigation, title }) => {
       }
     },
   });
+  useEffect(() => {
+    if (formik.values.master_machine_id) {
+      // query data machine type  berdasarkan machine id
+      formik.setFieldValue(
+        "id_master_machine_type",
+        dataMachine.find(
+          (item) => item.master_machine_id === formik.values.master_machine_id
+        ).id_master_machine_types
+      );
+      // main activity
+      formik.setFieldValue(
+        "id_master_machine_type",
+        dataMachine.find(
+          (item) => item.master_machine_id === formik.values.master_machine_id
+        ).id_master_machine_types
+      );
+    }
+  }, [formik.values.master_machine_id, ]);
 
   let schema = yup.object().shape({
     current_hour_meter: yup
@@ -157,8 +181,8 @@ const AddNew = ({ navigation, title }) => {
     id_master_main_activities: yup.string().required("Pilih Main Activity"),
   });
 
-  // console.log(formik.errors);
-  // console.log("value", formik.values);
+  console.log(formik.errors);
+  console.log("value", formik.values);
 
   const {
     data: dataSector,
@@ -199,7 +223,7 @@ const AddNew = ({ navigation, title }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  // console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log(JSON.stringify(dataMasterLog, null, 2));
   // console.log("data Log", dataMasterLog.length);
 
   const [hm, setHm] = useState(0);
@@ -216,6 +240,17 @@ const AddNew = ({ navigation, title }) => {
     setHm(hmArray.length > 0 ? hmArray[0] : 0);
   }, [formik.values.master_machine_id, dataMasterLog]);
 
+  // const [refreshing, setRefreshing] = useState(false);
+  // const onRefresh = async () => {
+  //   setRefreshing(true);
+  //   await getAllLog();
+  //   await getAllMachine();
+  //   await getAllCompany();
+  //   await getAllSector();
+  //   await getAllMachineType();
+  //   await getAllMainActivity();
+  //   setRefreshing(false);
+  // };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
@@ -234,361 +269,147 @@ const AddNew = ({ navigation, title }) => {
               </Text>
             </View>
           </View>
-          <View style={[styles.Content]}>
-            <Text
-              style={{
-                color: "#007AFF",
-                fontSize: 18,
-                fontFamily: "Poppins-Medium",
-                marginTop: 5,
-              }}
-            >
-              Details
-            </Text>
-            <View style={[styles.Details1]}>
-              <View style={[styles.button_waktu]}>
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={modalVisible}
-                  onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
-                    setModalVisible(!modalVisible);
+          {loading ? (
+            <>
+              <View style={[styles.loading, styles.horizontal]}>
+                <ActivityIndicator size="large" color="#0000ff" />
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={[styles.Content]}>
+                <Text
+                  style={{
+                    color: "#007AFF",
+                    fontSize: 18,
+                    fontFamily: "Poppins-Medium",
+                    marginTop: 5,
                   }}
                 >
-                  <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                      <DatePicker
-                        onSelectedChange={(date) => setSelectedDate(date)}
-                        mode="calendar"
-                        display="spinner"
-                        minimumDate={startDate}
-                        selected={date}
-                        onDateChange={(date) => {
-                          formik.setFieldValue("date", date);
-                        }}
-                      />
-                      <Pressable
-                        style={[styles.button, styles.buttonClose]}
-                        onPress={() => setModalVisible(!modalVisible)}
-                      >
-                        <Text style={styles.textStyle}>{}Simpan</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                </Modal>
-                {/* {showTime? } */}
-                <Pressable
-                  style={[styles.button, styles.buttonOpen]}
-                  onPress={() => setModalVisible(true)}
-                >
-                  <Text
-                    style={[
-                      styles.textStyle,
-                      { color: formik.setFieldValue ? "#88888D" : "black" },
-                    ]}
-                  >
-                    {formik.values.date
-                      ? dayjs(formik.values.date)
-                          .locale("id")
-                          .format("DD/MMM/YYYY ")
-                      : "pilih tanggal"}
-                  </Text>
-                </Pressable>
-              </View>
-              <DropdownComp
-                title="Company"
-                item={{
-                  values: dataCompany.map((company) => ({
-                    label: company.name,
-                    value: company.id_master_company,
-                  })),
-                  placeholder: dataCompany.find(
-                    (item) =>
-                      item.id_master_company === formik.values.id_master_company
-                  )?.name,
-                  onChange: (item) => {
-                    setIsFocus(false);
-                    formik.setFieldValue("id_master_company", item.value);
-                    console.log(item);
-                  },
-                  Dropdown: {
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                  },
-                }}
-              />
-              {formik.errors.id_master_company
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_company}
-                    </Text>;
-                  }
-                : null}
-              <DropdownComp
-                title="Sector"
-                item={{
-                  values: dataSector.map((sector) => ({
-                    label: sector.name,
-                    value: sector.id_master_sectors,
-                  })),
-                  placeholder: dataSector.find(
-                    (item) =>
-                      item.id_master_sectors === formik.values.id_master_sectors
-                  )?.name,
-                  onChange: (item) => {
-                    setIsFocus(false);
-                    formik.setFieldValue("id_master_sectors", item.value);
-                    console.log(item);
-                  },
-                  Dropdown: {
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                  },
-                }}
-              />
-              {formik.errors.id_master_sectors
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_sectors}
-                    </Text>;
-                  }
-                : null}
-
-              <InputData
-                Title="Compartement ID"
-                onChangeText={formik.handleChange("compartement_id")}
-                item={{
-                  placeholder: "Ex : AB001",
-                  value: formik.values.compartement_id,
-                  Input: {
-                    borderWidth: 0.5,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    height: 45,
-                  },
-                }}
-                buttonStyle={{
-                  borderColor: "#DDDDDD",
-                }}
-              />
-              {formik.errors.compartement_id
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.compartement_id}
-                    </Text>;
-                  }
-                : null}
-            </View>
-            <View
-              style={{
-                flex: 1,
-                marginLeft: -20,
-                borderBottomColor: "#3C3C43",
-                opacity: 0.3,
-                borderBottomWidth: 1,
-                marginVertical: 15,
-                marginRight: -200,
-              }}
-            />
-            <Text
-              style={{
-                marginBottom: 20,
-                color: "#88888D",
-                fontFamily: "Poppins-Regular",
-                fontWeight: 900,
-                fontSize: 18,
-                marginLeft: 10,
-              }}
-            >
-              Machine Information
-            </Text>
-            <View style={[styles.MechInfo]}>
-              <DropdownComp
-                title="Machine ID"
-                item={{
-                  values: dataMachine
-                    .filter((selected) => {
-                      return (
-                        selected.master_company_id ===
-                        formik.values.id_master_company
-                      );
-                      // console.log("Values", selected)
-                    })
-                    .map((machine) => ({
-                      label: machine.machine_id,
-                      value: machine.master_machine_id,
-                    })),
-                  placeholder: dataMachine.find(
-                    (item) =>
-                      item.master_machine_id === formik.values.master_machine_id
-                  )?.machine_id,
-                  onChange: (item) => {
-                    setIsFocus(false);
-                    formik.setFieldValue("master_machine_id", item.value);
-                    console.log(item);
-                  },
-                  Dropdown: {
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                  },
-                }}
-              />
-              {formik.errors.master_machine_id
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.master_machine_id}
-                    </Text>;
-                  }
-                : null}
-              <DropdownComp
-                title="Machine Type"
-                item={{
-                  values: dataMachineType.map((type) => ({
-                    label: type.name,
-                    value: type.id_master_machine_types,
-                  })),
-                  placeholder: dataMachineType.find(
-                    (item) =>
-                      item.id_master_machine_types ===
-                      formik.values.id_master_machine_types
-                  )?.name,
-                  onChange: (item) => {
-                    setIsFocus(false);
-                    formik.setFieldValue("id_master_machine_types", item.value);
-                    // console.log(item);
-                  },
-                  Dropdown: {
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                  },
-                }}
-              />
-              {formik.errors.id_master_machine_types
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_machine_types}
-                    </Text>;
-                  }
-                : null}
-              <DropdownComp
-                title="Main Activity"
-                item={{
-                  values: dataMainActivity
-                    .filter((selected) => {
-                      return (
-                        selected.master_machine_types_id ===
-                        formik.values.id_master_machine_types
-                      );
-                      // console.log("Values", selected)
-                    })
-                    .map((mainActivity) => ({
-                      label: mainActivity.name,
-                      value: mainActivity.id_master_main_activities,
-                    })),
-                  placeholder: dataMainActivity.find(
-                    (item) =>
-                      item.id_master_main_activities ===
-                      formik.values.id_master_main_activities
-                  )?.name,
-                  onChange: (item) => {
-                    setIsFocus(false);
-                    formik.setFieldValue(
-                      "id_master_main_activities",
-                      item.value
-                    );
-                    // console.log(item);
-                  },
-                  Dropdown: {
-                    borderWidth: 0.4,
-                    borderColor: "#88888D",
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                  },
-                }}
-              />
-              {formik.errors.id_master_main_activities
-                ? () => {
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.id_master_main_activities}
-                    </Text>;
-                  }
-                : null}
-              {isEnable ? (
-                <>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      flex: 1,
-                      backgroundColor: "white",
-                      borderWidth: 0.4,
-                      borderColor: "#88888D",
-                      borderRadius: 10,
-                      height: 45,
-                      marginLeft: 10,
-                      marginRight: 10,
-                      marginTop: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.container,
-                        {
-                          justifyContent: "center",
-                          backgroundColor: "white",
-                          flex: 1,
-                        },
-                      ]}
+                  Details
+                </Text>
+                <View style={[styles.Details1]}>
+                  <View style={[styles.button_waktu]}>
+                    <Modal
+                      animationType="slide"
+                      transparent={true}
+                      visible={modalVisible}
+                      onRequestClose={() => {
+                        Alert.alert("Modal has been closed.");
+                        setModalVisible(!modalVisible);
+                      }}
                     >
-                      <Text style={styles.Abu}>Last HM </Text>
-                    </View>
-                    <View
-                      style={[styles.container, { backgroundColor: "white" }]}
+                      <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                          <DatePicker
+                            onSelectedChange={(date) => setDate(date)}
+                            mode="calendar"
+                            display="spinner"
+                            minimumDate={startDate}
+                            selected={date}
+                            onDateChange={(date) => {
+                              formik.setFieldValue("date", date);
+                            }}
+                          />
+                          <Pressable
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => setModalVisible(!modalVisible)}
+                          >
+                            <Text style={styles.textStyle}>{}Simpan</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    </Modal>
+                    {/* {showTime? } */}
+                    <Pressable
+                      style={[styles.button, styles.buttonOpen]}
+                      onPress={() => setModalVisible(true)}
                     >
-                      <View
+                      <Text
                         style={[
-                          styles.container,
-                          {
-                            backgroundColor: "white",
-                            justifyContent: "center",
-                            alignItems: "flex-end",
-                            marginRight: 20,
-                          },
+                          styles.textStyle,
+                          { color: formik.setFieldValue ? "#88888D" : "black" },
                         ]}
                       >
-                        <Text style={{ fontSize: 16, color: "#88888D" }}>
-                          {dataMasterLog
-                            .filter(
-                              (item) =>
-                                item.master_machine_id ===
-                                formik.values.master_machine_id
-                            )
-                            .map((item, index, array) => {
-                              if (index === array.length - 1) {
-                                return item.current_hour_meter;
-                              } else {
-                                return null;
-                              }
-                            })}
-                        </Text>
-                      </View>
-                    </View>
+                        {formik.values.date
+                          ? dayjs(formik.values.date)
+                              .locale("id")
+                              .format("DD/MMM/YYYY ")
+                          : "pilih tanggal"}
+                      </Text>
+                    </Pressable>
                   </View>
-                  <InputData
-                    Title="HM Current"
-                    onChangeText={formik.handleChange("current_hour_meter")}
+                  <DropdownComp
+                    title="Company"
                     item={{
-                      placeholder: "XXX",
-                      value: formik.values.current_hour_meter,
+                      values: dataCompany.map((company) => ({
+                        label: company.name,
+                        value: company.id_master_company,
+                      })),
+                      placeholder: dataCompany.find(
+                        (item) =>
+                          item.id_master_company ===
+                          formik.values.id_master_company
+                      )?.name,
+                      onChange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_company", item.value);
+                        console.log(item);
+                      },
+                      Dropdown: {
+                        borderWidth: 0.4,
+                        borderColor: "#88888D",
+                        marginHorizontal: 10,
+                        marginVertical: 10,
+                      },
+                    }}
+                  />
+                  {formik.errors.id_master_company
+                    ? () => {
+                        <Text style={globalStyles.textError}>
+                          {formik.errors.id_master_company}
+                        </Text>;
+                      }
+                    : null}
+                  <DropdownComp
+                    title="Sector"
+                    item={{
+                      values: dataSector.map((sector) => ({
+                        label: sector.name,
+                        value: sector.id_master_sectors,
+                      })),
+                      placeholder: dataSector.find(
+                        (item) =>
+                          item.id_master_sectors ===
+                          formik.values.id_master_sectors
+                      )?.name,
+                      onChange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("id_master_sectors", item.value);
+                        console.log(item);
+                      },
+                      Dropdown: {
+                        borderWidth: 0.4,
+                        borderColor: "#88888D",
+                        marginHorizontal: 10,
+                        marginVertical: 10,
+                      },
+                    }}
+                  />
+                  {formik.errors.id_master_sectors
+                    ? () => {
+                        <Text style={globalStyles.textError}>
+                          {formik.errors.id_master_sectors}
+                        </Text>;
+                      }
+                    : null}
+
+                  <InputData
+                    Title="Compartement ID"
+                    onChangeText={formik.handleChange("compartement_id")}
+                    item={{
+                      placeholder: "Ex : AB001",
+                      value: formik.values.compartement_id,
                       Input: {
                         borderWidth: 0.5,
                         borderColor: "#88888D",
@@ -600,127 +421,361 @@ const AddNew = ({ navigation, title }) => {
                       borderColor: "#DDDDDD",
                     }}
                   />
-                  {/* <Label title="Mohon masukkan HM tidak lebih dari 24" /> */}
-                  {formik.values.current_hour_meter - hm > 24 ? (
-                    <View
-                      style={[styles.Label]}
-                    >
-                      <Text style={globalStyles.textError}>
-                        HM tidak boleh lebih dari 24 jam
-                      </Text>
-                    </View>
+                  {formik.errors.compartement_id
+                    ? () => {
+                        <Text style={globalStyles.textError}>
+                          {formik.errors.compartement_id}
+                        </Text>;
+                      }
+                    : null}
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    marginLeft: -20,
+                    borderBottomColor: "#3C3C43",
+                    opacity: 0.3,
+                    borderBottomWidth: 1,
+                    marginVertical: 15,
+                    marginRight: -200,
+                  }}
+                />
+                <Text
+                  style={{
+                    marginBottom: 20,
+                    color: "#88888D",
+                    fontFamily: "Poppins-Regular",
+                    fontWeight: 900,
+                    fontSize: 18,
+                    marginLeft: 10,
+                  }}
+                >
+                  Machine Information
+                </Text>
+                <View style={[styles.MechInfo]}>
+                  <DropdownComp
+                    title="Machine ID"
+                    item={{
+                      values: dataMachine
+                        .filter((selected) => {
+                          return (
+                            selected.master_company_id ===
+                            formik.values.id_master_company
+                          );
+                          // console.log("Values", selected)
+                        })
+                        .map((machine) => ({
+                          label: machine.machine_id,
+                          value: machine.master_machine_id,
+                        })),
+                      placeholder: dataMachine.find(
+                        (item) =>
+                          item.master_machine_id ===
+                          formik.values.master_machine_id
+                      )?.machine_id,
+                      onChange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue("master_machine_id", item.value);
+                        console.log(item);
+                      },
+                      Dropdown: {
+                        borderWidth: 0.4,
+                        borderColor: "#88888D",
+                        marginHorizontal: 10,
+                        marginVertical: 10,
+                      },
+                    }}
+                  />
+                  {formik.errors.master_machine_id
+                    ? () => {
+                        <Text style={globalStyles.textError}>
+                          {formik.errors.master_machine_id}
+                        </Text>;
+                      }
+                    : null}
+                  <DropdownComp
+                    title="Machine Type"
+                    item={{
+                      values: dataMachineType.map((type) => ({
+                        label: type.name,
+                        value: type.id_master_machine_types,
+                      })),
+                      placeholder: dataMachineType.find(
+                        (item) =>
+                          item.id_master_machine_types ===
+                          formik.values.id_master_machine_types
+                      )?.name,
+                      onChange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue(
+                          "id_master_machine_types",
+                          item.value
+                        );
+                        // console.log(item);
+                      },
+                      Dropdown: {
+                        borderWidth: 0.4,
+                        borderColor: "#88888D",
+                        marginHorizontal: 10,
+                        marginVertical: 10,
+                      },
+                    }}
+                  />
+                  {formik.errors.id_master_machine_types
+                    ? () => {
+                        <Text style={globalStyles.textError}>
+                          {formik.errors.id_master_machine_types}
+                        </Text>;
+                      }
+                    : null}
+                  <DropdownComp
+                    title="Main Activity"
+                    item={{
+                      values: dataMainActivity
+                        .filter((selected) => {
+                          return (
+                            selected.master_machine_types_id ===
+                            formik.values.id_master_machine_types
+                          );
+                          // console.log("Values", selected)
+                        })
+                        .map((mainActivity) => ({
+                          label: mainActivity.name,
+                          value: mainActivity.id_master_main_activities,
+                        })),
+                      placeholder: dataMainActivity.find(
+                        (item) =>
+                          item.id_master_main_activities ===
+                          formik.values.id_master_main_activities
+                      )?.name,
+                      onChange: (item) => {
+                        setIsFocus(false);
+                        formik.setFieldValue(
+                          "id_master_main_activities",
+                          item.value
+                        );
+                        // console.log(item);
+                      },
+                      Dropdown: {
+                        borderWidth: 0.4,
+                        borderColor: "#88888D",
+                        marginHorizontal: 10,
+                        marginVertical: 10,
+                      },
+                    }}
+                  />
+                  {formik.errors.id_master_main_activities
+                    ? () => {
+                        <Text style={globalStyles.textError}>
+                          {formik.errors.id_master_main_activities}
+                        </Text>;
+                      }
+                    : null}
+                  {isEnable ? (
+                    <>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flex: 1,
+                          backgroundColor: "white",
+                          borderWidth: 0.4,
+                          borderColor: "#88888D",
+                          borderRadius: 10,
+                          height: 45,
+                          marginLeft: 10,
+                          marginRight: 10,
+                          marginTop: 10,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <View
+                          style={[
+                            styles.container,
+                            {
+                              justifyContent: "center",
+                              backgroundColor: "white",
+                              flex: 1,
+                            },
+                          ]}
+                        >
+                          <Text style={styles.Abu}>Last HM </Text>
+                        </View>
+                        <View
+                          style={[
+                            styles.container,
+                            { backgroundColor: "white" },
+                          ]}
+                        >
+                          <View
+                            style={[
+                              styles.container,
+                              {
+                                backgroundColor: "white",
+                                justifyContent: "center",
+                                alignItems: "flex-end",
+                                marginRight: 20,
+                              },
+                            ]}
+                          >
+                            <Text style={{ fontSize: 16, color: "#88888D" }}>
+                              {dataMasterLog
+                                .filter(
+                                  (item) =>
+                                    item.master_machine_id ===
+                                    formik.values.master_machine_id
+                                )
+                                .map((item, index, array) => {
+                                  if (index === array.length - 1) {
+                                    return item.current_hour_meter;
+                                  } else {
+                                    return null;
+                                  }
+                                })}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                      <InputData
+                        Title="HM Current"
+                        onChangeText={formik.handleChange("current_hour_meter")}
+                        item={{
+                          placeholder: "XXX",
+                          value: formik.values.current_hour_meter,
+                          Input: {
+                            borderWidth: 0.5,
+                            borderColor: "#88888D",
+                            marginHorizontal: 10,
+                            height: 45,
+                          },
+                        }}
+                        buttonStyle={{
+                          borderColor: "#DDDDDD",
+                        }}
+                      />
+                      {/* <Label title="Mohon masukkan HM tidak lebih dari 24" /> */}
+                      {formik.values.current_hour_meter - hm > 24 ? (
+                        <View style={[styles.Label]}>
+                          <Text style={globalStyles.textError}>
+                            HM tidak boleh lebih dari 24 jam
+                          </Text>
+                        </View>
+                      ) : null}
+                      <View style={[styles.Label]}>
+                        <Text
+                          style={[
+                            styles.Abu,
+                            { fontStyle: "italic", alignItems: "flex-end" },
+                          ]}
+                        >
+                          * Masukkan HM tidak lebih dari 24 jam
+                        </Text>
+                      </View>
+                      {formik.errors.current_hour_meter ? (
+                        <Text style={globalStyles.textError}>
+                          {formik.errors.current_hour_meter}
+                        </Text>
+                      ) : null}
+                    </>
                   ) : null}
                   <View
-                    style={[ styles.Label]}
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      marginHorizontal: 5,
+                      marginVertical: 3,
+                    }}
                   >
-                    <Text
+                    <View
                       style={[
-                        styles.Abu,
-                        { fontStyle: "italic", alignItems: "flex-end" },
+                        styles.container,
+                        { justifyContent: "center", flex: 1 },
                       ]}
                     >
-                      * Masukkan HM tidak lebih dari 24 jam
-                    </Text>
+                      <Text style={{ opacity: 0.4 }}>Computer HM ? </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        marginHorizontal: 10,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row ",
+                          alignContent: "center",
+                          marginVertical: 2,
+                        }}
+                      >
+                        <Switch
+                          trackColor={{ false: "#FB9797", true: "#CAE6CA" }}
+                          // tumbColor={isEnable ? "red" : "green"}
+                          onValueChange={toggleSwitch}
+                          value={isEnable}
+                        />
+                        <Text style={{ color: "#AFAFAF" }}>
+                          {isEnable ? "on" : "off"}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-                  {formik.errors.current_hour_meter ? (
-                    <Text style={globalStyles.textError}>
-                      {formik.errors.current_hour_meter}
-                    </Text>
-                  ) : null}
-                </>
-              ) : null}
+                </View>
+                <View
+                  style={[styles.container, { paddingVertical: 10 }]}
+                ></View>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  borderRadius: 20,
+                  flex: 1,
+                }}
+              >
+                <View style={[styles.atas, { borderRadius: 10 }]}>
+                  <View
+                    style={[
+                      styles.containerInput,
+                      { backgroundColor: "#D8D8D8" },
+                    ]}
+                  >
+                    <Input
+                      item={{
+                        label: "Keterangan",
+                        placeholder: "Maintainance to Workshop for Repairment",
+                        value: formik.values.keterangan,
+                        backgroundColor: "red",
+                      }}
+                      input={{ backgroundColor: "black" }}
+                    />
+                  </View>
+                </View>
+              </View>
               <View
                 style={{
                   flex: 1,
                   justifyContent: "center",
-                  flexDirection: "row",
-                  marginHorizontal: 5,
-                  marginVertical: 3,
+                  marginTop: 10,
+                  marginBottom: 20,
+                  marginHorizontal: 20,
                 }}
               >
-                <View
-                  style={[
-                    styles.container,
-                    { justifyContent: "center", flex: 1 },
-                  ]}
-                >
-                  <Text style={{ opacity: 0.4 }}>Computer HM ? </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    marginHorizontal: 10,
-                    justifyContent: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                      flexDirection: "row ",
-                      alignContent: "center",
-                      marginVertical: 2,
-                    }}
-                  >
-                    <Switch
-                      trackColor={{ false: "#FB9797", true: "#CAE6CA" }}
-                      // tumbColor={isEnable ? "red" : "green"}
-                      onValueChange={toggleSwitch}
-                      value={isEnable}
-                    />
-                    <Text style={{ color: "#AFAFAF" }}>
-                      {isEnable ? "on" : "off"}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-            <View style={[styles.container, { paddingVertical: 10 }]}></View>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              borderRadius: 20,
-              flex: 1,
-            }}
-          >
-            <View style={[styles.atas, { borderRadius: 10 }]}>
-              <View
-                style={[styles.containerInput, { backgroundColor: "#D8D8D8" }]}
-              >
-                <Input
+                <Button
                   item={{
-                    label: "Keterangan",
-                    placeholder: "Maintainance to Workshop for Repairment",
-                    value: formik.values.keterangan,
-                    backgroundColor: "red",
+                    title: "Submit",
+                    backgroundcolor: "#8296FF",
+                    textcolor: "#FFFFFF",
+                    width: "100%",
+                    justifyContent: "center",
+                    onPress: () => formik.handleSubmit(),
                   }}
-                  input={{ backgroundColor: "black" }}
                 />
               </View>
-            </View>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              marginTop: 10,
-              marginBottom: 20,
-              marginHorizontal: 20,
-            }}
-          >
-            <Button
-              item={{
-                title: "Submit",
-                backgroundcolor: "#8296FF",
-                textcolor: "#FFFFFF",
-                width: "100%",
-                justifyContent: "center",
-                onPress: () => formik.handleSubmit(),
-              }}
-            />
-          </View>
+            </>
+          )}
         </ScrollView>
       </RefreshControl>
     </SafeAreaView>
@@ -916,10 +971,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 10,
   },
-  Label : {
+  Label: {
     flex: 1,
     alignItems: "flex-end",
     marginRight: 40,
     width: "100%",
-  }
+  },
+  loading: {
+    flex: 1,
+    marginLeft: -20,
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  horizontal: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 10,
+  },
 });

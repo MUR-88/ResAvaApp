@@ -1,5 +1,5 @@
 import { Model } from "@nozbe/watermelondb";
-import { date, field, text, immutableRelation, children  } from '@nozbe/watermelondb/decorators'
+import { date, field, text, immutableRelation, children, lazy, relation  } from '@nozbe/watermelondb/decorators'
 
 export default class MasterLogActivity extends Model {
   static table = "master_log_activities";
@@ -31,6 +31,10 @@ export default class MasterLogActivity extends Model {
       key: "user_id",
     },
   };
+
+  // @lazy commenters = this.collections.get('users').query(
+  //   Q.on('comments', 'post_id', this.id)
+  // )
   @field('id') id
   @field('id_master_log_activity') idMasterLogActivity
   @children('id_master_log_activity') idMasterLogActivity
@@ -50,5 +54,6 @@ export default class MasterLogActivity extends Model {
   @field('date') date
   @field('deleted_at') deletedAt
   @field('updated_at') updatedAt
+  @relation('machines', 'machine_id') machine;
   // @immutableRelation("master_company", "master_company_id") masterCompany; // Add this line
 }

@@ -1,8 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import Route from "./src/routes";
 import { useFonts } from "expo-font";
-import store from "./src/Redux/store";
-import { Provider } from "react-redux";
 import Toast from "react-native-toast-message";
 import {
   useQuery,
@@ -33,14 +31,12 @@ export default function App() {
   }
 
   return (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <View style={{ flex: 1 }}>
-          <Route />
-        </View>
-        <Toast />
-      </QueryClientProvider>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <View style={{ flex: 1 }}>
+        <Route />
+      </View>
+      <Toast />
+    </QueryClientProvider>
   );
 }
 

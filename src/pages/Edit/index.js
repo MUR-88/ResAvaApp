@@ -15,7 +15,6 @@ import {
   DropdownComp,
   Input,
   InputData,
-  PilihTanggal,
 } from "../../component";
 import {
   RefreshControl,
@@ -37,12 +36,7 @@ import { Formik, useFormik } from "formik";
 import { database } from "../../assets/Model/db";
 import Toast from "react-native-toast-message";
 import { globalStyles } from "../../styles";
-import MasterLogActivity from "../../assets/Model/master_log_activity";
-import { synchronize } from "@nozbe/watermelondb/sync";
-import { API } from "../../function";
 import { useRoute } from "@react-navigation/native";
-import { Q } from "@nozbe/watermelondb";
-import MasterMachine from "../../assets/Model/master_machine";
 
 const Edit = ({ navigation }) => {
   const route = useRoute();
@@ -71,27 +65,27 @@ const Edit = ({ navigation }) => {
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
   } = useMasterSector({ isGetData: true });
-  console.log("data sector", dataSector.length);
+  // console.log("data sector", dataSector.length);
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
-  console.log("data Company", dataCompany.length);
+  // console.log("data Company", dataCompany.length);
   // console.log(JSON.stringify(dataCompany, null, 2));
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
     connected: connectedMasterMachineType,
   } = useMasterMachineType({ isGetData: true });
-  console.log("data Machine Type", dataMachineType.length);
+  // console.log("data Machine Type", dataMachineType.length);
   // console.log(JSON.stringify(dataMachineType, null, 2));
   const {
     data: dataMachine,
     isLoading: isLoadingMachine,
     connected: connectedMasterMachine,
   } = useMasterMachine({ isGetData: true });
-  console.log("data Machine", dataMachine);
+  // console.log("data Machine", dataMachine);
   // console.log()
   // console.log(JSON.stringify(dataMachine, null, 2));
   const {
@@ -99,7 +93,7 @@ const Edit = ({ navigation }) => {
     isLoading: isLoadingMainActivity,
     connected: connectedMasterMainActivity,
   } = useMasterMainActivity({ isGetData: true });
-  console.log("data Main Activity", dataMainActivity.length);
+  // console.log("data Main Activity", dataMainActivity.length);
   // console.log(JSON.stringify(dataMainActivity, null, 2));
   const {
     data: dataMasterLog,
@@ -107,12 +101,12 @@ const Edit = ({ navigation }) => {
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
   // console.log(JSON.stringify(dataMasterLog, null, 2));
-  console.log("data Log", dataMasterLog.length);
+  // console.log("data Log", dataMasterLog.length);
 
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date();
 
-  const startDate = getFormatedDate(today.setDate(today.getDate() - 1));
+  const startDate = getFormatedDate(today.setDate(today.getDate() - 2));
 
   const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
@@ -171,6 +165,7 @@ const Edit = ({ navigation }) => {
             updateLog.isConnected = false;
             updateLog.date = dayjs(values.date).unix() * 1000;
           });
+          console.log("date", dayjs(values.date).unix() * 1000);
         });
 
         Toast.show({
@@ -262,7 +257,7 @@ const Edit = ({ navigation }) => {
                   <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                       <DatePicker
-                        onSelectedChange={(date) => setSelectedDate(date)}
+                        onSelectedChange={(date) => setDate(date)}
                         mode="calendar"
                         display="spinner"
                         minimumDate={startDate}

@@ -14,17 +14,14 @@ export const useMasterMachineType = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  function getAllMachineType() {
+  async function getAllMachineType() {
     setIsLoading(true);
-    const allMachineType = database
+    const allMachineType = await database
       .get(MasterMachineType.table)
       .query()
-      .observe()
-      .subscribe((masterMachineType) => {
-        // console.log("masterMachineType", );
-        setData(masterMachineType.map((masterMachineType) => masterMachineType._raw));
-        setIsLoading(false);
-      });
+      .fetch();
+    setData(allMachineType.map((masterMachineType) => masterMachineType._raw));
+    setIsLoading(false);
     return allMachineType;
   }
 
@@ -34,13 +31,13 @@ export const useMasterMachineType = ({ isGetData }) => {
       setConnected(netInfoState.isConnected);
     };
     checkInternetConnection();
-    if(isGetData){
+    if (isGetData) {
       const machineType = getAllMachineType();
-      return () => machineType.unsubscribe();
+      return () => machineType;
     }
     // const masterMachineType = getAllMachineType();
     // return () => masterMachineType.unsubscribe();
   }, []);
 
-  return { data, connected, isLoading,  };
+  return { data, connected, isLoading };
 };

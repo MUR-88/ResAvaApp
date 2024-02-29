@@ -13,17 +13,14 @@ export const useMasterMachine = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  function getAllMachine() {
+  async function getAllMachine() {
     setIsLoading(true);
-    const getAllMachine = database
+    const getAllMachine = await database
       .get(MasterMachine.table)
       .query()
-      .observe()
-      .subscribe((masterMachine) => {
-        // console.log("masterMachine");
-        setData(masterMachine.map((masterMachine) => masterMachine._raw));
-        setIsLoading(false);
-      });
+      .fetch();
+    setData(getAllMachine.map((masterMachine) => masterMachine._raw));
+    setIsLoading(false);
     return getAllMachine;
   }
 
@@ -33,13 +30,13 @@ export const useMasterMachine = ({ isGetData }) => {
       setConnected(netInfoState.isConnected);
     };
     checkInternetConnection();
-    if(isGetData){
+    if (isGetData) {
       const masterMachine = getAllMachine();
-      return () => masterMachine.unsubscribe();
+      return () => masterMachine;
     }
     // const masterMachine = getAllMachine();
     // return () => masterMachine.unsubscribe();
   }, []);
 
-  return { data, connected, isLoading,  };
+  return { data, connected, isLoading };
 };

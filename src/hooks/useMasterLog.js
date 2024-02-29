@@ -17,17 +17,15 @@ export const useMasterLog = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  function getAllLog() {
+  async function getAllLog() {
     setIsLoading(true);
-    const allLogActivity = database
+    const allLogActivity = await database
       .get(MasterLogActivity.table)
       .query(Q.experimentalJoinTables(["master_machine"]))
-      .observe()
-      .subscribe((masterLog) => {
-        // When changes occur, update the data and set loading state to false
-        setData(masterLog.map((masterLog) => masterLog._raw));
-        setIsLoading(false);
-      });
+      .fetch()
+      
+    setData(allLogActivity.map((masterLog) => masterLog._raw));
+    setIsLoading(false);
     return allLogActivity;
   }
 
@@ -40,9 +38,9 @@ export const useMasterLog = ({ isGetData }) => {
     checkInternetConnection();
     if (isGetData) {
       const masterLog = getAllLog();
-      return () => masterLog.unsubscribe();
+      return () => masterLog;
     }
   }, []);
 
-  return { data, connected, isLoading };
+  return { data, connected, isLoading, getAllLog };
 };

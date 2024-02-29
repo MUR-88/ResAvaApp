@@ -13,17 +13,13 @@ export const useMasterSector = ({ isGetData }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  function getAllSector() {
+  async function getAllSector() {
     setIsLoading(true);
-    const allSector = database
-      .get(MasterSector.table)
-      .query()
-      .observe()
-      .subscribe((masterSector) => {
-        // console.log("masterSector", );
-        setData(masterSector.map((masterSector) => masterSector._raw));
-        setIsLoading(false);
-      });
+    const allSector = await database.get(MasterSector.table).query().fetch();
+    // console.log("Al Sector", allSector);
+    
+    setData(allSector.map((masterSector) => masterSector._raw));
+    setIsLoading(false);
     return allSector;
   }
 
@@ -33,11 +29,11 @@ export const useMasterSector = ({ isGetData }) => {
       setConnected(netInfoState.isConnected);
     };
     checkInternetConnection();
-    if(isGetData){
+    if (isGetData) {
       const sector = getAllSector();
-      return () => sector.unsubscribe();
+      return () => sector;
     }
   }, []);
 
-  return { data, connected, isLoading,  };
+  return { data, connected, isLoading };
 };

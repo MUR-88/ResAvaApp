@@ -4,23 +4,29 @@ import { synchronize, hasUnsyncedChanges } from "@nozbe/watermelondb/sync";
 import { database } from "../assets/Model/db";
 import API from "../function/API";
 import dayjs from "dayjs";
-import MasterCompany from "../assets/Model/master_company";
 import { Q } from "@nozbe/watermelondb";
+import useLoadingStore from "./useLoadingStore";
 
 export const useAllSync = ({ isGetData }) => {
   // const . cari connected atau tidak
   // setelah itu useEffect untuk ambil data dari API jika connected, jika tidak ambil data dari WatermelonDB
   const [connected, setConnected] = useState(undefined);
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  
+  const { setIsLoading } = useLoadingStore();
+
   async function fetching() {
     const isFirstSync = response;
     const response = await synchronize({
+      onWillApplyRemoteChanges: () => {
+        setIsLoading(false);
+      },
+      onDidPullChanges: async () => {
+        setIsLoading(false);
+      },
       database,
       pullChanges: async ({ schemaVersion, lastPulledAt, migration }) => {
-        console.log("last pull All Sync", lastPulledAt);
+        setIsLoading(true);
+        // console.log("last pull All Sync", lastPulledAt);
         const urlParams = `last_pulled_at=${
           lastPulledAt ? lastPulledAt : ""
         }&schema_version=${schemaVersion}&migration=${encodeURIComponent(
@@ -54,9 +60,9 @@ export const useAllSync = ({ isGetData }) => {
         const masterMachineCreated = changes.master_machine.created.filter(
           (item) => item.isSync === false
         );
-        const masterMachineUpdated = changes.master_machine.updated.filter(
-          (item) => item.isSync === false
-        );
+        // const masterMachineUpdated = changes.master_machine.updated.filter(
+        //   (item) => item.isSync === false
+        // );
 
         console.log("Created", JSON.stringify(masterLogCreated, null, 2));
         console.log("Updated", JSON.stringify(masterLogUpdated, null, 2));
@@ -69,12 +75,12 @@ export const useAllSync = ({ isGetData }) => {
             },
             master_machine: {
               created: masterMachineCreated,
-              updated: masterMachineUpdated,
+              // updated: masterMachineUpdated,
             },
             last_pulled_at: lastPulledAt,
           });
 
-          console.log(JSON.stringify(pushDataResponse, null, 2));
+          // console.log(JSON.stringify(pushDataResponse, null, 2));
 
           const syncAndUpdate = async (items, updateFunction) => {
             await database.write(async () => {
@@ -92,15 +98,15 @@ export const useAllSync = ({ isGetData }) => {
           await syncAndUpdate("master_log_activities", (masterLog) => {
             masterLog.isSync = true;
           });
-          await syncAndUpdate("master_machine", (masterMachine) => {
-            masterMachine.isSync = true;
-          });
+          // await syncAndUpdate("master_machine", (masterMachine) => {
+          //   masterMachine.isSync = true;
+          // });
 
-          // console.log("pushDataResponse", pushDataResponse);
+          console.log("pushDataResponse", pushDataResponse);
           return Promise.resolve();
         } catch (pushDataError) {
           console.error(pushDataError);
-          // return Promise.reject(pushDataError);
+          return Promise.reject(pushDataError);
           throw new Error(pushDataError.message);
         }
       },
@@ -110,7 +116,6 @@ export const useAllSync = ({ isGetData }) => {
 
     const unsyncedChangesResponse = await hasUnsyncedChanges({ database });
     console.log("unsyncedChangesResponse", unsyncedChangesResponse);
-    
   }
 
   useEffect(() => {
@@ -125,5 +130,5 @@ export const useAllSync = ({ isGetData }) => {
     checkInternetConnection();
   }, []);
 
-  return { data, connected, isLoading, fetching };
+  return { connected, fetching };
 };
