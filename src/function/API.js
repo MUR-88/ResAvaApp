@@ -1,17 +1,7 @@
 //Home IP
-// const API_URL = "http://192.168.100.15:8000/api/";
-//hostspot IP
-// const API_URL = "http://192.168.8.100:8000/api/";
-// const API_URL = "http://192.168.68.219:8000/api/";
-// const API_URL = "http://192.168.115.219:8000/api/";
-const API_URL = "http://192.168.240.219:8000/api/";
-// const API_URL = "http://192.168.1.100/api/";
+// const API_URL = "http://207.148.67.242/api/";
+const API_URL = "http://192.168.63.219:8000/api/";
 
-
-
-// const API_URL = "http://192.168.100.21:8000/api/";
-
-// const API_URL = "https://api.lapor-mas.id/v1";
 
 class Api {
   token = null;

@@ -60,11 +60,13 @@ import MasterMachine from "../../assets/Model/master_machine";
 // Restrict to HM = done
 
 // Push changes di lanjutkan
-// Fix get Data from other tables = priority to fix
+// Join Table = priority to fix
 // Fix sync update data = need to do
 // Filament fix the data create
 // fix lagg issue = need to be faster
-// delete estate table db = on going
+// delete estate table db = Done
+// recall data Resource update = ?
+// add Hm calculate & hm Current at Status Page = ?
 
 const Home = ({ navigation }) => {
   const { isLoading } = useLoadingStore();
@@ -138,35 +140,35 @@ const Home = ({ navigation }) => {
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
   } = useMasterSector({ isGetData: true });
-  // console.log("data sector", dataSector.length);
+  console.log("data sector", dataSector.length);
   // console.log(JSON.stringify(dataSector, null, 2));
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
-  // console.log("data Company", dataCompany.length);
+  console.log("data Company", dataCompany.length);
 
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
     connected: connectedMasterMachineType,
   } = useMasterMachineType({ isGetData: true });
-  // console.log("data Machine Type", dataMachineType.length);
+  console.log("data Machine Type", dataMachineType.length);
   // console.log(JSON.stringify(dataMachineType, null, 2));
   const {
     data: dataMachine,
     isLoading: isLoadingMachine,
     connected: connectedMasterMachine,
   } = useMasterMachine({ isGetData: true });
-  // console.log("data Machine", dataMachine.length);
+  console.log("data Machine", dataMachine.length);
   // console.log(JSON.stringify(dataMachine, null, 2));
   const {
     data: dataMainActivity,
     isLoading: isLoadingMainActivity,
     connected: connectedMasterMainActivity,
   } = useMasterMainActivity({ isGetData: true });
-  // console.log("data Main Activity", dataMainActivity.length);
+  console.log("data Main Activity", dataMainActivity.length);
   // console.log(JSON.stringify(dataMainActivity, null, 2));
   const {
     data: dataMasterLog,
@@ -174,8 +176,8 @@ const Home = ({ navigation }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  // console.log(JSON.stringify(dataMasterLog, null, 2));
-  // console.log("data Log", dataMasterLog.length);
+  console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log("data Log", dataMasterLog.length);
 
   const queryClient = useQueryClient();
   // Queries
@@ -184,7 +186,7 @@ const Home = ({ navigation }) => {
   };
 
   const query = useQuery({ queryKey: ["history"], queryFn: getHistory });
-  console.log(query?.data?.data?.data);
+  // console.log("query data", query?.data?.data?.data);
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = async () => {
     setRefreshing(true);
@@ -195,340 +197,339 @@ const Home = ({ navigation }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       <StatusBar style="light" />
       {isConnected ? (
-        // <ScrollView
-        //   style={{ flex: 1 }}
-        //   refreshControl={
-        //     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        //   }
-        // >
-        //   <View
-        //     style={{
-        //       backgroundColor: "#007AFF",
-        //       height: 100,
-        //       justifyContent: "flex_start",
-        //     }}
-        //   >
-        //     <View style={[styles.Kotak]}>
-        //       <Text style={[styles.Header1]}>Home</Text>
-        //       <TouchableOpacity onPress={handleLogout}>
-        //         <View style={[styles.Profile_Circle]}>
-        //           <AutoHeightImage
-        //             source={Profile_Set}
-        //             width={35}
-        //             style={{ justifyContent: "center" }}
-        //           />
-        //         </View>
-        //       </TouchableOpacity>
-        //     </View>
-        //   </View>
-        //   <View style={[styles.Content2, { marginHorizontal: 10 }]}>
-        //     <View style={{ flexDirection: "row", marginTop: 5, flex: 1 }}>
-        //       <View>
-        //         <Text
-        //           style={{
-        //             color: "#007AFF",
-        //             fontSize: 18,
-        //             fontFamily: "Poppins-Medium",
-        //           }}
-        //         >
-        //           Today's Update
-        //         </Text>
-        //       </View>
+        <ScrollView
+          style={{ flex: 1 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View
+            style={{
+              backgroundColor: "#007AFF",
+              height: 100,
+              justifyContent: "flex_start",
+            }}
+          >
+            <View style={[styles.Kotak]}>
+              <Text style={[styles.Header1]}>Home</Text>
+              <TouchableOpacity onPress={handleLogout}>
+                <View style={[styles.Profile_Circle]}>
+                  <AutoHeightImage
+                    source={Profile_Set}
+                    width={35}
+                    style={{ justifyContent: "center" }}
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={[styles.Content2, { marginHorizontal: 10 }]}>
+            <View style={{ flexDirection: "row", marginTop: 5, flex: 1 }}>
+              <View>
+                <Text
+                  style={{
+                    color: "#007AFF",
+                    fontSize: 18,
+                    fontFamily: "Poppins-Medium",
+                  }}
+                >
+                  Today's Update
+                </Text>
+              </View>
 
-        //       <View
-        //         style={{
-        //           flex: 1,
-        //           flexDirection: "row",
-        //           justifyContent: "space-around",
-        //           marginRight: -30,
-        //         }}
-        //       >
-        //         <View style={{ flex: 1, marginLeft: 50 }}>
-        //           <Button
-        //             buttonStyle={{
-        //               borderRadius: 20,
-        //             }}
-        //             item={{
-        //               title: "Status",
-        //               height: 25,
-        //               width: "100%",
-        //               textcolor: "#007AFF",
-        //               backgroundcolor: "#DEEBFF",
-        //               alginSelf: "center",
-        //               borderRadius: 20,
-        //               onPress: () => navigation.navigate("Status"),
-        //             }}
-        //           />
-        //         </View>
-        //         <View style={{ flex: 1, marginLeft: 20 }}>
-        //           <Button
-        //             buttonStyle={{
-        //               borderRadius: 20,
-        //             }}
-        //             item={{
-        //               title: "Sync",
-        //               height: 25,
-        //               width: "60%",
-        //               textcolor: "#007AFF",
-        //               backgroundcolor: "#DEEBFF",
-        //               borderRadius: 20,
-        //               alginSelf: "center",
-        //               onPress: () => navigation.navigate("Splash"),
-        //             }}
-        //           />
-        //         </View>
-        //       </View>
-        //     </View>
-        //   </View>
-        //   {isLoading ? (
-        //     <>
-        //       <View style={[styles.loading, styles.horizontal]}>
-        //         <ActivityIndicator size="large" color="#0000ff" />
-        //       </View>
-        //     </>
-        //   ) : (
-        //     <>
-        //       <View style={{ flex: 1, marginHorizontal: 10 }}>
-        //         {dataMasterLog
-        //           .sort((a, b) => dayjs(b.created_at) - dayjs(a.created_at))
-        //           .filter(
-        //             (item) =>
-        //               dayjs(item.date) >= today.setDate(today.getDate() - 2)
-        //           )
-        //           .map((item, index) => (
-        //             <View style={[styles.Isi]}>
-        //               <View
-        //                 style={{
-        //                   flex: 1,
-        //                   flexDirection: "row",
-        //                   justifyContent: "space-between",
-        //                 }}
-        //                 key={`master_Activity${index}`}
-        //               >
-        //                 <Text
-        //                   style={{
-        //                     color: "#3C3C43",
-        //                     marginVertical: 5,
-        //                     marginLeft: 10,
-        //                     opacity: 0.6,
-        //                   }}
-        //                 >
-        //                   {dayjs(item.updated_at)
-        //                     .locale("id")
-        //                     .format("DD/MMM/YYYY ")}
-        //                 </Text>
-        //                 <View
-        //                   style={{
-        //                     flex: 1,
-        //                     flexDirection: "row",
-        //                     justifyContent: "flex-end",
-        //                     alignContent: "center",
-        //                   }}
-        //                 >
-        //                   <View
-        //                     style={{
-        //                       backgroundColor:
-        //                         item.isSync === true ? "#6BBC3B" : "#BCBCBC",
-        //                       width: 15,
-        //                       justifyContent: "center",
-        //                       borderRadius: 50,
-        //                       height: 15,
-        //                       marginTop: 5,
-        //                     }}
-        //                   />
-        //                   <TouchableOpacity
-        //                     // onPress={onDelete}
-        //                     onPress={() => deleteAllRecords(item.id)}
-        //                     style={{
-        //                       flex: 1,
-        //                       justifyContent: "center",
-        //                       marginRight: 5,
-        //                       opacity: 0.4,
-        //                     }}
-        //                   >
-        //                     <Image
-        //                       source={Delete}
-        //                       style={{
-        //                         height: 24,
-        //                         width: 24,
-        //                         marginHorizontal: 8,
-        //                       }}
-        //                     ></Image>
-        //                   </TouchableOpacity>
-        //                 </View>
-        //               </View>
-        //               <View
-        //                 style={{
-        //                   flex: 1,
-        //                   marginHorizontal: 10,
-        //                   borderBottomColor: "#3C3C43",
-        //                   opacity: 0.3,
-        //                   borderBottomWidth: 1,
-        //                 }}
-        //               />
-        //               <View style={[styles.IsiContent]}>
-        //                 <AutoHeightImage
-        //                   source={Profile_Set}
-        //                   width={40}
-        //                   style={{ marginLeft: 10, marginBottom: 5 }}
-        //                 />
-        //                 <View style={{ flex: 1 }}>
-        //                   <View style={{ flex: 1 }}>
-        //                     <Text style={[styles.IsiText]}>
-        //                       {dataCompany
-        //                         .filter(
-        //                           (select) =>
-        //                             select.id_master_company ===
-        //                             item.master_company_id
-        //                         )
-        //                         .map((matchedCompany) => {
-        //                           return matchedCompany.name;
-        //                         })}
-        //                     </Text>
-        //                     <Text style={[styles.IsiText2]}>
-        //                       {dataMachine
-        //                         .filter(
-        //                           (select) =>
-        //                             select.master_machine_id ===
-        //                             item.master_machine_id
-        //                         )
-        //                         .map((matchedMachine) => {
-        //                           return matchedMachine.machine_id;
-        //                         })}{" "}
-        //                       -{item.compartement_id}
-        //                     </Text>
-        //                     <Text
-        //                       style={[styles.IsiText2, { fontWeight: 900 }]}
-        //                     >
-        //                       HM : {item.current_hour_meter}
-        //                     </Text>
-        //                     <Text style={[styles.IsiText3]}>
-        //                       Create :{" "}
-        //                       {dayjs(item.date)
-        //                         .locale("id")
-        //                         .format(" DD/MM/YYYY ")}
-        //                     </Text>
-        //                   </View>
-        //                   {/* <Text
-        //                 style={[
-        //                   styles.IsiText,
-        //                   { fontSize: 10, marginVertical: 2 },
-        //                 ]}
-        //               >
-        //                 {dayjs(item.created_at)
-        //                   .locale("id")
-        //                   .format("DD/MMM/YYYY ")}
-        //               </Text> */}
-        //                 </View>
-        //                 <View
-        //                   style={{
-        //                     width: 80,
-        //                     marginRight: 20,
-        //                     justifyContent: "center",
-        //                   }}
-        //                 >
-        //                   {dayjs(item.created_at)
-        //                     .locale("id")
-        //                     .format("DD/MMM/YYYY ") >=
-        //                   getFormatedDate(
-        //                     today.setDate(today.getDate() - 1)
-        //                   ) ? (
-        //                     <Button
-        //                       buttonStyle={{ borderRadius: 20 }}
-        //                       item={{
-        //                         title: "Edit",
-        //                         textcolor: "#007AFF",
-        //                         backgroundcolor: "#D6E8FD",
-        //                         alginSelf: "center",
-        //                         onPress: () =>
-        //                           navigation.navigate("Edit", {
-        //                             masterLog: item,
-        //                           }),
-        //                       }}
-        //                     />
-        //                   ) : null}
-        //                 </View>
-        //               </View>
-        //             </View>
-        //           ))}
-        //       </View>
-        //       <View style={[styles.Content1]}>
-        //         <Text
-        //           style={{
-        //             color: "grey",
-        //             fontSize: 18,
-        //             fontFamily: "Poppins-Medium",
-        //           }}
-        //         >
-        //           30 Days History
-        //         </Text>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  marginRight: -30,
+                }}
+              >
+                <View style={{ flex: 1, marginLeft: 50 }}>
+                  <Button
+                    buttonStyle={{
+                      borderRadius: 20,
+                    }}
+                    item={{
+                      title: "Status",
+                      height: 25,
+                      width: "100%",
+                      textcolor: "#007AFF",
+                      backgroundcolor: "#DEEBFF",
+                      alginSelf: "center",
+                      borderRadius: 20,
+                      onPress: () => navigation.navigate("Status"),
+                    }}
+                  />
+                </View>
+                <View style={{ flex: 1, marginLeft: 20 }}>
+                  <Button
+                    buttonStyle={{
+                      borderRadius: 20,
+                    }}
+                    item={{
+                      title: "Sync",
+                      height: 25,
+                      width: "60%",
+                      textcolor: "#007AFF",
+                      backgroundcolor: "#DEEBFF",
+                      borderRadius: 20,
+                      alginSelf: "center",
+                      onPress: () => navigation.navigate("Splash"),
+                    }}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+          {isLoading ? (
+            <>
+              <View style={[styles.loading, styles.horizontal]}>
+                <ActivityIndicator size="large" color="#0000ff" />
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={{ flex: 1, marginHorizontal: 10 }}>
+                {dataMasterLog
+                  .sort((a, b) => dayjs(b.created_at) - dayjs(a.created_at))
+                  .filter(
+                    (item) =>
+                      dayjs(item.date) >= today.setDate(today.getDate() - 2)
+                  )
+                  .map((item, index) => (
+                    <View style={[styles.Isi]}>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                        }}
+                        key={`master_Activity${index}`}
+                      >
+                        <Text
+                          style={{
+                            color: "#3C3C43",
+                            marginVertical: 5,
+                            marginLeft: 10,
+                            opacity: 0.6,
+                          }}
+                        >
+                          {dayjs(item.updated_at)
+                            .locale("id")
+                            .format("DD/MMM/YYYY ")}
+                        </Text>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            justifyContent: "flex-end",
+                            alignContent: "center",
+                          }}
+                        >
+                          <View
+                            style={{
+                              backgroundColor:
+                                item.isSync === true ? "#6BBC3B" : "#88888D",
+                              width: 15,
+                              justifyContent: "center",
+                              borderRadius: 50,
+                              height: 15,
+                              marginTop: 5,
+                            }}
+                          />
+                          <TouchableOpacity
+                            // onPress={onDelete}
+                            onPress={() => deleteAllRecords(item.id)}
+                            style={{
+                              flex: 1,
+                              justifyContent: "center",
+                              marginRight: 5,
+                              opacity: 0.4,
+                            }}
+                          >
+                            <Image
+                              source={Delete}
+                              style={{
+                                height: 24,
+                                width: 24,
+                                marginHorizontal: 8,
+                              }}
+                            ></Image>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          marginHorizontal: 10,
+                          borderBottomColor: "#3C3C43",
+                          opacity: 0.3,
+                          borderBottomWidth: 1,
+                        }}
+                      />
+                      <View style={[styles.IsiContent]}>
+                        <AutoHeightImage
+                          source={Profile_Set}
+                          width={40}
+                          style={{ marginLeft: 10, marginBottom: 5 }}
+                        />
+                        <View style={{ flex: 1 }}>
+                          <View style={{ flex: 1 }}>
+                            <Text style={[styles.IsiText]}>
+                              {dataCompany
+                                .filter(
+                                  (select) =>
+                                    select.id_master_company ===
+                                    item.master_company_id
+                                )
+                                .map((matchedCompany) => {
+                                  return matchedCompany.name;
+                                })}
+                            </Text>
+                            <Text style={[styles.IsiText2]}>
+                              {dataMachine
+                                .filter(
+                                  (select) =>
+                                    select.master_machine_id ===
+                                    item.master_machine_id
+                                )
+                                .map((matchedMachine) => {
+                                  return matchedMachine.machine_id;
+                                })}{" "}
+                              -{item.compartement_id}
+                            </Text>
+                            <Text
+                              style={[styles.IsiText2, { fontWeight: 900 }]}
+                            >
+                              HM : {item.current_hour_meter}
+                            </Text>
+                            <Text style={[styles.IsiText3]}>
+                              Create :{" "}
+                              {dayjs(item.date)
+                                .locale("id")
+                                .format(" DD/MM/YYYY ")}
+                            </Text>
+                          </View>
+                          {/* <Text
+                        style={[
+                          styles.IsiText,
+                          { fontSize: 10, marginVertical: 2 },
+                        ]}
+                      >
+                        {dayjs(item.created_at)
+                          .locale("id")
+                          .format("DD/MMM/YYYY ")}
+                      </Text> */}
+                        </View>
+                        <View
+                          style={{
+                            width: 80,
+                            marginRight: 20,
+                            justifyContent: "center",
+                          }}
+                        >
+                          {dayjs(item.created_at)
+                            .locale("id")
+                            .format("DD/MMM/YYYY") <=
+                          dayjs(today)
+                            .subtract(2, "days")
+                            .format("DD/MMM/YYYY") ? (
+                            <Button
+                              buttonStyle={{ borderRadius: 20 }}
+                              item={{
+                                title: "Edit",
+                                textcolor: "#007AFF",
+                                backgroundcolor: "#D6E8FD",
+                                alginSelf: "center",
+                                onPress: () =>
+                                  navigation.navigate("Edit", {
+                                    masterLog: item,
+                                  }),
+                              }}
+                            />
+                          ) : null}
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+              </View>
+              <View style={[styles.Content1]}>
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 18,
+                    fontFamily: "Poppins-Medium",
+                  }}
+                >
+                  30 Days History
+                </Text>
 
-        //         {query?.data?.data?.data.map((item, index) => {
-        //           return (
-        //             <View style={[styles.Isi]}>
-        //               <View
-        //                 style={{
-        //                   flex: 1,
-        //                   flexDirection: "row",
-        //                   justifyContent: "space-between",
-        //                   marginBottom: 5,
-        //                 }}
-        //               >
-        //                 <Text
-        //                   style={{
-        //                     color: "#3C3C43",
-        //                     marginVertical: 5,
-        //                     marginLeft: 10,
-        //                     opacity: 0.6,
-        //                   }}
-        //                 >
-        //                   {dayjs(item.created_at)
-        //                     .locale("id")
-        //                     .format("dddd, DD MMMM YYYY")}
-        //                 </Text>
-        //               </View>
-        //               <View
-        //                 style={{
-        //                   flex: 1,
-        //                   marginHorizontal: 10,
-        //                   borderBottomColor: "#3C3C43",
-        //                   opacity: 0.3,
-        //                   borderBottomWidth: 1,
-        //                 }}
-        //               />
-        //               <View style={[styles.IsiContent]}>
-        //                 <AutoHeightImage
-        //                   source={Profile_Set}
-        //                   width={40}
-        //                   style={{
-        //                     marginLeft: 10,
-        //                     marginBottom: 5,
-        //                     marginRight: 5,
-        //                   }}
-        //                 />
-        //                 <View style={{ flex: 1 }}>
-        //                   <Text style={[styles.IsiText]}>
-        //                     {item.master_company.name}
-        //                   </Text>
-        //                   <Text style={[styles.IsiText2, { fontWeight: 900 }]}>
-        //                     Bas EA002
-        //                   </Text>
-        //                   <Text style={[styles.IsiText3]}>
-        //                     Updated at{" "}
-        //                     {dayjs(item.updated_at)
-        //                       .locale("id")
-        //                       .format(" DD MM YYYY")}
-        //                   </Text>
-        //                 </View>
-        //               </View>
-        //             </View>
-        //           );
-        //         })}
-        //       </View>
-        //     </>
-        //   )}
-        // </ScrollView>
-        <Text>asd</Text>
+                {query?.data?.data?.data.map((item, index) => {
+                  return (
+                    <View style={[styles.Isi]}>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          marginBottom: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#3C3C43",
+                            marginVertical: 5,
+                            marginLeft: 10,
+                            opacity: 0.6,
+                          }}
+                        >
+                          {dayjs(item.created_at)
+                            .locale("id")
+                            .format("dddd, DD MMMM YYYY")}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          marginHorizontal: 10,
+                          borderBottomColor: "#3C3C43",
+                          opacity: 0.3,
+                          borderBottomWidth: 1,
+                        }}
+                      />
+                      <View style={[styles.IsiContent]}>
+                        <AutoHeightImage
+                          source={Profile_Set}
+                          width={40}
+                          style={{
+                            marginLeft: 10,
+                            marginBottom: 5,
+                            marginRight: 5,
+                          }}
+                        />
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.IsiText]}>
+                            {item.master_company.name}
+                          </Text>
+                          <Text style={[styles.IsiText2, { fontWeight: 900 }]}>
+                            Bas EA002
+                          </Text>
+                          <Text style={[styles.IsiText3]}>
+                            Updated at{" "}
+                            {dayjs(item.updated_at)
+                              .locale("id")
+                              .format(" DD MM YYYY")}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            </>
+          )}
+        </ScrollView>
       ) : (
         <Alert.alert title="No Internet Connection" />
       )}

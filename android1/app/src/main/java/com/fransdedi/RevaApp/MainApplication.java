@@ -15,7 +15,7 @@ import com.facebook.soloader.SoLoader;
 
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
-// import com.nozbe.watermelondb.WatermelonDBPackage;
+
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -32,7 +32,6 @@ public class MainApplication extends Application implements ReactApplication {
         @SuppressWarnings("UnnecessaryLocalVariable")
         List<ReactPackage> packages = new PackageList(this).getPackages();
         // Packages that cannot be autolinked yet can be added manually here, for example:
-        // packages.add(new WatermelonDBPackage());
         // packages.add(new MyReactNativePackage());
         return packages;
       }
@@ -69,7 +68,9 @@ public class MainApplication extends Application implements ReactApplication {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
       DefaultNewArchitectureEntryPoint.load();
     }
-    ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    if (BuildConfig.DEBUG) {
+      ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    }
     ApplicationLifecycleDispatcher.onApplicationCreate(this);
   }
 

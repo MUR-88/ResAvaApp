@@ -28,7 +28,10 @@ import {
 // import {color} from "../..variabel";
 import "dayjs/locale/id";
 import * as yup from "yup";
-import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
+import DatePicker, {
+  getFormatedDate,
+  getToday,
+} from "react-native-modern-datepicker";
 import {
   useMasterSector,
   useMasterCompany,
@@ -86,7 +89,7 @@ const AddNew = ({ navigation, title }) => {
       id_master_main_activities: "",
       current_hour_meter: "",
       keterangan: "",
-      id_master_log_activity:"",
+      id_master_log_activity: "",
     },
     validationSchema: schema,
 
@@ -121,8 +124,8 @@ const AddNew = ({ navigation, title }) => {
               item.created_at = dayjs(values.date).unix() * 1000;
               item.date = dayjs(values.date).unix() * 1000;
             });
-            
-            Toast.show({
+
+          Toast.show({
             visibilityTime: 500,
             type: "success",
             text1: "Yeay, Berhasil!",
@@ -133,8 +136,8 @@ const AddNew = ({ navigation, title }) => {
           return masterLog;
           // setLoading(false);
         });
-        // navigation.replace("Mytabs");
-        formik.resetForm();
+        navigation.replace("Mytabs");
+        // formik.resetForm();
       } catch (error) {
         visibilityTime: 500,
           Toast.show({
@@ -162,7 +165,7 @@ const AddNew = ({ navigation, title }) => {
         ).id_master_machine_types
       );
     }
-  }, [formik.values.master_machine_id, ]);
+  }, [formik.values.master_machine_id]);
 
   let schema = yup.object().shape({
     current_hour_meter: yup
@@ -189,20 +192,20 @@ const AddNew = ({ navigation, title }) => {
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
   } = useMasterSector({ isGetData: true });
-  console.log("data sector", dataSector.length);
+  // console.log("data sector", dataSector.length);
   // console.log(JSON.stringify(dataSector, null, 2));
   const {
     data: dataCompany,
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
-  console.log("data Company", dataCompany.length);
+  // console.log("data Company", dataCompany.length);
   const {
     data: dataMachineType,
     isLoading: isLoadingMachineType,
     connected: connectedMasterMachineType,
   } = useMasterMachineType({ isGetData: true });
-  console.log("data Machine Type", dataMachineType.length);
+  // console.log("data Machine Type", dataMachineType.length);
   // console.log(JSON.stringify(dataMachineType, null, 2));
   const {
     data: dataMachine,
@@ -210,20 +213,20 @@ const AddNew = ({ navigation, title }) => {
     connected: connectedMasterMachine,
   } = useMasterMachine({ isGetData: true });
   console.log("data Machine", dataMachine.length);
-  // console.log(JSON.stringify(dataMachine, null, 2));
+  console.log(JSON.stringify(dataMachine, null, 2));
   const {
     data: dataMainActivity,
     isLoading: isLoadingMainActivity,
     connected: connectedMasterMainActivity,
   } = useMasterMainActivity({ isGetData: true });
-  console.log("data Main Activity", dataMainActivity.length);
+  // console.log("data Main Activity", dataMainActivity.length);
   // console.log(JSON.stringify(dataMainActivity, null, 2));
   const {
     data: dataMasterLog,
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  console.log(JSON.stringify(dataMasterLog, null, 2));
+  // console.log(JSON.stringify(dataMasterLog, null, 2));
   // console.log("data Log", dataMasterLog.length);
 
   const [hm, setHm] = useState(0);
@@ -239,6 +242,14 @@ const AddNew = ({ navigation, title }) => {
 
     setHm(hmArray.length > 0 ? hmArray[0] : 0);
   }, [formik.values.master_machine_id, dataMasterLog]);
+
+  // useEffect(() => {
+  //   const lastData = dataMasterLog.filter(dataMasterLog.length - 1).map(
+  //     (item) => item
+  //   );
+
+  //   setLastData(lastData);
+  // }, [formik.values.master_machine_id, dataMasterLog]);
 
   // const [refreshing, setRefreshing] = useState(false);
   // const onRefresh = async () => {
@@ -306,9 +317,9 @@ const AddNew = ({ navigation, title }) => {
                             mode="calendar"
                             display="spinner"
                             minimumDate={startDate}
-                            selected={date}
+                            selected={date || getToday()}
                             onDateChange={(date) => {
-                              formik.setFieldValue("date", date);
+                              formik.setFieldValue("date", date || getToday());
                             }}
                           />
                           <Pressable
@@ -332,7 +343,7 @@ const AddNew = ({ navigation, title }) => {
                         ]}
                       >
                         {formik.values.date
-                          ? dayjs(formik.values.date)
+                          ? dayjs(formik.values.date || formik.values.today)
                               .locale("id")
                               .format("DD/MMM/YYYY ")
                           : "pilih tanggal"}
@@ -628,9 +639,19 @@ const AddNew = ({ navigation, title }) => {
                                   if (index === array.length - 1) {
                                     return item.current_hour_meter;
                                   } else {
-                                    return null;
+                                    return 0;
                                   }
                                 })}
+
+                              {/* {dataMachine
+                                .filter(
+                                  (item) =>
+                                    item.machine_id ===
+                                    formik.values.master_machine_id
+                                )
+                                .map((item, index, array) => {
+                                  return item.hour_meter;
+                                })} */}
                             </Text>
                           </View>
                         </View>
@@ -657,6 +678,24 @@ const AddNew = ({ navigation, title }) => {
                         <View style={[styles.Label]}>
                           <Text style={globalStyles.textError}>
                             HM tidak boleh lebih dari 24 jam
+                          </Text>
+                        </View>
+                      ) : null}
+                      {formik.values.current_hour_meter - hm <
+                      dataMasterLog
+                        .filter(
+                          (item) =>
+                            item.master_machine_id ===
+                            formik.values.master_machine_id
+                        )
+                        .map((item, index, array) => {
+                          if (index === array.length - 2) {
+                            return item.current_hour_meter;
+                          }
+                        }) ? (
+                        <View style={[styles.Label]}>
+                          <Text style={globalStyles.textError}>
+                            HM tidak boleh kurang dari HM sebelumnya
                           </Text>
                         </View>
                       ) : null}

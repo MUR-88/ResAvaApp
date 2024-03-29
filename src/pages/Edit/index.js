@@ -10,12 +10,7 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import {
-  Button,
-  DropdownComp,
-  Input,
-  InputData,
-} from "../../component";
+import { Button, DropdownComp, Input, InputData } from "../../component";
 import {
   RefreshControl,
   ScrollView,
@@ -595,6 +590,67 @@ const Edit = ({ navigation }) => {
                                 formik.values.master_machine_id
                             )
                             .map((item, index, array) => {
+                              if (index === array.length - 2) {
+                                return item.current_hour_meter !== null
+                                  ? item.current_hour_meter
+                                  : 0;
+                              } else {
+                                return 0;
+                              }
+                            })}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flex: 1,
+                      backgroundColor: "white",
+                      borderWidth: 0.4,
+                      borderColor: "#88888D",
+                      borderRadius: 10,
+                      height: 45,
+                      marginLeft: 10,
+                      marginRight: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.container,
+                        {
+                          justifyContent: "center",
+                          backgroundColor: "white",
+                          flex: 1,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.Abu}>Last Input HM </Text>
+                    </View>
+                    <View
+                      style={[styles.container, { backgroundColor: "white" }]}
+                    >
+                      <View
+                        style={[
+                          styles.container,
+                          {
+                            backgroundColor: "white",
+                            justifyContent: "center",
+                            alignItems: "flex-end",
+                            marginRight: 20,
+                          },
+                        ]}
+                      >
+                        <Text style={{ fontSize: 16, color: "#88888D" }}>
+                          {dataMasterLog
+                            .filter(
+                              (item) =>
+                                item.master_machine_id ===
+                                formik.values.master_machine_id
+                            )
+                            .map((item, index, array) => {
                               if (index === array.length - 1) {
                                 return item.current_hour_meter;
                               } else {
@@ -627,6 +683,13 @@ const Edit = ({ navigation }) => {
                     <View style={[styles.Label]}>
                       <Text style={globalStyles.textError}>
                         HM tidak boleh lebih dari 24 jam
+                      </Text>
+                    </View>
+                  ) : null}
+                  {formik.values.current_hour_meter - hm < hm ? (
+                    <View style={[styles.Label]}>
+                      <Text style={globalStyles.textError}>
+                        HM tidak boleh kurang dari HM sebelumnya
                       </Text>
                     </View>
                   ) : null}

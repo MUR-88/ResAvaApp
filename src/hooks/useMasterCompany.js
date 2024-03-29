@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { synchronize } from "@nozbe/watermelondb/sync";
 import { database } from "../assets/Model/db";
-import API from "../function/API";
-import dayjs from "dayjs";
 import MasterCompany from "../assets/Model/master_company";
 
 export const useMasterCompany = ({ isGetData }) => {

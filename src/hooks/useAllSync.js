@@ -64,8 +64,8 @@ export const useAllSync = ({ isGetData }) => {
         //   (item) => item.isSync === false
         // );
 
-        console.log("Created", JSON.stringify(masterLogCreated, null, 2));
-        console.log("Updated", JSON.stringify(masterLogUpdated, null, 2));
+        // console.log("Created", JSON.stringify(masterLogCreated, null, 2));
+        // console.log("Updated", JSON.stringify(masterLogUpdated, null, 2));
 
         try {
           const pushDataResponse = await API.post("push/data", {
@@ -98,9 +98,9 @@ export const useAllSync = ({ isGetData }) => {
           await syncAndUpdate("master_log_activities", (masterLog) => {
             masterLog.isSync = true;
           });
-          // await syncAndUpdate("master_machine", (masterMachine) => {
-          //   masterMachine.isSync = true;
-          // });
+          await syncAndUpdate("master_machine", (masterMachine) => {
+            masterMachine.isSync = true;
+          });
 
           console.log("pushDataResponse", pushDataResponse);
           return Promise.resolve();
