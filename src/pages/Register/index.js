@@ -37,7 +37,7 @@ const Register = ({ navigation }) => {
     isLoading: isLoadingCompany,
     connected: connectedMasterCompany,
   } = useMasterCompany({ isGetData: true });
-  console.log("data Company", dataCompany.length);
+  // console.log("data Company", dataCompany.length);
   const {
     data: dataMachine,
     isLoading: isLoadingMachine,
@@ -97,9 +97,6 @@ const Register = ({ navigation }) => {
               item.brand = values.brand;
               item.class = parseInt(values.class);
               item.current_hour_meter = parseInt(values.current_hour_meter);
-              // item.brand = "Komatsu";
-              // item.current_hour_meter = 50;
-              // item.class = 30;
               item.machine_id = values.id_master_machine;
               item.master_machine_types_id = values.id_master_machine_types;
               item.master_main_activity_id = values.id_master_main_activities;
@@ -141,7 +138,7 @@ const Register = ({ navigation }) => {
           >
             <View style={[styles.Kotak]}>
               <Text style={[styles.Header1, { marginBottom: -10 }]}>
-                Resources Update
+                Register Machine
               </Text>
             </View>
           </View>

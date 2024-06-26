@@ -28,8 +28,8 @@ const Login = ({ navigation }) => {
 
   const formik = useFormik({
     validationSchema: schema,
-    initialValues: { SAP: "123456", password: "12345678" },
-    // initialValues: { SAP: "", password: "" },
+    // initialValues: { SAP: "123456", password: "12345678" },
+    initialValues: { SAP: "", password: "" },
     onSubmit: async (values) => {
       try {
         setIsLoading(true);
@@ -43,7 +43,7 @@ const Login = ({ navigation }) => {
           type: "error",
           text1: "Silahkan Masukkan SAP dan Password dengan benar",
         });
-        console.log(error);
+        // console.log(error);
       }
     },
   });
@@ -81,7 +81,7 @@ const Login = ({ navigation }) => {
                     label: "SAP",
                     backgroundColor: "black",
                     // width: 50,
-                    // vales: values.SAP,
+                    // value: value.SAP,
                     marginBottom: 10,
                     placeholder: "Isi SAP",
                   }}
@@ -104,7 +104,7 @@ const Login = ({ navigation }) => {
                   onChangeText={formik.handleChange("password")}
                   item={{
                     label: "Password",
-                    // value: values.password,
+                    // value: value.password,
                     placeholder: "Password",
                   }}
                   buttonStyle={{

@@ -40,6 +40,7 @@ export default schemaMigrations({
             { name: "master_machine_id", type: "number" },
             { name: "master_machine_types_id", type: "number" },
             { name: "master_main_activity_id", type: "number" },
+            { name: "oil", type: "number" },
             { name: "compartement_id", type: "string" },
             { name: "current_hour_meter", type: "number" },
             { name: "last_hour_meter", type: "number" },
@@ -57,7 +58,7 @@ export default schemaMigrations({
           columns: [
             { name: "master_machine_id", type: "number", isIndexed: true },
             { name: "brand", type: "string" },
-            { name: "master_machine_types_id", type: "number" },
+            { name: "master_machine_type_id", type: "number" },
             { name: "master_company_id", type: "number" },
             { name: "class", type: "number" },
             { name: "machine_id", type: "string" },

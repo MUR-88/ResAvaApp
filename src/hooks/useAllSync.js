@@ -6,6 +6,7 @@ import API from "../function/API";
 import dayjs from "dayjs";
 import { Q } from "@nozbe/watermelondb";
 import useLoadingStore from "./useLoadingStore";
+import Toast from "react-native-toast-message";
 
 export const useAllSync = ({ isGetData }) => {
   // const . cari connected atau tidak
@@ -60,12 +61,21 @@ export const useAllSync = ({ isGetData }) => {
         const masterMachineCreated = changes.master_machine.created.filter(
           (item) => item.isSync === false
         );
-        // const masterMachineUpdated = changes.master_machine.updated.filter(
-        //   (item) => item.isSync === false
-        // );
+        const masterMachineUpdated = changes.master_machine.updated.filter(
+          (item) => item.isSync === false
+        );
 
-        // console.log("Created", JSON.stringify(masterLogCreated, null, 2));
-        // console.log("Updated", JSON.stringify(masterLogUpdated, null, 2));
+        console.log("Created Log", JSON.stringify(masterLogCreated, null, 2));
+        console.log("Updated Log", JSON.stringify(masterLogUpdated, null, 2));
+
+        console.log(
+          "Created Machine",
+          JSON.stringify(masterMachineCreated, null, 2)
+        );
+        console.log(
+          "Updated Log",
+          JSON.stringify(masterMachineUpdated, null, 2)
+        );
 
         try {
           const pushDataResponse = await API.post("push/data", {
@@ -75,16 +85,16 @@ export const useAllSync = ({ isGetData }) => {
             },
             master_machine: {
               created: masterMachineCreated,
-              // updated: masterMachineUpdated,
+              updated: masterMachineUpdated,
             },
-            last_pulled_at: lastPulledAt,
+            last_pulled_at: lastPulledAt / 1000,
           });
 
           // console.log(JSON.stringify(pushDataResponse, null, 2));
 
           const syncAndUpdate = async (items, updateFunction) => {
             await database.write(async () => {
-              console.log("Test", JSON.stringify(items, null, 2));
+              // console.log("Test", JSON.stringify(items, null, 2));
               const allItems = await database
                 .get(items)
                 .query(Q.where("isSync", false))
@@ -102,10 +112,17 @@ export const useAllSync = ({ isGetData }) => {
             masterMachine.isSync = true;
           });
 
-          console.log("pushDataResponse", pushDataResponse);
+          // console.log("pushDataResponse", pushDataResponse);
+
           return Promise.resolve();
         } catch (pushDataError) {
-          console.error(pushDataError);
+          Toast.show({
+            visibilityTime: 5000,
+            type: "error",
+            text1: "Error!",
+            text2: "Data Gagal Sync",
+          });
+          // console.error(pushDataError);
           return Promise.reject(pushDataError);
           throw new Error(pushDataError.message);
         }
@@ -115,7 +132,7 @@ export const useAllSync = ({ isGetData }) => {
     });
 
     const unsyncedChangesResponse = await hasUnsyncedChanges({ database });
-    console.log("unsyncedChangesResponse", unsyncedChangesResponse);
+    // console.log("unsyncedChangesResponse", unsyncedChangesResponse);
   }
 
   useEffect(() => {
@@ -124,7 +141,7 @@ export const useAllSync = ({ isGetData }) => {
         const netInfoState = await NetInfo.fetch();
         setConnected(netInfoState.isConnected);
       } catch (netInfoError) {
-        console.error("Error checking internet connection", netInfoError);
+        // console.error("Error checking internet connection", netInfoError);
       }
     };
     checkInternetConnection();

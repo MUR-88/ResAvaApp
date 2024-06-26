@@ -101,7 +101,7 @@ const Edit = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date();
 
-  const startDate = getFormatedDate(today.setDate(today.getDate() - 2));
+  const startDate = getFormatedDate(today.setDate(today.getDate(-30)));
 
   const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
@@ -120,9 +120,9 @@ const Edit = ({ navigation }) => {
         setText("Inactive");
       }
       setIsEnable((previouvsState) => !previouvsState);
-      console.log(isEnable);
+      // console.log(isEnable);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
   const formik = useFormik({
@@ -154,13 +154,14 @@ const Edit = ({ navigation }) => {
             updateLog.master_machine_types_id = values.id_master_machine_types;
             updateLog.master_main_activity_id =
               values.id_master_main_activities;
+            // updateLog.current_hour_meter = values.current_hour_meter;
             updateLog.current_hour_meter = parseInt(values.current_hour_meter);
             updateLog.keterangan = values.keterangan;
             updateLog.isSynced = false;
             updateLog.isConnected = false;
             updateLog.date = dayjs(values.date).unix() * 1000;
           });
-          console.log("date", dayjs(values.date).unix() * 1000);
+          // console.log("date", dayjs(values.date).unix() * 1000);
         });
 
         Toast.show({
@@ -170,29 +171,29 @@ const Edit = ({ navigation }) => {
           text2: "Data Log Activity Berhasil Diupdate!",
         });
         navigation.replace("Mytabs");
-        console.log("value", values);
+        // console.log("value", values);
       } catch (error) {
         Toast.show({
           // visibilityTime: 1000,
           type: "error",
           text1: error.message,
         });
-        console.log("error", error.message), console.log(database);
+        // // console.log("error", error.message), console.log(database);
       }
     },
   });
 
   function handleChangeDate(date) {
-    console.log("tanggal pilih", Date);
+    // console.log("tanggal pilih", Date);
     setDate(Date);
-    console.log("tanggal pilih", date);
+    // console.log("tanggal pilih", date);
     setDate(date);
   }
 
   console.log(formik.errors);
   console.log("value", formik.values);
-  console.log("id", masterLog.id);
-  console.log(formik.masterLog);
+  // console.log("id", masterLog.id);
+  // console.log(formik.masterLog);
   //to do buat component tanggal
 
   const [hm, setHm] = useState(0);
@@ -223,7 +224,7 @@ const Edit = ({ navigation }) => {
           >
             <View style={[styles.Kotak]}>
               <Text style={[styles.Header1, { marginBottom: -10 }]}>
-                Resources Update
+                Resources Edit
               </Text>
             </View>
           </View>
@@ -304,7 +305,7 @@ const Edit = ({ navigation }) => {
                   onChange: (item) => {
                     setIsFocus(false);
                     formik.setFieldValue("id_master_company", item.value);
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     borderWidth: 0.4,
@@ -336,7 +337,7 @@ const Edit = ({ navigation }) => {
                   onChange: (item) => {
                     setIsFocus(false);
                     formik.setFieldValue("id_master_sector", item.value);
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     borderWidth: 0.4,
@@ -419,7 +420,7 @@ const Edit = ({ navigation }) => {
                   onChange: (item) => {
                     setIsFocus(false);
                     formik.setFieldValue("master_machine_id", item.value);
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     borderWidth: 0.4,
@@ -477,7 +478,7 @@ const Edit = ({ navigation }) => {
                   onChange: (item) => {
                     setIsFocus(false);
                     formik.setFieldValue("id_master_machine_types", item.value);
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     borderWidth: 0.4,
@@ -522,7 +523,7 @@ const Edit = ({ navigation }) => {
                       "id_master_main_activities",
                       item.value
                     );
-                    console.log(item);
+                    // console.log(item);
                   },
                   Dropdown: {
                     borderWidth: 0.4,
@@ -566,67 +567,6 @@ const Edit = ({ navigation }) => {
                         },
                       ]}
                     >
-                      <Text style={styles.Abu}>Last HM </Text>
-                    </View>
-                    <View
-                      style={[styles.container, { backgroundColor: "white" }]}
-                    >
-                      <View
-                        style={[
-                          styles.container,
-                          {
-                            backgroundColor: "white",
-                            justifyContent: "center",
-                            alignItems: "flex-end",
-                            marginRight: 20,
-                          },
-                        ]}
-                      >
-                        <Text style={{ fontSize: 16, color: "#88888D" }}>
-                          {dataMasterLog
-                            .filter(
-                              (item) =>
-                                item.master_machine_id ===
-                                formik.values.master_machine_id
-                            )
-                            .map((item, index, array) => {
-                              if (index === array.length - 2) {
-                                return item.current_hour_meter !== null
-                                  ? item.current_hour_meter
-                                  : 0;
-                              } else {
-                                return 0;
-                              }
-                            })}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      flex: 1,
-                      backgroundColor: "white",
-                      borderWidth: 0.4,
-                      borderColor: "#88888D",
-                      borderRadius: 10,
-                      height: 45,
-                      marginLeft: 10,
-                      marginRight: 10,
-                      marginTop: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.container,
-                        {
-                          justifyContent: "center",
-                          backgroundColor: "white",
-                          flex: 1,
-                        },
-                      ]}
-                    >
                       <Text style={styles.Abu}>Last Input HM </Text>
                     </View>
                     <View
@@ -644,19 +584,7 @@ const Edit = ({ navigation }) => {
                         ]}
                       >
                         <Text style={{ fontSize: 16, color: "#88888D" }}>
-                          {dataMasterLog
-                            .filter(
-                              (item) =>
-                                item.master_machine_id ===
-                                formik.values.master_machine_id
-                            )
-                            .map((item, index, array) => {
-                              if (index === array.length - 1) {
-                                return item.current_hour_meter;
-                              } else {
-                                return 0;
-                              }
-                            })}
+                           { formik.values.current_hour_meter}
                         </Text>
                       </View>
                     </View>
@@ -686,7 +614,7 @@ const Edit = ({ navigation }) => {
                       </Text>
                     </View>
                   ) : null}
-                  {formik.values.current_hour_meter - hm < hm ? (
+                  {formik.values.current_hour_meter < hm ? (
                     <View style={[styles.Label]}>
                       <Text style={globalStyles.textError}>
                         HM tidak boleh kurang dari HM sebelumnya
@@ -756,14 +684,29 @@ const Edit = ({ navigation }) => {
                 style={[styles.containerInput, { backgroundColor: "#D8D8D8" }]}
               >
                 <Input
+                  Title="Ketrangan"
+                  onChangeText={formik.handleChange("keterangan")}
                   item={{
-                    label: "Keterangan",
-                    placeholder: "Maintainance to Workshop for Repairment",
-                    value: formik.values.keterangan,
-                    backgroundColor: "red",
+                    placeholder: "Ex : Under Maintanance",
+                    values: formik.values.keterangan.toString(),
+                    Input: {
+                      borderWidth: 0.5,
+                      borderColor: "#88888D",
+                      marginHorizontal: 10,
+                      height: 45,
+                    },
                   }}
-                  value={formik.values.keterangan}
-                  input={{ backgroundColor: "black" }}
+                  buttonStyle={{
+                    borderColor: "#DDDDDD",
+                  }}
+                  // item={{
+                  //   label: "Keterangan",
+                  //   placeholder: "Maintainance to Workshop for Repairment",
+                  //   value: formik.values.keterangan,
+                  //   backgroundColor: "red",
+                  // }}
+                  // value={formik.values.keterangan}
+                  // input={{ backgroundColor: "black" }}
                 />
               </View>
             </View>

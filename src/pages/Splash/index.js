@@ -25,13 +25,19 @@ const Splash = ({ navigation }) => {
       try {
         setIsLoading(true);
         await fatchingAllSync();
+        Toast.show({
+          visibilityTime: 10000,
+          type: "success",
+          text1: "Yeay, Berhasil!",
+          text2: "Data Berhasil Sync",
+        });
         setIsLoading(false);
       } catch (error) {
         Toast.show({
           type: "error",
           text1: error.message,
         });
-        console.log(error);
+        // console.log(error);
       }
     })();
   }, []);

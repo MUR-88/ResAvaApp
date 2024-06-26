@@ -87,6 +87,7 @@ export default mySchema = appSchema({
         { name: "compartement_id", type : "string"},
         { name: "current_hour_meter", type: "number" },
         { name: "last_hour_meter", type: "number" },
+        { name: "oil", type: "number" },
         { name: "keterangan", type: "string" },
         { name: "isSync", type: "boolean" },
         { name: "isConnected", type: "boolean" },

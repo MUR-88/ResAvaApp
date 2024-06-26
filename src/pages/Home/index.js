@@ -6,24 +6,16 @@ import {
   StyleSheet,
   Dimensions,
   Image,
-  Touchable,
   ScrollView,
   RefreshControl,
   ActivityIndicator,
   Alert,
 } from "react-native";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import {
-  Delete,
-  NoSync,
-  Profile_Set,
-  Sync,
-  delete_icon,
-} from "../../assets/icon";
+import { Delete, Profile_Set } from "../../assets/icon";
 import AutoHeightImage from "react-native-auto-height-image";
 import { Button, Input, PilihTanggal } from "../../component";
 import { TouchableOpacity } from "react-native-gesture-handler";
-
 import { StatusBar } from "expo-status-bar";
 import API from "../../function/API";
 import dayjs from "dayjs";
@@ -39,34 +31,6 @@ import {
   useLoadingStore,
 } from "../../hooks";
 import Toast from "react-native-toast-message";
-import { getFormatedDate } from "react-native-modern-datepicker";
-import MasterLogActivity from "../../assets/Model/master_log_activity";
-import { Q } from "@nozbe/watermelondb";
-import MasterMachine from "../../assets/Model/master_machine";
-
-// beli domain
-//
-
-// Todo
-// tombol sync = done
-// tombol status di home = done
-// simbol sync bulat hijau & dark grey = done
-// isi value warna Hitam
-// estate hilangin = done
-// comparttement di pindah ke bawah sector = done
-// Sync belum masuk = done
-// Register data already recorded = done
-// Delete date ada 3 = done delete 1
-// Restrict to HM = done
-
-// Push changes di lanjutkan
-// Join Table = priority to fix
-// Fix sync update data = need to do
-// Filament fix the data create
-// fix lagg issue = need to be faster
-// delete estate table db = Done
-// recall data Resource update = ?
-// add Hm calculate & hm Current at Status Page = ?
 
 const Home = ({ navigation }) => {
   const { isLoading } = useLoadingStore();
@@ -78,7 +42,7 @@ const Home = ({ navigation }) => {
       navigation.replace("Login"); // Assuming 'Login' is the login screen route name
       // console.log(response);
     } catch (error) {
-      console.error("Error logging out:", error);
+      // console.error("Error logging out:", error);
     }
   };
 
@@ -99,7 +63,7 @@ const Home = ({ navigation }) => {
             text2: "Data Log Activity Berhasil Dihapus",
           });
         } else {
-          console.log("Log not found");
+          // console.log("Log not found");
         }
       });
     } catch (error) {
@@ -108,7 +72,7 @@ const Home = ({ navigation }) => {
         type: "error",
         text1: error.message,
       });
-      console.error("Error:", error);
+      // console.error("Error:", error);
     }
   };
 
@@ -176,8 +140,8 @@ const Home = ({ navigation }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  console.log(JSON.stringify(dataMasterLog, null, 2));
   console.log("data Log", dataMasterLog.length);
+  console.log(JSON.stringify(dataMasterLog, null, 2));
 
   const queryClient = useQueryClient();
   // Queries
@@ -429,26 +393,26 @@ const Home = ({ navigation }) => {
                             justifyContent: "center",
                           }}
                         >
-                          {dayjs(item.created_at)
+                          {/* {dayjs(item.created_at)
                             .locale("id")
                             .format("DD/MMM/YYYY") <=
                           dayjs(today)
                             .subtract(2, "days")
-                            .format("DD/MMM/YYYY") ? (
-                            <Button
-                              buttonStyle={{ borderRadius: 20 }}
-                              item={{
-                                title: "Edit",
-                                textcolor: "#007AFF",
-                                backgroundcolor: "#D6E8FD",
-                                alginSelf: "center",
-                                onPress: () =>
-                                  navigation.navigate("Edit", {
-                                    masterLog: item,
-                                  }),
-                              }}
-                            />
-                          ) : null}
+                            .format("DD/MMM/YYYY") ? ( */}
+                          <Button
+                            buttonStyle={{ borderRadius: 20 }}
+                            item={{
+                              title: "Edit",
+                              textcolor: "#007AFF",
+                              backgroundcolor: "#D6E8FD",
+                              alginSelf: "center",
+                              onPress: () =>
+                                navigation.navigate("Edit", {
+                                  masterLog: item,
+                                }),
+                            }}
+                          />
+                          {/* ) : null} */}
                         </View>
                       </View>
                     </View>

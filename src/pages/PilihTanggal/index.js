@@ -29,7 +29,7 @@ useEffect(() => {
 const fetchpilihTanggal = async () => {
   if (Response.status == 1) {
     setPilihTanggal(respone.data);
-    console.log(response.data);
+    // console.log(response.data);
   }
 };
 

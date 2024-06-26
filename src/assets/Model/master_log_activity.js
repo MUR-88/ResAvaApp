@@ -47,6 +47,7 @@ export default class MasterLogActivity extends Model {
   @field('current_hour_meter') current_hour_meter
   @field('last_hour_meter') last_hour_meter
   @field('class') class
+  @field('oil') oil
   @field('keterangan') keterangan
   @field('isSync') isSync
   @field('isConnected') isConnected

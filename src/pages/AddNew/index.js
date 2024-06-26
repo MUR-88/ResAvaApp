@@ -12,14 +12,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native";
-import {
-  Button,
-  DropdownComp,
-  Input,
-  InputData,
-  PilihTanggal,
-  Label,
-} from "../../component";
+import { Button, DropdownComp, Input, InputData } from "../../component";
 import {
   RefreshControl,
   ScrollView,
@@ -28,10 +21,7 @@ import {
 // import {color} from "../..variabel";
 import "dayjs/locale/id";
 import * as yup from "yup";
-import DatePicker, {
-  getFormatedDate,
-  getToday,
-} from "react-native-modern-datepicker";
+import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 import {
   useMasterSector,
   useMasterCompany,
@@ -46,10 +36,26 @@ import Toast from "react-native-toast-message";
 import { globalStyles } from "../../styles";
 import MasterLogActivity from "../../assets/Model/master_log_activity";
 import dayjs from "dayjs";
-import { synchronize } from "@nozbe/watermelondb/sync";
-import { API } from "../../function";
-import { hasUnsyncedChanges } from "@nozbe/watermelondb/sync";
-import { Q } from "@nozbe/watermelondb";
+
+const schema = yup.object().shape({
+  current_hour_meter: yup
+    .number()
+    .max(24, "tidak lebih dari 24 jam")
+    .required("Mohon masukkan format yang benar"),
+  master_machine_id: yup
+    .string()
+    .matches(/^[A-Za-z]{1,2}\d{1,3}$/, "Input must follow the format AB003")
+    .min(1)
+    .required("Masukkan Machine Id"),
+  id_master_sectors: yup.string().required("Pilih Sector"),
+  id_master_company: yup.string().required("Pilih Company"),
+  master_machine_id: yup.string().required("Pilih Machine ID"),
+  id_master_machine_types: yup.string().required("Pilih Machine Type"),
+  id_master_main_activities: yup.string().required("Pilih Main Activity"),
+  compartement_id: yup.string().required("Pilih Compartement"),
+  current_hour_meter: yup.string().required("Pilih Hour Meter"),
+  date: yup.string().required("Pilih Date"),
+});
 
 const AddNew = ({ navigation, title }) => {
   const [selectedDate, setSelectedDate] = useState("");
@@ -96,16 +102,6 @@ const AddNew = ({ navigation, title }) => {
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        // todo buat safety input hm <24 jam
-        // Tambahkan Label Input 24 jam = done
-        // install filament = done
-        // Capslock Data Entry = done
-        // Data HM dari register = done
-        // Data Estate dihapus DB = done
-        // Check status di edit  hapus = done
-        // Sync indicator tidk jalan = done
-        // Machine Type & Activity di kasih tombol untuk ganti activity sesuai di field
-
         await database.write(async () => {
           const masterLog = await database
             .get(MasterLogActivity.table)
@@ -124,27 +120,28 @@ const AddNew = ({ navigation, title }) => {
               item.created_at = dayjs(values.date).unix() * 1000;
               item.date = dayjs(values.date).unix() * 1000;
             });
-
           Toast.show({
-            visibilityTime: 500,
+            visibilityTime: 5000,
             type: "success",
             text1: "Yeay, Berhasil!",
             text2: "Data Log Activity Berhasil Ditambahkan",
           });
+
           // console.log("masterLog", database);
-          console.log("date", dayjs(values.date).unix() * 1000);
+          console.log("date", dayjs(values.date).unix());
           return masterLog;
-          // setLoading(false);
         });
         navigation.replace("Mytabs");
         // formik.resetForm();
       } catch (error) {
-        visibilityTime: 500,
-          Toast.show({
-            type: "error",
-            text1: error.message,
-          });
-        // console.log(database);
+        Toast.show({
+          visibilityTime: 5000,
+          type: "error",
+          text1: error.message,
+        });
+        console.log(error);
+      } finally {
+        setLoading(false);
       }
     },
   });
@@ -167,23 +164,6 @@ const AddNew = ({ navigation, title }) => {
     }
   }, [formik.values.master_machine_id]);
 
-  let schema = yup.object().shape({
-    current_hour_meter: yup
-      .number()
-      .max(24, "tidak lebih dari 24 jam")
-      .required("Mohon masukkan format yang benar"),
-    master_machine_id: yup
-      .string()
-      .matches(/^[A-Za-z]{1,2}\d{1,3}$/, "Input must follow the format AB003")
-      .min(1)
-      .required("Masukkan Machine Id"),
-    id_master_sectors: yup.string().required("Pilih Sector"),
-    id_master_company: yup.string().required("Pilih Company"),
-    master_machine_id: yup.string().required("Pilih Machine ID"),
-    id_master_machine_types: yup.string().required("Pilih Machine Type"),
-    id_master_main_activities: yup.string().required("Pilih Main Activity"),
-  });
-
   console.log(formik.errors);
   console.log("value", formik.values);
 
@@ -192,7 +172,7 @@ const AddNew = ({ navigation, title }) => {
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
   } = useMasterSector({ isGetData: true });
-  // console.log("data sector", dataSector.length);
+  console.log("data sector", dataSector.length);
   // console.log(JSON.stringify(dataSector, null, 2));
   const {
     data: dataCompany,
@@ -243,14 +223,6 @@ const AddNew = ({ navigation, title }) => {
     setHm(hmArray.length > 0 ? hmArray[0] : 0);
   }, [formik.values.master_machine_id, dataMasterLog]);
 
-  // useEffect(() => {
-  //   const lastData = dataMasterLog.filter(dataMasterLog.length - 1).map(
-  //     (item) => item
-  //   );
-
-  //   setLastData(lastData);
-  // }, [formik.values.master_machine_id, dataMasterLog]);
-
   // const [refreshing, setRefreshing] = useState(false);
   // const onRefresh = async () => {
   //   setRefreshing(true);
@@ -276,7 +248,7 @@ const AddNew = ({ navigation, title }) => {
           >
             <View style={[styles.Kotak]}>
               <Text style={[styles.Header1, { marginBottom: -10 }]}>
-                Resources Update
+                Add New
               </Text>
             </View>
           </View>
@@ -317,9 +289,9 @@ const AddNew = ({ navigation, title }) => {
                             mode="calendar"
                             display="spinner"
                             minimumDate={startDate}
-                            selected={date || getToday()}
+                            selected={date}
                             onDateChange={(date) => {
-                              formik.setFieldValue("date", date || getToday());
+                              formik.setFieldValue("date", date);
                             }}
                           />
                           <Pressable
@@ -343,7 +315,7 @@ const AddNew = ({ navigation, title }) => {
                         ]}
                       >
                         {formik.values.date
-                          ? dayjs(formik.values.date || formik.values.today)
+                          ? dayjs(formik.values.date)
                               .locale("id")
                               .format("DD/MMM/YYYY ")
                           : "pilih tanggal"}
@@ -639,19 +611,9 @@ const AddNew = ({ navigation, title }) => {
                                   if (index === array.length - 1) {
                                     return item.current_hour_meter;
                                   } else {
-                                    return 0;
+                                    return null;
                                   }
                                 })}
-
-                              {/* {dataMachine
-                                .filter(
-                                  (item) =>
-                                    item.machine_id ===
-                                    formik.values.master_machine_id
-                                )
-                                .map((item, index, array) => {
-                                  return item.hour_meter;
-                                })} */}
                             </Text>
                           </View>
                         </View>
@@ -681,21 +643,10 @@ const AddNew = ({ navigation, title }) => {
                           </Text>
                         </View>
                       ) : null}
-                      {formik.values.current_hour_meter - hm <
-                      dataMasterLog
-                        .filter(
-                          (item) =>
-                            item.master_machine_id ===
-                            formik.values.master_machine_id
-                        )
-                        .map((item, index, array) => {
-                          if (index === array.length - 2) {
-                            return item.current_hour_meter;
-                          }
-                        }) ? (
+                      {formik.values.current_hour_meter < hm ? (
                         <View style={[styles.Label]}>
                           <Text style={globalStyles.textError}>
-                            HM tidak boleh kurang dari HM sebelumnya
+                            HM tidak boleh lebih dari 24 jam
                           </Text>
                         </View>
                       ) : null}
@@ -716,6 +667,33 @@ const AddNew = ({ navigation, title }) => {
                       ) : null}
                     </>
                   ) : null}
+                  <InputData
+                    Title="Refueling Oil"
+                    onChangeText={formik.handleChange("oil")}
+                    item={{
+                      placeholder: "100(Litre)",
+                      value: formik.values.oil,
+                      Input: {
+                        borderWidth: 0.5,
+                        borderColor: "#88888D",
+                        marginHorizontal: 10,
+                        height: 45,
+                      },
+                    }}
+                    buttonStyle={{
+                      borderColor: "#DDDDDD",
+                    }}
+                  />
+                  <View style={[styles.Label]}>
+                    <Text
+                      style={[
+                        styles.Abu,
+                        { fontStyle: "italic", alignItems: "flex-end" },
+                      ]}
+                    >
+                      * Input hanya angka saja
+                    </Text>
+                  </View>
                   <View
                     style={{
                       flex: 1,
@@ -768,6 +746,23 @@ const AddNew = ({ navigation, title }) => {
               </View>
               <View
                 style={{
+                  flex: 1,
+                  alignItems: "flex-start",
+                  marginLeft: 30,
+                  width: "100%",
+                }}
+              >
+                <Text
+                  style={[
+                    styles.Abu,
+                    { fontStyle: "italic", alignItems: "flex-end" },
+                  ]}
+                >
+                  Keterangan
+                </Text>
+              </View>
+              <View
+                style={{
                   flexDirection: "row",
                   justifyContent: "center",
                   borderRadius: 20,
@@ -782,17 +777,48 @@ const AddNew = ({ navigation, title }) => {
                     ]}
                   >
                     <Input
+                      Title="Ketrangan"
+                      onChangeText={formik.handleChange("keterangan")}
                       item={{
-                        label: "Keterangan",
-                        placeholder: "Maintainance to Workshop for Repairment",
-                        value: formik.values.keterangan,
-                        backgroundColor: "red",
+                        placeholder: "Ex : Under Maintanance",
+                        values: formik.values.keterangan.toString(),
+                        Input: {
+                          borderWidth: 0.5,
+                          borderColor: "#88888D",
+                          marginHorizontal: 10,
+                          height: 45,
+                        },
                       }}
-                      input={{ backgroundColor: "black" }}
+                      buttonStyle={{
+                        borderColor: "#DDDDDD",
+                      }}
                     />
+                    {/* <InputData
+                      onChangeText={formik.handleChange("keterangan")}
+                      item={{
+                        placeholder: "Ex : AB001",
+                        value: formik.values.keterangan,
+                        Input: {
+                          borderWidth: 0.5,
+                          borderColor: "#88888D",
+                          marginHorizontal: 10,
+                          height: 45,
+                        },
+                      }}
+                      buttonStyle={{
+                        borderColor: "#DDDDDD",
+                      }}
+                    /> */}
                   </View>
                 </View>
               </View>
+              {formik.values.current_hour_meter !== formik.values.current_hour_meter ? (
+                <View style={styles.Label}>
+                  <Text style={globalStyles.textError}>
+                    Silahkan Masukkan Justifikasi
+                  </Text>
+                </View>
+              ) : null}
               <View
                 style={{
                   flex: 1,
