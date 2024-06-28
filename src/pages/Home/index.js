@@ -12,9 +12,9 @@ import {
   Alert,
 } from "react-native";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { Delete, Profile_Set } from "../../assets/icon";
+import { Delete, Export, Export_Biru, Profile_Set } from "../../assets/icon";
 import AutoHeightImage from "react-native-auto-height-image";
-import { Button, Input, PilihTanggal } from "../../component";
+import { Button, CustomAlert, Input, PilihTanggal } from "../../component";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import API from "../../function/API";
@@ -34,7 +34,21 @@ import Toast from "react-native-toast-message";
 
 const Home = ({ navigation }) => {
   const { isLoading } = useLoadingStore();
+  const [exportedData, setExportedData] = useState(null);
   // console.log("isLoading", isLoading);
+  const [showAlert, setShowAlert] = useState(false);
+
+  const handleCancel = () => {
+    setShowAlert(false);
+  };
+
+  const handleSubmit = (item) => {
+    setShowAlert(false);
+    // navigation.navigate("Edit");
+    navigation.navigate("Edit", {
+      masterLog: item,
+    });
+  };
 
   const handleLogout = async () => {
     try {
@@ -157,6 +171,48 @@ const Home = ({ navigation }) => {
     await getAllLog();
     setRefreshing(false);
   };
+  const [isExport, setIsExport] = useState(false);
+
+  // const exportData = async () => {
+  //   try {
+  //     const response = await API.get("export_data");
+  //     console.log(response);
+  //     setIsExport(true);
+  //   } catch (error) {
+  //     console.error("Error exporting data:", error);
+  //   }
+  // };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await API.get("export_data"); // Replace with your backend URL
+      const data = await response.json();
+      setExportedData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const shareViaWhatsApp = () => {
+    try {
+      if (exportedData) {
+        const message = `Check out the exported data: ${exportedData.message}`;
+        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(
+          message
+        )}`;
+
+        Linking.openURL(whatsappUrl)
+          .then(() => console.log("Message sent to WhatsApp"))
+          .catch((error) => console.error("Error opening WhatsApp:", error));
+      }
+    } catch (error) {
+      console.error("Error sharing via WhatsApp:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       <StatusBar style="light" />
@@ -245,6 +301,16 @@ const Home = ({ navigation }) => {
                 </View>
               </View>
             </View>
+            {/* <TouchableOpacity onPress={exportData}> */}
+            {exportedData ? null : (
+              <TouchableOpacity onPress={shareViaWhatsApp}>
+                <AutoHeightImage
+                  source={Export_Biru}
+                  width={30}
+                  style={{ marginTop: 10, marginBottom: 10 }}
+                />
+              </TouchableOpacity>
+            )}
           </View>
           {isLoading ? (
             <>
@@ -259,7 +325,7 @@ const Home = ({ navigation }) => {
                   .sort((a, b) => dayjs(b.created_at) - dayjs(a.created_at))
                   .filter(
                     (item) =>
-                      dayjs(item.date) >= today.setDate(today.getDate() - 2)
+                      dayjs(item.date) >= today.setDate(today.getDate() - 5)
                   )
                   .map((item, index) => (
                     <View style={[styles.Isi]}>
@@ -304,7 +370,24 @@ const Home = ({ navigation }) => {
                           />
                           <TouchableOpacity
                             // onPress={onDelete}
-                            onPress={() => deleteAllRecords(item.id)}
+                            // onPress={() => deleteAllRecords(item.id)}
+                            onPress={() => {
+                              Alert.alert(
+                                "Confirm Deletion",
+                                "Are you sure you want to delete This records?",
+                                [
+                                  {
+                                    text: "Cancel",
+                                    style: "cancel",
+                                  },
+                                  {
+                                    text: "Delete",
+                                    onPress: () => deleteAllRecords(item.id),
+                                  },
+                                ],
+                                { cancelable: false }
+                              );
+                            }}
                             style={{
                               flex: 1,
                               justifyContent: "center",
@@ -406,11 +489,18 @@ const Home = ({ navigation }) => {
                               textcolor: "#007AFF",
                               backgroundcolor: "#D6E8FD",
                               alginSelf: "center",
-                              onPress: () =>
-                                navigation.navigate("Edit", {
-                                  masterLog: item,
-                                }),
+                              // onPress: () =>
+                              //   navigation.navigate("Edit", {
+                              //     masterLog: item,
+                              //   }),
+                              onPress: () => setShowAlert(true),
                             }}
+                        />
+                          <CustomAlert
+                            visible={showAlert}
+                            message="Are you sure you want to submit the form?"
+                            onCancel={handleCancel}
+                            onConfirm={() => handleSubmit(item)}
                           />
                           {/* ) : null} */}
                         </View>

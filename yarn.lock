@@ -1397,6 +1397,11 @@
     dotenv-expand "~10.0.0"
     getenv "^1.0.0"
 
+"@expo/html-elements@^0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@expo/html-elements/-/html-elements-0.10.1.tgz#ec2625370cf1d4cb78efa954df45d422532d5ab6"
+  integrity sha512-3PTmtkV15D7+lykXVtvkH1jQ5Y6JE+e3zCaoMMux7z2cSLGQUNwDEUwG37gew3OEB1/E4/SEWgjvg8m7E6/e2Q==
+
 "@expo/image-utils@0.3.22":
   version "0.3.22"
   resolved "https://registry.yarnpkg.com/@expo/image-utils/-/image-utils-0.3.22.tgz#3a45fb2e268d20fcc761c87bca3aca7fd8e24260"

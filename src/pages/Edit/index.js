@@ -10,7 +10,13 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import { Button, DropdownComp, Input, InputData } from "../../component";
+import {
+  Button,
+  CustomAlert,
+  DropdownComp,
+  Input,
+  InputData,
+} from "../../component";
 import {
   RefreshControl,
   ScrollView,
@@ -36,6 +42,16 @@ import { useRoute } from "@react-navigation/native";
 const Edit = ({ navigation }) => {
   const route = useRoute();
   const masterLog = route.params.masterLog;
+  const [showAlert, setShowAlert] = useState(false);
+
+  const handleCancel = () => {
+    setShowAlert(false);
+  };
+
+  const handleSubmit = () => {
+    setShowAlert(false);
+    formik.handleSubmit();
+  };
 
   let schema = yup.object().shape({
     current_hour_meter: yup
@@ -154,7 +170,7 @@ const Edit = ({ navigation }) => {
             updateLog.master_machine_types_id = values.id_master_machine_types;
             updateLog.master_main_activity_id =
               values.id_master_main_activities;
-            // updateLog.current_hour_meter = values.current_hour_meter;
+            updateLog.oil = values.oil;
             updateLog.current_hour_meter = parseInt(values.current_hour_meter);
             updateLog.keterangan = values.keterangan;
             updateLog.isSynced = false;
@@ -584,7 +600,7 @@ const Edit = ({ navigation }) => {
                         ]}
                       >
                         <Text style={{ fontSize: 16, color: "#88888D" }}>
-                           { formik.values.current_hour_meter}
+                          {masterLog.current_hour_meter}
                         </Text>
                       </View>
                     </View>
@@ -623,51 +639,24 @@ const Edit = ({ navigation }) => {
                   ) : null}
                 </>
               ) : null}
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  flexDirection: "row",
-                  marginHorizontal: 5,
-                  marginVertical: 3,
-                }}
-              >
-                <View
-                  style={[
-                    styles.container,
-                    { justifyContent: "center", flex: 1 },
-                  ]}
-                >
-                  <Text style={{ opacity: 0.4 }}>Computer HM ? </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
+              <InputData
+                Title="Refueling"
+                onChangeText={formik.handleChange("oil")}
+                item={{
+                  placeholder: "100(Litre)",
+                  value: formik.values.oil,
+                  Input: {
+                    borderWidth: 0.5,
+                    borderColor: "#88888D",
                     marginHorizontal: 10,
-                    justifyContent: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                      flexDirection: "row ",
-                      alignContent: "center",
-                      marginVertical: 2,
-                    }}
-                  >
-                    <Switch
-                      trackColor={{ false: "#FB9797", true: "#CAE6CA" }}
-                      // tumbColor={isEnable ? "red" : "green"}
-                      onValueChange={toggleSwitch}
-                      value={isEnable}
-                    />
-                    <Text style={{ color: "#AFAFAF" }}>
-                      {isEnable ? "on" : "off"}
-                    </Text>
-                  </View>
-                </View>
-              </View>
+                    height: 45,
+                    marginBottom: 10,
+                  },
+                }}
+                buttonStyle={{
+                  borderColor: "#DDDDDD",
+                }}
+              />
             </View>
             <View style={[styles.container, { paddingVertical: 10 }]}></View>
           </View>
@@ -727,8 +716,14 @@ const Edit = ({ navigation }) => {
                 textcolor: "#FFFFFF",
                 width: "100%",
                 justifyContent: "center",
-                onPress: () => formik.handleSubmit(),
+                onPress: () => setShowAlert(true),
               }}
+            />
+            <CustomAlert
+              visible={showAlert}
+              message="Are you sure you want to submit the form?"
+              onCancel={handleCancel}
+              onConfirm={handleSubmit}
             />
           </View>
         </ScrollView>

@@ -6,9 +6,20 @@ import {
   StyleSheet,
   Dimensions,
   StatusBar,
+  Alert,
 } from "react-native";
-import { Button, DropdownComp, Input, InputData } from "../../component";
-import { RefreshControl, ScrollView } from "react-native-gesture-handler";
+import {
+  Button,
+  CustomAlert,
+  DropdownComp,
+  Input,
+  InputData,
+} from "../../component";
+import {
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
 // import {color} from "../..variabel";
 import "dayjs/locale/id";
 import * as yup from "yup";
@@ -31,6 +42,16 @@ import dayjs from "dayjs";
 import MasterMachine from "../../assets/Model/master_machine";
 const Register = ({ navigation }) => {
   const [isFocus, setIsFocus] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
+
+  const handleCancel = () => {
+    setShowAlert(false);
+  };
+
+  const handleSubmit = () => {
+    setShowAlert(false);
+    formik.handleSubmit();
+  };
 
   const {
     data: dataCompany,
@@ -124,6 +145,7 @@ const Register = ({ navigation }) => {
   });
   console.log(formik.errors);
   console.log("value", formik.values);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
@@ -160,8 +182,8 @@ const Register = ({ navigation }) => {
               }
             })} */}
             <View style={[styles.MechInfo]}>
-              <DropdownComp
-                title="Company ID"
+              {/* <DropdownComp
+                title="Contractor"
                 item={{
                   values: dataCompany.map((company) => ({
                     label: company.name,
@@ -177,6 +199,31 @@ const Register = ({ navigation }) => {
                     // console.log(item);
                   },
                   Dropdown: {
+                    marginHorizontal: 10,
+                    marginVertical: 10,
+                  },
+                }}
+              /> */}
+              <DropdownComp
+                title="Contractor"
+                item={{
+                  values: dataCompany.map((company) => ({
+                    label: company.name,
+                    value: company.id_master_company,
+                  })),
+                  marginRight:-100,
+                  placeholder: dataCompany.find(
+                    (item) =>
+                      item.id_master_company === formik.values.id_master_company
+                  )?.name,
+                  onChange: (item) => {
+                    setIsFocus(false);
+                    formik.setFieldValue("id_master_company", item.value);
+                    console.log(item);
+                  },
+                  Dropdown: {
+                    // borderWidth: 0.4,
+                    // borderColor: "#88888D",
                     marginHorizontal: 10,
                     marginVertical: 10,
                   },
@@ -373,8 +420,14 @@ const Register = ({ navigation }) => {
                 textcolor: "#FFFFFF",
                 width: "100%",
                 justifyContent: "center",
-                onPress: () => formik.handleSubmit(),
+                onPress: () => setShowAlert(true),
               }}
+            />
+            <CustomAlert
+              visible={showAlert}
+              message="Are you sure you want to submit the form?"
+              onCancel={handleCancel}
+              onConfirm={handleSubmit}
             />
           </View>
         </ScrollView>

@@ -17,7 +17,8 @@ import Delete from "./delete.png";
 import PanahKiri from "./Panah-kiri.png";
 import NoSync from "./no_sync.png";
 import Sync from "./sync.png";
-
+import Export from "./export.png";
+import Export_Biru from "./export_biru.png";
 
 export {
   Logo,
@@ -39,4 +40,6 @@ export {
   PanahKiri,
   NoSync,
   Sync,
+  Export,
+  Export_Biru,
 };

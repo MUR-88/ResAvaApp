@@ -6,7 +6,7 @@ import DropdownComp from "./DropdownComp";
 import InputData from "./InputData";
 import PilihTanggal from "./PilihTanggal";
 import Label from "./Label";
-
+import CustomAlert from "./Alert";
 export {
   Label,
   Text,
@@ -16,4 +16,5 @@ export {
   DropdownComp,
   InputData,
   PilihTanggal,
+  CustomAlert,
 };

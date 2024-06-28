@@ -10,7 +10,7 @@ const index = ({ title, item }) => {
       <View style={[styles.container]}>
         <Text style={styles.Abu}>{title} </Text>
       </View>
-      <View style={[styles.container, { backgroundColor: "white" }]}>
+      <View style={[styles.container1, { marginRight: item.marginRight }]}>
         <Dropdown
           style={[styles.dropdown]}
           placeholderStyle={styles.placeholderStyle}
@@ -56,9 +56,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 8,
     justifyContent: "center",
-    backgroundColor: "white",
+    // backgroundColor: "white",
     borderRadius: 8,
     flex: 1,
+  },
+  container1: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    marginHorizontal: 8,
+    justifyContent: "center",
+    // backgroundColor: "white",
+    borderRadius: 8,
+    flex: 1,
+    marginRight:-70
   },
   dropdown: {
     height: 40,

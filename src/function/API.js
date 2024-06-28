@@ -5,10 +5,10 @@
 // const API_URL = "https://resava.site/api/";
 
 //Url Dev
-const API_URL = "https://dev.resava.site/api/";
+// const API_URL = "https://dev.resava.site/api/";
 
 
-// const API_URL = "http://192.168.138.219:8000/api/";
+const API_URL = "http://192.168.120.219:8000/api/";
 // const API_URL = "http://192.168.100.78:8000/api/";
 
 

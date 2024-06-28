@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     justifyContent: "flex-end",
-    marginHorizontal: 10,
+    // marginHorizontal: ,
+    marginRight:-12
   },
 });

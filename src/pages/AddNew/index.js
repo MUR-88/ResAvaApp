@@ -11,6 +11,7 @@ import {
   Modal,
   Pressable,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Button, DropdownComp, Input, InputData } from "../../component";
 import {
@@ -36,6 +37,7 @@ import Toast from "react-native-toast-message";
 import { globalStyles } from "../../styles";
 import MasterLogActivity from "../../assets/Model/master_log_activity";
 import dayjs from "dayjs";
+import { text } from "@nozbe/watermelondb/decorators";
 
 const schema = yup.object().shape({
   current_hour_meter: yup
@@ -52,8 +54,8 @@ const schema = yup.object().shape({
   master_machine_id: yup.string().required("Pilih Machine ID"),
   id_master_machine_types: yup.string().required("Pilih Machine Type"),
   id_master_main_activities: yup.string().required("Pilih Main Activity"),
-  compartement_id: yup.string().required("Pilih Compartement"),
-  current_hour_meter: yup.string().required("Pilih Hour Meter"),
+  compartement_id: yup.string().required("Input Compartement"),
+  current_hour_meter: yup.string().required("Input Hour Meter"),
   date: yup.string().required("Pilih Date"),
 });
 
@@ -96,6 +98,7 @@ const AddNew = ({ navigation, title }) => {
       current_hour_meter: "",
       keterangan: "",
       id_master_log_activity: "",
+      oil: "",
     },
     validationSchema: schema,
 
@@ -115,6 +118,7 @@ const AddNew = ({ navigation, title }) => {
               item.master_main_activity_id = values.id_master_main_activities;
               item.current_hour_meter = parseInt(values.current_hour_meter);
               item.keterangan = values.keterangan;
+              item.oil = values.oil;
               item.isSynced = false;
               item.isConnected = false;
               item.created_at = dayjs(values.date).unix() * 1000;
@@ -172,7 +176,7 @@ const AddNew = ({ navigation, title }) => {
     isLoading: isLoadingSector,
     connected: connectedMasterSector,
   } = useMasterSector({ isGetData: true });
-  console.log("data sector", dataSector.length);
+  // console.log("data sector", dataSector.length);
   // console.log(JSON.stringify(dataSector, null, 2));
   const {
     data: dataCompany,
@@ -192,8 +196,8 @@ const AddNew = ({ navigation, title }) => {
     isLoading: isLoadingMachine,
     connected: connectedMasterMachine,
   } = useMasterMachine({ isGetData: true });
-  console.log("data Machine", dataMachine.length);
-  console.log(JSON.stringify(dataMachine, null, 2));
+  // console.log("data Machine", dataMachine.length);
+  // console.log(JSON.stringify(dataMachine, null, 2));
   const {
     data: dataMainActivity,
     isLoading: isLoadingMainActivity,
@@ -223,17 +227,6 @@ const AddNew = ({ navigation, title }) => {
     setHm(hmArray.length > 0 ? hmArray[0] : 0);
   }, [formik.values.master_machine_id, dataMasterLog]);
 
-  // const [refreshing, setRefreshing] = useState(false);
-  // const onRefresh = async () => {
-  //   setRefreshing(true);
-  //   await getAllLog();
-  //   await getAllMachine();
-  //   await getAllCompany();
-  //   await getAllSector();
-  //   await getAllMachineType();
-  //   await getAllMainActivity();
-  //   setRefreshing(false);
-  // };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
@@ -267,6 +260,7 @@ const AddNew = ({ navigation, title }) => {
                     fontSize: 18,
                     fontFamily: "Poppins-Medium",
                     marginTop: 5,
+                    marginBottom: 10,
                   }}
                 >
                   Details
@@ -318,17 +312,18 @@ const AddNew = ({ navigation, title }) => {
                           ? dayjs(formik.values.date)
                               .locale("id")
                               .format("DD/MMM/YYYY ")
-                          : "pilih tanggal"}
+                          : "Pilih Tanggal"}
                       </Text>
                     </Pressable>
                   </View>
                   <DropdownComp
-                    title="Company"
+                    title="Contractor"
                     item={{
                       values: dataCompany.map((company) => ({
                         label: company.name,
                         value: company.id_master_company,
                       })),
+                      marginRight: -90,
                       placeholder: dataCompany.find(
                         (item) =>
                           item.id_master_company ===
@@ -361,6 +356,8 @@ const AddNew = ({ navigation, title }) => {
                         label: sector.name,
                         value: sector.id_master_sectors,
                       })),
+                      marginRight: -90,
+
                       placeholder: dataSector.find(
                         (item) =>
                           item.id_master_sectors ===
@@ -398,6 +395,7 @@ const AddNew = ({ navigation, title }) => {
                         borderColor: "#88888D",
                         marginHorizontal: 10,
                         height: 45,
+                        marginBottom: 10,
                       },
                     }}
                     buttonStyle={{
@@ -411,6 +409,9 @@ const AddNew = ({ navigation, title }) => {
                         </Text>;
                       }
                     : null}
+                  <View style={{ marginHorizontal: 5 }}>
+                    <Text style={{ color: "white" }}></Text>
+                  </View>
                 </View>
                 <View
                   style={{
@@ -451,6 +452,7 @@ const AddNew = ({ navigation, title }) => {
                           label: machine.machine_id,
                           value: machine.master_machine_id,
                         })),
+                      marginRight: -90,
                       placeholder: dataMachine.find(
                         (item) =>
                           item.master_machine_id ===
@@ -488,6 +490,7 @@ const AddNew = ({ navigation, title }) => {
                           item.id_master_machine_types ===
                           formik.values.id_master_machine_types
                       )?.name,
+                      marginRight: -90,
                       onChange: (item) => {
                         setIsFocus(false);
                         formik.setFieldValue(
@@ -526,6 +529,7 @@ const AddNew = ({ navigation, title }) => {
                           label: mainActivity.name,
                           value: mainActivity.id_master_main_activities,
                         })),
+                      marginRight: -90,
                       placeholder: dataMainActivity.find(
                         (item) =>
                           item.id_master_main_activities ===
@@ -629,6 +633,7 @@ const AddNew = ({ navigation, title }) => {
                             borderColor: "#88888D",
                             marginHorizontal: 10,
                             height: 45,
+                            keyboardType: "numeric",
                           },
                         }}
                         buttonStyle={{
@@ -636,6 +641,17 @@ const AddNew = ({ navigation, title }) => {
                         }}
                       />
                       {/* <Label title="Mohon masukkan HM tidak lebih dari 24" /> */}
+
+                      <View style={[styles.Label, { marginBottom: 5 }]}>
+                        <Text
+                          style={[
+                            styles.Abu,
+                            { fontStyle: "italic", alignItems: "flex-end" },
+                          ]}
+                        >
+                          * Masukkan HM tidak lebih dari 24 jam
+                        </Text>
+                      </View>
                       {formik.values.current_hour_meter - hm > 24 ? (
                         <View style={[styles.Label]}>
                           <Text style={globalStyles.textError}>
@@ -646,29 +662,21 @@ const AddNew = ({ navigation, title }) => {
                       {formik.values.current_hour_meter < hm ? (
                         <View style={[styles.Label]}>
                           <Text style={globalStyles.textError}>
-                            HM tidak boleh lebih dari 24 jam
+                            HM tidak boleh kurang dari HM sebelumnya
                           </Text>
                         </View>
                       ) : null}
-                      <View style={[styles.Label]}>
-                        <Text
-                          style={[
-                            styles.Abu,
-                            { fontStyle: "italic", alignItems: "flex-end" },
-                          ]}
-                        >
-                          * Masukkan HM tidak lebih dari 24 jam
-                        </Text>
-                      </View>
-                      {formik.errors.current_hour_meter ? (
-                        <Text style={globalStyles.textError}>
-                          {formik.errors.current_hour_meter}
-                        </Text>
+                      {formik.values.current_hour_meter - hm <= 5 ? (
+                        <View style={[styles.Label]}>
+                          <Text style={globalStyles.textWarning}>
+                            Silahkan Masukkan Justifikasi
+                          </Text>
+                        </View>
                       ) : null}
                     </>
                   ) : null}
                   <InputData
-                    Title="Refueling Oil"
+                    Title="Refueling"
                     onChangeText={formik.handleChange("oil")}
                     item={{
                       placeholder: "100(Litre)",
@@ -691,53 +699,8 @@ const AddNew = ({ navigation, title }) => {
                         { fontStyle: "italic", alignItems: "flex-end" },
                       ]}
                     >
-                      * Input hanya angka saja
+                      {/* * Input hanya angka saja */}
                     </Text>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      flexDirection: "row",
-                      marginHorizontal: 5,
-                      marginVertical: 3,
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.container,
-                        { justifyContent: "center", flex: 1 },
-                      ]}
-                    >
-                      <Text style={{ opacity: 0.4 }}>Computer HM ? </Text>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        marginHorizontal: 10,
-                        justifyContent: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          justifyContent: "center",
-                          alignItems: "center",
-                          flexDirection: "row ",
-                          alignContent: "center",
-                          marginVertical: 2,
-                        }}
-                      >
-                        <Switch
-                          trackColor={{ false: "#FB9797", true: "#CAE6CA" }}
-                          // tumbColor={isEnable ? "red" : "green"}
-                          onValueChange={toggleSwitch}
-                          value={isEnable}
-                        />
-                        <Text style={{ color: "#AFAFAF" }}>
-                          {isEnable ? "on" : "off"}
-                        </Text>
-                      </View>
-                    </View>
                   </View>
                 </View>
                 <View
@@ -812,13 +775,7 @@ const AddNew = ({ navigation, title }) => {
                   </View>
                 </View>
               </View>
-              {formik.values.current_hour_meter !== formik.values.current_hour_meter ? (
-                <View style={styles.Label}>
-                  <Text style={globalStyles.textError}>
-                    Silahkan Masukkan Justifikasi
-                  </Text>
-                </View>
-              ) : null}
+
               <View
                 style={{
                   flex: 1,
@@ -835,7 +792,23 @@ const AddNew = ({ navigation, title }) => {
                     textcolor: "#FFFFFF",
                     width: "100%",
                     justifyContent: "center",
-                    onPress: () => formik.handleSubmit(),
+                    // onPress: () => formik.handleSubmit(),
+                    onPress: () =>
+                      Alert.alert(
+                        "Confirm Submission",
+                        "Are you sure you want to Submit this Activity?",
+                        [
+                          {
+                            text: "Cancel",
+                            style: "cancel",
+                          },
+                          {
+                            text: "Submit",
+                            onPress: () => formik.handleSubmit(),
+                          },
+                        ],
+                        { cancelable: false }
+                      ),
                   }}
                 />
               </View>
@@ -1053,5 +1026,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     padding: 10,
+  },
+  textWarning: {
+    color: "Yellow",
+    fontSize: 12,
   },
 });
