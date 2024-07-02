@@ -38,10 +38,14 @@ import { database } from "../../assets/Model/db";
 import Toast from "react-native-toast-message";
 import { globalStyles } from "../../styles";
 import { useRoute } from "@react-navigation/native";
+import { json } from "@nozbe/watermelondb/decorators";
 
 const Edit = ({ navigation }) => {
   const route = useRoute();
   const masterLog = route.params.masterLog;
+  // console.log(json)
+  console.log(JSON.stringify(masterLog, null, 2));
+
   const [showAlert, setShowAlert] = useState(false);
 
   const handleCancel = () => {
@@ -307,12 +311,13 @@ const Edit = ({ navigation }) => {
                 </Pressable>
               </View>
               <DropdownComp
-                title="Company"
+                title="Contractor"
                 item={{
                   values: dataCompany.map((company) => ({
                     label: company.name,
                     value: company.id_master_company,
                   })),
+                  marginRight: -100,
                   value: formik.values.id_master_company,
                   placeholder: dataCompany.find(
                     (item) =>
@@ -345,6 +350,7 @@ const Edit = ({ navigation }) => {
                     label: sector.name,
                     value: sector.id_master_sectors,
                   })),
+                  marginRight: -100,
                   value: formik.values.id_master_sector,
                   placeholder: dataSector.find(
                     (item) =>
@@ -428,6 +434,7 @@ const Edit = ({ navigation }) => {
                       label: machine.machine_id,
                       value: machine.master_machine_id,
                     })),
+                  marginRight: -90,
                   value: formik.values.master_machine_id,
                   placeholder: dataMachine.find(
                     (item) =>
@@ -485,6 +492,7 @@ const Edit = ({ navigation }) => {
                     label: type.name,
                     value: type.id_master_machine_types,
                   })),
+                  marginRight: -90,
                   placeholder: dataMachineType.find(
                     (item) =>
                       item.id_master_machine_types ===
@@ -527,6 +535,7 @@ const Edit = ({ navigation }) => {
                       label: mainActivity.name,
                       value: mainActivity.id_master_main_activities,
                     })),
+                  marginRight: -90,
                   value: formik.values.id_master_main_activities,
                   placeholder: dataMainActivity.find(
                     (item) =>
@@ -595,7 +604,7 @@ const Edit = ({ navigation }) => {
                             backgroundColor: "white",
                             justifyContent: "center",
                             alignItems: "flex-end",
-                            marginRight: 20,
+                            marginRight: 10,
                           },
                         ]}
                       >
@@ -619,6 +628,7 @@ const Edit = ({ navigation }) => {
                         height: 45,
                       },
                     }}
+                    keyboardType="numeric"
                     buttonStyle={{
                       borderColor: "#DDDDDD",
                     }}
@@ -653,6 +663,7 @@ const Edit = ({ navigation }) => {
                     marginBottom: 10,
                   },
                 }}
+                keyboardType="numeric"
                 buttonStyle={{
                   borderColor: "#DDDDDD",
                 }}

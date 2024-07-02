@@ -38,16 +38,30 @@ const Home = ({ navigation }) => {
   // console.log("isLoading", isLoading);
   const [showAlert, setShowAlert] = useState(false);
 
+  const handlePress = () => {
+    navigation.navigate("Splash"); // Navigate to 'Splash' screen
+    navigation.navigate("Splash"); // Navigate to 'Splash' screen again
+  };
+
   const handleCancel = () => {
     setShowAlert(false);
   };
 
   const handleSubmit = (item) => {
+    try {
+      setShowAlert(false);
+      navigation.navigate("Edit", {
+        masterLog: item,
+      });
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  const handleDelete = (item) => {
     setShowAlert(false);
     // navigation.navigate("Edit");
-    navigation.navigate("Edit", {
-      masterLog: item,
-    });
+    deleteAllRecords;
   };
 
   const handleLogout = async () => {
@@ -71,9 +85,9 @@ const Home = ({ navigation }) => {
           // navigation.replace("Home");
           // console.log("Log deleted", database);
           Toast.show({
-            visibilityTime: 100,
+            visibilityTime: 5000,
             type: "success",
-            text1: "Yeay, Berhasil!",
+            text1: "Berhasil!",
             text2: "Data Log Activity Berhasil Dihapus",
           });
         } else {
@@ -183,35 +197,35 @@ const Home = ({ navigation }) => {
   //   }
   // };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
-  const fetchData = async () => {
-    try {
-      const response = await API.get("export_data"); // Replace with your backend URL
-      const data = await response.json();
-      setExportedData(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  const shareViaWhatsApp = () => {
-    try {
-      if (exportedData) {
-        const message = `Check out the exported data: ${exportedData.message}`;
-        const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(
-          message
-        )}`;
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await API.get("export_data"); // Replace with your backend URL
+  //     const data = await response.json();
+  //     setExportedData(data);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+  // const shareViaWhatsApp = () => {
+  //   try {
+  //     if (exportedData) {
+  //       const message = `Check out the exported data: ${exportedData.message}`;
+  //       const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(
+  //         message
+  //       )}`;
 
-        Linking.openURL(whatsappUrl)
-          .then(() => console.log("Message sent to WhatsApp"))
-          .catch((error) => console.error("Error opening WhatsApp:", error));
-      }
-    } catch (error) {
-      console.error("Error sharing via WhatsApp:", error);
-    }
-  };
+  //       Linking.openURL(whatsappUrl)
+  //         .then(() => console.log("Message sent to WhatsApp"))
+  //         .catch((error) => console.error("Error opening WhatsApp:", error));
+  //     }
+  //   } catch (error) {
+  //     console.error("Error sharing via WhatsApp:", error);
+  //   }
+  // };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
@@ -295,22 +309,14 @@ const Home = ({ navigation }) => {
                       backgroundcolor: "#DEEBFF",
                       borderRadius: 20,
                       alginSelf: "center",
-                      onPress: () => navigation.navigate("Splash"),
+                      // onPress: () => navigation.navigate("Splash"),
+                      onPress: () => handlePress(),
                     }}
+                    // onPress={handlePress}
                   />
                 </View>
               </View>
             </View>
-            {/* <TouchableOpacity onPress={exportData}> */}
-            {exportedData ? null : (
-              <TouchableOpacity onPress={shareViaWhatsApp}>
-                <AutoHeightImage
-                  source={Export_Biru}
-                  width={30}
-                  style={{ marginTop: 10, marginBottom: 10 }}
-                />
-              </TouchableOpacity>
-            )}
           </View>
           {isLoading ? (
             <>
@@ -369,12 +375,10 @@ const Home = ({ navigation }) => {
                             }}
                           />
                           <TouchableOpacity
-                            // onPress={onDelete}
-                            // onPress={() => deleteAllRecords(item.id)}
                             onPress={() => {
                               Alert.alert(
-                                "Confirm Deletion",
-                                "Are you sure you want to delete This records?",
+                                "Delete Confirmation",
+                                `Are you sure you want to delete ${item.delete}?`,
                                 [
                                   {
                                     text: "Cancel",
@@ -383,9 +387,10 @@ const Home = ({ navigation }) => {
                                   {
                                     text: "Delete",
                                     onPress: () => deleteAllRecords(item.id),
+                                    style: "destructive",
                                   },
                                 ],
-                                { cancelable: false }
+                                { cancelable: true }
                               );
                             }}
                             style={{
@@ -476,35 +481,45 @@ const Home = ({ navigation }) => {
                             justifyContent: "center",
                           }}
                         >
-                          {/* {dayjs(item.created_at)
+                          {dayjs(item.created_at)
                             .locale("id")
                             .format("DD/MMM/YYYY") <=
                           dayjs(today)
                             .subtract(2, "days")
-                            .format("DD/MMM/YYYY") ? ( */}
-                          <Button
-                            buttonStyle={{ borderRadius: 20 }}
-                            item={{
-                              title: "Edit",
-                              textcolor: "#007AFF",
-                              backgroundcolor: "#D6E8FD",
-                              alginSelf: "center",
-                              // onPress: () =>
-                              //   navigation.navigate("Edit", {
-                              //     masterLog: item,
-                              //   }),
-                              onPress: () => setShowAlert(true),
-                            }}
-                        />
-                          <CustomAlert
-                            visible={showAlert}
-                            message="Are you sure you want to submit the form?"
-                            onCancel={handleCancel}
-                            onConfirm={() => handleSubmit(item)}
-                          />
-                          {/* ) : null} */}
+                            .format("DD/MMM/YYYY") ? (
+                            <Button
+                              buttonStyle={{ borderRadius: 20 }}
+                              item={{
+                                title: "Edit",
+                                textcolor: "#007AFF",
+                                backgroundcolor: "#D6E8FD",
+                                alginSelf: "center",
+                                // onPress: () =>
+                                //   navigation.navigate("Edit", {
+                                //     masterLog: item,
+                                //   }),
+                                onPress: () => setShowAlert(true, item),
+                              }}
+                            />
+                          ) : null}
                         </View>
                       </View>
+                      <CustomAlert
+                        visible={showAlert}
+                        message={
+                          item.delete
+                            ? "Are you sure you want to DELETE the data?"
+                            : "Are you sure you want to submit the form?"
+                        }
+                        onCancel={handleCancel}
+                        onConfirm={() => handleSubmit(item)}
+                      />
+                      {/* <CustomAlert
+                        visible={showAlert}
+                        message="Are you sure you want to DELETE the data?"
+                        onCancel={handleCancel}
+                        onConfirm={() => handleDelete(item)}
+                      /> */}
                     </View>
                   ))}
               </View>

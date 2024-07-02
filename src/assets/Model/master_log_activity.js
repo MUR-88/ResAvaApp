@@ -56,5 +56,7 @@ export default class MasterLogActivity extends Model {
   @field('deleted_at') deletedAt
   @field('updated_at') updatedAt
   @relation('machines', 'machine_id') machine;
+  // @lazy @field('machine', 'id_master_machine') machine;
+  // @relation('master_machine', 'id_master_machine') @lazy machine;
   // @immutableRelation("master_company", "master_company_id") masterCompany; // Add this line
 }

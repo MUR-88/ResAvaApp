@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar } from "react-native";
 
-const CustomAlert = ({ visible, message, onCancel, onConfirm }) => {
+const CustomAlert = ({ visible, message, onCancel, onConfirm, item }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       {/* <StatusBar style="light" /> */}
@@ -23,7 +23,7 @@ const CustomAlert = ({ visible, message, onCancel, onConfirm }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.button, { backgroundColor: "#8296FF" }]}
-                onPress={() => onConfirm()}
+                onPress={() => onConfirm(item, {masterlog: item})}
               >
                 <Text style={[styles.buttonText, { color: "#FFFFFF" }]}>
                   Submit

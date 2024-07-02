@@ -7,12 +7,13 @@ const index = ({ title, item }) => {
 
   return (
     <View style={[styles.Top, item.Dropdown]}>
-      <View style={[styles.container]}>
+      <View style={[styles.container, item.container]}>
         <Text style={styles.Abu}>{title} </Text>
       </View>
       <View style={[styles.container1, { marginRight: item.marginRight }]}>
         <Dropdown
           style={[styles.dropdown]}
+          containerStyle={item.containerStyle}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           iconStyle={styles.iconStyle}
@@ -37,16 +38,15 @@ const index = ({ title, item }) => {
 export default index;
 
 const styles = StyleSheet.create({
+  container2: {
+    // width: "100%",
+  },
   Top: {
     flexDirection: "row",
     flex: 1,
     backgroundColor: "white",
-    // borderWidth: 0.4,
-    // borderColor: "#88888D",
     borderRadius: 10,
     height: 45,
-    // marginLeft: 10,
-    // marginRight: 10,
     marginTop: 10,
     marginBottom: 5,
   },
@@ -56,7 +56,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 8,
     justifyContent: "center",
-    // backgroundColor: "white",
     borderRadius: 8,
     flex: 1,
   },
@@ -66,26 +65,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 8,
     justifyContent: "center",
-    // backgroundColor: "white",
     borderRadius: 8,
     flex: 1,
-    marginRight:-70
+    // marginRight:-200
+    // width: "100%",
   },
   dropdown: {
     height: 40,
-    // borderWidth: 0.5,
-    // backgroundColor: "white",
     opacity: 0.4,
     borderRadius: 8,
     paddingHorizontal: 8,
   },
   placeholderStyle: {
     fontSize: 16,
-    color: 'black'
+    color: "black",
   },
   selectedTextStyle: {
     fontSize: 16,
-    color: 'black'
+    color: "black",
   },
   iconStyle: {
     width: 20,

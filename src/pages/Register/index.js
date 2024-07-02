@@ -211,7 +211,7 @@ const Register = ({ navigation }) => {
                     label: company.name,
                     value: company.id_master_company,
                   })),
-                  marginRight:-100,
+                  marginRight: -100,
                   placeholder: dataCompany.find(
                     (item) =>
                       item.id_master_company === formik.values.id_master_company
@@ -226,6 +226,10 @@ const Register = ({ navigation }) => {
                     // borderColor: "#88888D",
                     marginHorizontal: 10,
                     marginVertical: 10,
+                  },
+                  containerStyle: {
+                    marginRight: 100,
+                    marginLeft: -100,
                   },
                 }}
               />
@@ -283,6 +287,7 @@ const Register = ({ navigation }) => {
                     height: 45,
                   },
                 }}
+                keyboardType="numeric"
               />
               {formik.errors.class
                 ? () => {
@@ -318,6 +323,7 @@ const Register = ({ navigation }) => {
                     label: type.name,
                     value: type.id_master_machine_types,
                   })),
+                  marginRight: -100,
                   placeholder: dataMachineType.find(
                     (item) =>
                       item.id_master_machine_types ===
@@ -331,6 +337,10 @@ const Register = ({ navigation }) => {
                   Dropdown: {
                     marginHorizontal: 10,
                     marginVertical: 10,
+                  },
+                  containerStyle: {
+                    marginRight: 100,
+                    marginLeft: -100,
                   },
                 }}
               />
@@ -355,6 +365,7 @@ const Register = ({ navigation }) => {
                       label: mainActivity.name,
                       value: mainActivity.id_master_main_activities,
                     })),
+                  marginRight: -100,
                   placeholder: dataMainActivity.find(
                     (item) =>
                       item.id_master_main_activities ===
@@ -371,6 +382,10 @@ const Register = ({ navigation }) => {
                   Dropdown: {
                     marginHorizontal: 10,
                     marginVertical: 10,
+                  },
+                  containerStyle: {
+                    marginRight: 100,
+                    marginLeft: -100,
                   },
                 }}
               />
@@ -393,6 +408,7 @@ const Register = ({ navigation }) => {
                     height: 45,
                   },
                 }}
+                keyboardType="numeric"
               />
               {formik.errors.current_hour_meter
                 ? () => {

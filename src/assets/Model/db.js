@@ -10,6 +10,7 @@ import MasterMachine from "./master_machine";
 import MasterMachineType from "./master_machine_types";
 import MasterMainActivities from "./master_main_activity";
 import Migration from "../Migration";
+import User from "./user";
 
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
 
@@ -30,6 +31,7 @@ export const database = new Database({
     MasterMachine,
     MasterMachineType,
     MasterMainActivities,
+    // User,
   ],
   actionsEnabled: true,
 });
