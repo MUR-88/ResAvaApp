@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
   Top: {
     flexDirection: "row",
     flex: 1,
-    backgroundColor: "white",
     borderRadius: 10,
     height: 45,
     marginTop: 10,

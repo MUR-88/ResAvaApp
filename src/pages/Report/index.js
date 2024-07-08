@@ -14,7 +14,6 @@ import { Formik, useFormik } from "formik";
 import { database } from "../../assets/Model/db";
 import Toast from "react-native-toast-message";
 import MasterLogActivity from "../../assets/Model/master_log_activity";
-import { Dropdown } from "react-native-element-dropdown";
 import dayjs from "dayjs";
 import {
   useMasterSector,
@@ -29,59 +28,75 @@ import Clipboard from "@react-native-clipboard/clipboard";
 const Report = ({ navigation }) => {
   const [isFocus, setIsFocus] = React.useState(false);
 
-  const copyToClipboard = () => {
+  const copyToClipboard = (selectedCompanyId) => {
+    console.log("selectedCompanyId", selectedCompanyId);
     let clipboardContent = "";
+    try {
+      if (selectedCompanyId != null) {
+        clipboardContent += `Tanggal : ${dayjs()
+          .subtract(1, "day")
+          .format("DD/MMM/")} - ${dayjs().format("DD/MMM")}\n`;
+        clipboardContent += `Contractor : ${
+          dataCompany.find(
+            (company) => company.id_master_company === selectedCompanyId
+          )?.name || ""
+        }\n\n\n`;
 
-    // Loop through dataMasterLog to construct clipboardContent
-    // {dayjs().subtract(1, "day").format("DD/MMM/")} -{" "}
-    //           {dayjs().format("DD/MMM")}
-    clipboardContent += `Tanggal : ${dayjs()
-      .subtract(1, "day")
-      .format("DD/MMM/")} - ${dayjs().format("DD/MMM")}\n`;
-    clipboardContent += `Contractor : ${
-      dataCompany.find(
-        (company) =>
-          company.id_master_company === formik.values.id_master_company
-      )?.name
-    }\n\n\n`;
+        dataMasterLog
+          .filter((item) => item.master_company_id === selectedCompanyId)
+          .forEach((item, index) => {
+            clipboardContent += `No: ${index + 1}\n`;
+            clipboardContent += `Contractor: ${
+              dataCompany.find(
+                (company) =>
+                  company.id_master_company === item.master_company_id
+              )?.name || ""
+            }\n`;
+            clipboardContent += `Activity: ${
+              dataMainActivity.find(
+                (activity) =>
+                  activity.id_master_main_activities ===
+                  item.master_main_activity_id
+              )?.name || ""
+            }\n`;
+            clipboardContent += `Id Unit: ${
+              dataMachine.find(
+                (machine) =>
+                  machine.master_machine_id === item.master_machine_id
+              )?.machine_id || ""
+            }\n`;
+            clipboardContent += `Sector: ${
+              dataSector.find(
+                (sector) => sector.id_master_sectors === item.master_sector_id
+              )?.name || ""
+            }\n`;
+            clipboardContent += `Compartement: ${item.compartement_id}\n`;
+            clipboardContent += `Hour Meter: ${
+              dataMasterLog.length > 0
+                ? Math.abs(
+                    dataMasterLog[dataMasterLog.length - 1].current_hour_meter -
+                      item.current_hour_meter
+                  )
+                : "No previous hour meter available"
+            }\n`;
+            clipboardContent += `Working Hour: ${item.working_hour}\n`;
+            clipboardContent += `Remark: ${item.keterangan}\n`;
+            clipboardContent += `Create: ${dayjs(item.date)
+              .locale("id")
+              .format(" DD/MM/YYYY ")}\n\n`;
+          });
+      } else {
+        alert("Please select a company");
+        return;
+      }
 
-    dataMasterLog.map((item, index) => {
-      clipboardContent += `No: ${index + 1}\n`;
-      clipboardContent += `Contractor: ${
-        dataCompany.find(
-          (company) => company.id_master_company === item.master_company_id
-        )?.name
-      }\n`;
-      clipboardContent += `Id Unit: ${
-        dataMachine.find(
-          (machine) => machine.master_machine_id === item.master_machine_id
-        )?.machine_id
-      }\n`;
-      clipboardContent += `Sector: ${
-        dataSector.find(
-          (sector) => sector.id_master_sectors === item.master_sector_id
-        )?.name || ""
-      }\n`;
-      clipboardContent += `Compartement: ${item.compartement_id}\n`;
-      clipboardContent += `Hour Meter: ${
-        dataMasterLog.length >= 0
-          ? Math.abs(
-              dataMasterLog[dataMasterLog.length - 1].current_hour_meter -
-                item.current_hour_meter
-            )
-          : "No previous hour meter available"
-      }\n`;
-      clipboardContent += `Working Hour: ${item.compartement_id}\n`;
-      clipboardContent += `Remark: ${item.keterangan}\n`;
-      clipboardContent += `Create: ${dayjs(item.date)
-        .locale("id")
-        .format(" DD/MM/YYYY ")}\n\n`;
-    });
-
-    // Copy clipboardContent to clipboard
-    Clipboard.setString(clipboardContent);
-    alert("Data copied to clipboard!");
-    console.log("clipboardContent", clipboardContent);
+      // Copy clipboardContent to clipboard
+      Clipboard.setString(clipboardContent);
+      alert("Data copied to clipboard!");
+      console.log("clipboardContent", clipboardContent);
+    } catch (error) {
+      console.error("Error copying data:", error);
+    }
   };
 
   const today = new Date();
@@ -201,7 +216,7 @@ const Report = ({ navigation }) => {
                 marginRight: 30,
               }}
             >
-              <Button
+              {/* <Button
                 buttonStyle={{
                   borderRadius: 20,
                 }}
@@ -217,22 +232,10 @@ const Report = ({ navigation }) => {
                   borderRadius: 20,
                   onPress: () => copyToClipboard(),
                 }}
-              />
+              /> */}
             </View>
-            {/* <TouchableOpacity
-              onPress={copyToClipboard}
-              style={{
-                padding: 10,
-                backgroundColor: "blue",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ color: "white", fontSize: 16 }}>Copy Data</Text>
-            </TouchableOpacity> */}
           </View>
           <View style={{ flex: 1, marginLeft: 30, flexDirection: "row" }}>
-            {/* <Text style={[styles.Judul1]}>Contractor : </Text> */}
-            {/* <View style={{width:100}}> */}
             <DropdownComp
               title="Contractor :"
               item={{
@@ -248,10 +251,9 @@ const Report = ({ navigation }) => {
                 onChange: (item) => {
                   setIsFocus(false);
                   formik.setFieldValue("id_master_company", item.value);
-                  // console.log(item);
+                  copyToClipboard(item.value); // Call copyToClipboard with selected company ID
                 },
                 Dropdown: {
-                  backgroundColor: "rgba(242, 242, 242, 0.5)",
                   marginLeft: -10,
                   marginTop: -10,
                 },
@@ -260,7 +262,7 @@ const Report = ({ navigation }) => {
                   marginHorizontal: -10,
                 },
                 containerStyle: {
-                  marginRight:15,
+                  marginRight: 15,
                   marginLeft: -100,
                 },
               }}
@@ -301,7 +303,7 @@ const Report = ({ navigation }) => {
                       color: "#3C3C43",
                       marginVertical: 5,
                       marginLeft: 5,
-                      opacity: 0.6,
+                      // opacity: 0.6,
                       flex: 1,
                     }}
                   >
@@ -312,7 +314,7 @@ const Report = ({ navigation }) => {
                     <Text style={[styles.IsiText2]}>Id Unit</Text>
                     <Text style={[styles.IsiText2]}>Compartement</Text>
                     <Text style={[styles.IsiText2]}>Activity</Text>
-                    <Text style={[styles.IsiText2]}>Last HM</Text>
+                    <Text style={[styles.IsiText2]}>HM</Text>
                     <Text style={[styles.IsiText2]}>Working Hours</Text>
                     <Text style={[styles.IsiText2]}>Remarks</Text>
                     <Text style={[styles.IsiText2]}>Sector</Text>
@@ -486,7 +488,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderColor: "#8888D",
     alignItems: "center",
-    opacity: 0.4,
+    // opacity: 0.4,
   },
   IsiText2: {
     flex: 1,

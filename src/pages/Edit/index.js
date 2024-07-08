@@ -633,17 +633,32 @@ const Edit = ({ navigation }) => {
                       borderColor: "#DDDDDD",
                     }}
                   />
+                  {formik.values.current_hour_meter < hm ? (
+                    <View style={[styles.Label, { marginBottom: 5 }]}>
+                      <Text style={globalStyles.textError}>
+                        HM tidak boleh kurang dari HM terakhir
+                      </Text>
+                    </View>
+                  ) : null}
+                  {formik.values.current_hour_meter - hm > 0 &&
+                  formik.values.current_hour_meter - hm < 5 ? (
+                    <View style={[styles.Label, { marginBottom: 5 }]}>
+                      <Text style={globalStyles.textError}>
+                        Masukkan Justifikasi
+                      </Text>
+                    </View>
+                  ) : null}
                   {formik.values.current_hour_meter - hm > 24 ? (
-                    <View style={[styles.Label]}>
+                    <View style={[styles.Label, { marginBottom: 5 }]}>
                       <Text style={globalStyles.textError}>
                         HM tidak boleh lebih dari 24 jam
                       </Text>
                     </View>
                   ) : null}
-                  {formik.values.current_hour_meter < hm ? (
-                    <View style={[styles.Label]}>
+                  {formik.values.current_hour_meter == hm ? (
+                    <View style={[styles.Label, { marginBottom: 5 }]}>
                       <Text style={globalStyles.textError}>
-                        HM tidak boleh kurang dari HM sebelumnya
+                        Masukkan Justifikasi
                       </Text>
                     </View>
                   ) : null}
@@ -679,35 +694,47 @@ const Edit = ({ navigation }) => {
               flex: 1,
             }}
           >
-            <View style={[styles.atas, { borderRadius: 10 }]}>
-              <View
-                style={[styles.containerInput, { backgroundColor: "#D8D8D8" }]}
-              >
-                <Input
-                  Title="Ketrangan"
-                  onChangeText={formik.handleChange("keterangan")}
-                  item={{
-                    placeholder: "Ex : Under Maintanance",
-                    values: formik.values.keterangan.toString(),
-                    Input: {
-                      borderWidth: 0.5,
-                      borderColor: "#88888D",
-                      marginHorizontal: 10,
-                      height: 45,
-                    },
-                  }}
-                  buttonStyle={{
-                    borderColor: "#DDDDDD",
-                  }}
-                  // item={{
-                  //   label: "Keterangan",
-                  //   placeholder: "Maintainance to Workshop for Repairment",
-                  //   value: formik.values.keterangan,
-                  //   backgroundColor: "red",
-                  // }}
-                  // value={formik.values.keterangan}
-                  // input={{ backgroundColor: "black" }}
-                />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                borderRadius: 20,
+                flex: 1,
+              }}
+            >
+              <View style={[styles.atas, { borderRadius: 10 }]}>
+                <View
+                  style={[
+                    styles.containerInput,
+                    { backgroundColor: "#D8D8D8" },
+                  ]}
+                >
+                  <Input
+                    Title="Ketrangan"
+                    onChangeText={formik.handleChange("keterangan")}
+                    item={{
+                      placeholder: "Ex : Under Maintanance",
+                      values: formik.values.keterangan.toString(),
+                      Input: {
+                        borderWidth: 0.5,
+                        borderColor: "#88888D",
+                        marginHorizontal: 10,
+                        height: 45,
+                      },
+                    }}
+                    buttonStyle={{
+                      borderColor: "#DDDDDD",
+                    }}
+                    // item={{
+                    //   label: "Keterangan",
+                    //   placeholder: "Maintainance to Workshop for Repairment",
+                    //   value: formik.values.keterangan,
+                    //   backgroundColor: "red",
+                    // }}
+                    // value={formik.values.keterangan}
+                    // input={{ backgroundColor: "black" }}
+                  />
+                </View>
               </View>
             </View>
           </View>

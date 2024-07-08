@@ -34,7 +34,15 @@ const Login = ({ navigation }) => {
       try {
         setIsLoading(true);
         const response = await API.post("login", values);
+        console.log("response", response);
+        // await Promise.all([
+        //   AsyncStorage.setItem("token", response.token.plainTextToken),
+        //   AsyncStorage.setItem("user_id", response.user.id),
+        //   AsyncStorage.setItem("name", response.user.name)
+        // ]);
         await AsyncStorage.setItem("token", response.token.plainTextToken);
+        // await AsyncStorage.setItem("user_id", response.user.id.toString());
+        // await AsyncStorage.setItem("name", response.user.name);
         API.setToken(response.token.plainTextToken);
         setIsLoading(false);
         navigation.replace("Mytabs");

@@ -31,12 +31,20 @@ import {
   useLoadingStore,
 } from "../../hooks";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { json } from "@nozbe/watermelondb/decorators";
 
 const Home = ({ navigation }) => {
   const { isLoading } = useLoadingStore();
   const [exportedData, setExportedData] = useState(null);
   // console.log("isLoading", isLoading);
   const [showAlert, setShowAlert] = useState(false);
+
+  const Api = AsyncStorage.getItem;
+  // console.log("Api", Api);
+  // console.log("Api", json
+  console.log("API", JSON.stringify(Api, null, 2));
+
 
   const handlePress = () => {
     navigation.navigate("Splash"); // Navigate to 'Splash' screen
@@ -59,9 +67,18 @@ const Home = ({ navigation }) => {
   };
 
   const handleDelete = (item) => {
-    setShowAlert(false);
-    // navigation.navigate("Edit");
-    deleteAllRecords;
+    try {
+      setShowAlert(false);
+      // navigation.navigate("Edit");
+      deleteAllRecords;
+    } catch (error) {
+      Toast.show({
+        visibilityTime: 5000,
+        type: "error",
+        text1: error.message,
+      });
+      console.error("Error deleting data:", error);
+    }
   };
 
   const handleLogout = async () => {
@@ -77,6 +94,7 @@ const Home = ({ navigation }) => {
   const deleteAllRecords = async (id) => {
     try {
       // Menghapus data
+      setShowAlert(false);
       await database.write(async () => {
         const log = await database.get("master_log_activities").find(id);
         if (log) {
@@ -226,6 +244,43 @@ const Home = ({ navigation }) => {
   //     console.error("Error sharing via WhatsApp:", error);
   //   }
   // };
+  const [itemBackgroundColors, setItemBackgroundColors] = useState([]);
+
+  useEffect(() => {
+    const today = new Date();
+    const updatedItemBackgroundColors = dataMasterLog.map((item) => ({
+      backgroundColor:
+        dayjs(item.date) >= dayjs(today.setDate(today.getDate() - 5))
+          ? "#6BBC3B"
+          : "#88888D",
+    }));
+    setItemBackgroundColors(updatedItemBackgroundColors);
+  }, [dataMasterLog]);
+
+  const getUserInfo = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("user_id");
+      const name = await AsyncStorage.getItem("name");
+
+      // Handle null or undefined values if necessary
+      return { userId, name };
+    } catch (error) {
+      console.error("Error retrieving user info:", error);
+      return { userId: null, name: null }; // or handle the error as needed
+    }
+  };
+
+  const fetchUserInfo = async () => {
+    const { userId, name } = await getUserInfo();
+    if (userId && name) {
+      console.log("User ID:", userId);
+      console.log("Name:", name);
+      // Use userId and name as needed
+    } else {
+      console.log("User info not found in AsyncStorage");
+      // Handle case where user info is not available
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
@@ -366,7 +421,8 @@ const Home = ({ navigation }) => {
                           <View
                             style={{
                               backgroundColor:
-                                item.isSync === true ? "#6BBC3B" : "#88888D",
+                                itemBackgroundColors[index]?.backgroundColor ||
+                                "#88888D",
                               width: 15,
                               justifyContent: "center",
                               borderRadius: 50,
@@ -376,22 +432,23 @@ const Home = ({ navigation }) => {
                           />
                           <TouchableOpacity
                             onPress={() => {
-                              Alert.alert(
-                                "Delete Confirmation",
-                                `Are you sure you want to delete ${item.delete}?`,
-                                [
-                                  {
-                                    text: "Cancel",
-                                    style: "cancel",
-                                  },
-                                  {
-                                    text: "Delete",
-                                    onPress: () => deleteAllRecords(item.id),
-                                    style: "destructive",
-                                  },
-                                ],
-                                { cancelable: true }
-                              );
+                              // setShowAlert(true);
+                              // Alert.alert(
+                              //   "Delete Confirmation",
+                              //   `Are you sure you want to delete ${item.delete}?`,
+                              //   [
+                              //     {
+                              //       text: "Cancel",
+                              //       style: "cancel",
+                              //     },
+                              //     {
+                              //       text: "Delete",
+                              //       onPress: () => deleteAllRecords(item.id),
+                              //       style: "destructive",
+                              //     },
+                              //   ],
+                              //   { cancelable: true }
+                              // );
                             }}
                             style={{
                               flex: 1,
@@ -494,11 +551,11 @@ const Home = ({ navigation }) => {
                                 textcolor: "#007AFF",
                                 backgroundcolor: "#D6E8FD",
                                 alginSelf: "center",
-                                // onPress: () =>
-                                //   navigation.navigate("Edit", {
-                                //     masterLog: item,
-                                //   }),
-                                onPress: () => setShowAlert(true, item),
+                                onPress: () =>
+                                  navigation.navigate("Edit", {
+                                    masterLog: item,
+                                  }),
+                                // onPress: () => setShowAlert(true, item),
                               }}
                             />
                           ) : null}
@@ -512,7 +569,7 @@ const Home = ({ navigation }) => {
                             : "Are you sure you want to submit the form?"
                         }
                         onCancel={handleCancel}
-                        onConfirm={() => handleSubmit(item)}
+                        onConfirm={() => deleteAllRecords(item)}
                       />
                       {/* <CustomAlert
                         visible={showAlert}

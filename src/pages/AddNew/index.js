@@ -100,63 +100,72 @@ const AddNew = ({ navigation, title }) => {
       id_master_main_activities: "",
       current_hour_meter: "",
       keterangan: "",
-      // id_master_log_activity: "",
       oil: "",
     },
     validationSchema: schema,
-
     onSubmit: async (values) => {
-      // if (dataMasterLog.created_at !== formik.values.date) {
       setLoading(true);
       try {
-        await database.write(async () => {
-          const masterLog = await database
-            .get(MasterLogActivity.table)
-            .create((item) => {
-              item.id_master_log_activity = dataMasterLog.length + 1;
-              item.master_sector_id = values.id_master_sectors;
-              item.master_company_id = values.id_master_company;
-              item.master_machine_id = values.master_machine_id;
-              item.compartement_id = values.compartement_id;
-              item.master_machine_types_id = values.id_master_machine_types;
-              item.master_main_activity_id = values.id_master_main_activities;
-              item.current_hour_meter = parseInt(values.current_hour_meter);
-              item.keterangan = values.keterangan;
-              item.oil = values.oil;
-              item.isSynced = false;
-              item.isConnected = false;
-              item.created_at = dayjs(values.date).unix() * 1000;
-              item.date = dayjs(values.date).unix() * 1000;
-            });
+        // Check if data with the same date already exists in dataMasterLog
+        const existingLog = dataMasterLog.find(
+          (log) =>
+            dayjs(log.created_at).format("YYYY-MM-DD") ===
+              dayjs(values.date).format("YYYY-MM-DD") &&
+            log.master_machine_id === formik.values.master_machine_id &&
+            log.master_machine_id === formik.values.master_machine_id
+        );
 
+        if (existingLog) {
           Toast.show({
             visibilityTime: 5000,
-            type: "success",
-            text1: "Yeay, Berhasil!",
-            text2: "Data Log Activity Berhasil Ditambahkan",
+            type: "error",
+            text1: "Data Sudah ada",
           });
+        } else {
+          await database.write(async () => {
+            const masterLog = await database
+              .get(MasterLogActivity.table)
+              .create((item) => {
+                item.id_master_log_activity = dataMasterLog.length + 1;
+                item.master_sector_id = values.id_master_sectors;
+                item.master_company_id = values.id_master_company;
+                item.master_machine_id = values.master_machine_id;
+                item.compartement_id = values.compartement_id;
+                item.master_machine_types_id = values.id_master_machine_types;
+                item.master_main_activity_id = values.id_master_main_activities;
+                item.current_hour_meter = parseInt(values.current_hour_meter);
+                item.keterangan = values.keterangan;
+                item.oil = values.oil;
+                item.isSynced = false;
+                item.isConnected = false;
+                item.created_at = dayjs(values.date).unix() * 1000;
+                item.date = dayjs(values.date).unix() * 1000;
+              });
 
-          navigation.replace("Mytabs");
-        });
+            Toast.show({
+              visibilityTime: 5000,
+              type: "success",
+              text1: "Yeay, Berhasil!",
+              text2: "Data Log Activity Berhasil Ditambahkan",
+            });
+
+            navigation.replace("Mytabs");
+          });
+        }
       } catch (error) {
         Toast.show({
           visibilityTime: 5000,
           type: "error",
           text1: error.message,
         });
+        // alert(error.message);
         console.log(error);
       } finally {
         setLoading(false);
       }
-      // } else {
-      //   Toast.show({
-      //     visibilityTime: 5000,
-      //     type: "error",
-      //     text1: "Data Sudah ada",
-      //   });
-      // }
     },
   });
+
   useEffect(() => {
     if (formik.values.master_machine_id) {
       // query data machine type  berdasarkan machine id
@@ -578,7 +587,6 @@ const AddNew = ({ navigation, title }) => {
                             selected.master_machine_types_id ===
                             formik.values.id_master_machine_types
                           );
-                          // console.log("Values", selected)
                         })
                         .map((mainActivity) => ({
                           label: mainActivity.name,
@@ -808,7 +816,7 @@ const AddNew = ({ navigation, title }) => {
                 <View style={[styles.atas, { borderRadius: 10 }]}>
                   <View
                     style={[
-                      styles.containerInput1,
+                      styles.containerInput,
                       { backgroundColor: "#D8D8D8" },
                     ]}
                   >
@@ -821,17 +829,21 @@ const AddNew = ({ navigation, title }) => {
                         Input: {
                           borderWidth: 0.5,
                           borderColor: "#88888D",
-                          marginHorizontal: 20,
+                          marginHorizontal: 10,
                           height: 45,
-                          width: "100%",
                         },
                       }}
                       buttonStyle={{
-                        // backgroundColor:"black",
-                        borderWidth: 0.5,
                         borderColor: "#DDDDDD",
-                        marginHorizontal: 20,
                       }}
+                      // item={{
+                      //   label: "Keterangan",
+                      //   placeholder: "Maintainance to Workshop for Repairment",
+                      //   value: formik.values.keterangan,
+                      //   backgroundColor: "red",
+                      // }}
+                      // value={formik.values.keterangan}
+                      // input={{ backgroundColor: "black" }}
                     />
                   </View>
                 </View>
@@ -847,7 +859,9 @@ const AddNew = ({ navigation, title }) => {
                 }}
               >
                 {formik.values.current_hour_meter - hm <= 24 &&
-                formik.values.current_hour_meter > hm &&
+                formik.values.current_hour_meter > hm ||
+                // formik.values.keterangan !== "" &&
+                formik.values.current_hour_meter >= hm &&
                 formik.values.keterangan !== "" ? (
                   <Button
                     item={{

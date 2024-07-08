@@ -40,6 +40,7 @@ import { globalStyles } from "../../styles";
 import MasterLogActivity from "../../assets/Model/master_log_activity";
 import dayjs from "dayjs";
 import MasterMachine from "../../assets/Model/master_machine";
+import { Dropdown } from "react-native-element-dropdown";
 const Register = ({ navigation }) => {
   const [isFocus, setIsFocus] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
@@ -176,34 +177,7 @@ const Register = ({ navigation }) => {
             >
               Details
             </Text>
-            {/* {dataMachine.map((item, index, array) => {
-              if (index === array.length - 1) {
-                console.log("item", item);
-              }
-            })} */}
             <View style={[styles.MechInfo]}>
-              {/* <DropdownComp
-                title="Contractor"
-                item={{
-                  values: dataCompany.map((company) => ({
-                    label: company.name,
-                    value: company.id_master_company,
-                  })),
-                  placeholder: dataCompany.find(
-                    (item) =>
-                      item.id_master_company === formik.values.id_master_company
-                  )?.name,
-                  onChange: (item) => {
-                    setIsFocus(false);
-                    formik.setFieldValue("id_master_company", item.value);
-                    // console.log(item);
-                  },
-                  Dropdown: {
-                    marginHorizontal: 10,
-                    marginVertical: 10,
-                  },
-                }}
-              /> */}
               <DropdownComp
                 title="Contractor"
                 item={{
@@ -222,14 +196,16 @@ const Register = ({ navigation }) => {
                     console.log(item);
                   },
                   Dropdown: {
-                    // borderWidth: 0.4,
-                    // borderColor: "#88888D",
                     marginHorizontal: 10,
                     marginVertical: 10,
                   },
                   containerStyle: {
                     marginRight: 100,
                     marginLeft: -100,
+                  },
+                  Dropdown: {
+                    backgroundColor: "white",
+                    marginHorizontal:10
                   },
                 }}
               />
@@ -315,7 +291,6 @@ const Register = ({ navigation }) => {
                     </Text>;
                   }
                 : null}
-
               <DropdownComp
                 title="Machine Type"
                 item={{
@@ -341,6 +316,11 @@ const Register = ({ navigation }) => {
                   containerStyle: {
                     marginRight: 100,
                     marginLeft: -100,
+                  },
+                  Dropdown: {
+                    backgroundColor: "white",
+                    marginHorizontal:10,
+                    borderRadius: 10
                   },
                 }}
               />
@@ -386,6 +366,10 @@ const Register = ({ navigation }) => {
                   containerStyle: {
                     marginRight: 100,
                     marginLeft: -100,
+                  },
+                  Dropdown: {
+                    backgroundColor: "white",
+                    marginHorizontal:10
                   },
                 }}
               />

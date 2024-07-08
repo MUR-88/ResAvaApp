@@ -9,7 +9,7 @@ import useLoadingStore from "./useLoadingStore";
 import Toast from "react-native-toast-message";
 
 export const useAllSync = ({ isGetData }) => {
-  // const . cari connected atau tidak
+
   // setelah itu useEffect untuk ambil data dari API jika connected, jika tidak ambil data dari WatermelonDB
   const [connected, setConnected] = useState(undefined);
 
@@ -31,12 +31,13 @@ export const useAllSync = ({ isGetData }) => {
         const urlParams = `last_pulled_at=${
           lastPulledAt ? lastPulledAt : ""
         }&schema_version=${schemaVersion}&migration=${encodeURIComponent(
-          JSON.stringify(migration)
+          // JSON.stringify(migration)
         )}`;
         const response = await API.get(`allSync?${urlParams}`);
-        //   console.log(JSON.stringify(response, null, 2));
+          console.log("test data", JSON.stringify(response, null, 2));
 
         // Check if the request was successful
+        
         if (response.status_code !== 200) {
           throw new Error(`Request failed with status ${response.status}`);
         }

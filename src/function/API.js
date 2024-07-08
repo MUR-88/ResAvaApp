@@ -1,5 +1,7 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 //Home IP
 // const API_URL = "http://192.168.80.219:8000/api/";
+
 
 //Url Prod
 // const API_URL = "https://resava.site/api/";
@@ -8,9 +10,8 @@
 const API_URL = "https://dev.resava.site/api/";
 
 
-// const API_URL = "http://192.168.120.219:8000/api/";
+// const API_URL = "http://192.168.233.219:8000/api/";
 // const API_URL = "http://192.168.100.78:8000/api/";
-
 
 
 // Main API                                                                       
@@ -26,21 +27,43 @@ class Api {
     }
   }
 
-  setToken(token) {
+  // setToken(token) {
+  //   this.token = token;
+  // }
+
+  // resetToken() {
+  //   this.token = null;
+  // }
+
+  // getToken() {
+  //   return this.token;
+  // }
+
+
+  async setToken(token) {
     this.token = token;
+    await AsyncStorage.setItem('token', token);
   }
 
-  resetToken() {
+  async resetToken() {
     this.token = null;
+    await AsyncStorage.removeItem('token');
   }
 
-  getToken() {
+  async getToken() {
+    if (!this.token) {
+      this.token = await AsyncStorage.getItem('token');
+    }
     return this.token;
   }
 
+  
   async request(path, options = {}) {
     const headers = new Headers();
-    headers.append("Authorization", `Bearer ${this.getToken()}`);
+    
+    const token = await this.getToken();
+    // headers.append("Authorization", `Bearer ${this.getToken()}`);
+    headers.append("Authorization", `Bearer ${token}`);
     headers.append("Accept", "application/json");
 
     if (!(options.body instanceof FormData)) {
