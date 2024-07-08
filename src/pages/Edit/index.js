@@ -219,17 +219,27 @@ const Edit = ({ navigation }) => {
   const [hm, setHm] = useState(0);
 
   useEffect(() => {
-    const hmArray = dataMasterLog
-      .filter(
-        (item) => item.master_machine_id === formik.values.master_machine_id
-      )
-      .map((item, index, array) =>
-        index === array.length - 1 ? item.current_hour_meter : null
-      );
+    // Filter dataMasterLog based on formik.values.master_machine_id
+    const filteredData = dataMasterLog.filter(
+      (item) => item.master_machine_id === formik.values.master_machine_id
+    );
 
-    setHm(hmArray.length > 0 ? hmArray[0] : 0);
+    // Initialize variable to hold the last current_hour_meter
+    let latestHm = 0;
+
+    // Check if filteredData has items
+    if (filteredData.length > 0) {
+      // Get the last item in filteredData
+      const lastItem = filteredData[filteredData.length - 1];
+      // Assign the current_hour_meter of the last item to latestHm
+      latestHm = lastItem.current_hour_meter;
+    }
+
+    // Update state with the latestHm
+    setHm(latestHm);
   }, [formik.values.master_machine_id, dataMasterLog]);
 
+  console.log("hm", hm);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
       <StatusBar style="light" />
@@ -747,16 +757,23 @@ const Edit = ({ navigation }) => {
               marginHorizontal: 20,
             }}
           >
-            <Button
-              item={{
-                title: "Submit",
-                backgroundcolor: "#8296FF",
-                textcolor: "#FFFFFF",
-                width: "100%",
-                justifyContent: "center",
-                onPress: () => setShowAlert(true),
-              }}
-            />
+           {formik.values.current_hour_meter - hm <= 24 &&
+                formik.values.current_hour_meter > hm ||
+                // formik.values.keterangan !== "" &&
+                formik.values.current_hour_meter >= hm &&
+                formik.values.keterangan !== "" ? (
+                  <Button
+                    item={{
+                      title: "Submit",
+                      backgroundcolor: "#8296FF",
+                      textcolor: "#FFFFFF",
+                      width: "100%",
+                      justifyContent: "center",
+                      // onPress: () => handleSubmit(),
+                      onPress: () => setShowAlert(true),
+                    }}
+                  />
+                ) : null}
             <CustomAlert
               visible={showAlert}
               message="Are you sure you want to submit the form?"

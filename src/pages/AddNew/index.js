@@ -109,7 +109,7 @@ const AddNew = ({ navigation, title }) => {
         // Check if data with the same date already exists in dataMasterLog
         const existingLog = dataMasterLog.find(
           (log) =>
-            dayjs(log.created_at).format("YYYY-MM-DD") ===
+            dayjs(log.date).format("YYYY-MM-DD") ===
               dayjs(values.date).format("YYYY-MM-DD") &&
             log.master_machine_id === formik.values.master_machine_id &&
             log.master_machine_id === formik.values.master_machine_id
@@ -268,7 +268,7 @@ const AddNew = ({ navigation, title }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  // console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log(JSON.stringify(dataMasterLog, null, 2));
   // console.log("data Log", dataMasterLog.length);
 
   return (
@@ -723,14 +723,14 @@ const AddNew = ({ navigation, title }) => {
                           </Text>
                         </View>
                       ) : null}
-                      {formik.values.current_hour_meter - hm > 24 ? (
+                      {formik.values.current_hour_meter - hm > 24 &&  hm === "" ? (
                         <View style={[styles.Label, { marginBottom: 5 }]}>
                           <Text style={globalStyles.textError}>
                             HM tidak boleh lebih dari 24 jam
                           </Text>
                         </View>
                       ) : null}
-                      {formik.values.current_hour_meter == hm ? (
+                      {formik.values.current_hour_meter == hm || hm === "" ? (
                         <View style={[styles.Label, { marginBottom: 5 }]}>
                           <Text style={globalStyles.textError}>
                             Masukkan Justifikasi
@@ -862,7 +862,7 @@ const AddNew = ({ navigation, title }) => {
                 formik.values.current_hour_meter > hm ||
                 // formik.values.keterangan !== "" &&
                 formik.values.current_hour_meter >= hm &&
-                formik.values.keterangan !== "" ? (
+                formik.values.keterangan !== ""|| formik.values.current_hour_meter === "" && hm === "" ? (
                   <Button
                     item={{
                       title: "Submit",

@@ -515,7 +515,7 @@ const Home = ({ navigation }) => {
                             </Text>
                             <Text style={[styles.IsiText3]}>
                               Create :{" "}
-                              {dayjs(item.date)
+                              {dayjs(item.created_at)
                                 .locale("id")
                                 .format(" DD/MM/YYYY ")}
                             </Text>
@@ -610,7 +610,7 @@ const Home = ({ navigation }) => {
                             opacity: 0.6,
                           }}
                         >
-                          {dayjs(item.created_at)
+                          {dayjs(item.date)
                             .locale("id")
                             .format("dddd, DD MMMM YYYY")}
                         </Text>
