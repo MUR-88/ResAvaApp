@@ -24,7 +24,7 @@ const Login = ({ navigation }) => {
   //hook
 
   // todo satus error hilangkan hanya message saja
-  // 
+  //
 
   const formik = useFormik({
     validationSchema: schema,
@@ -34,16 +34,17 @@ const Login = ({ navigation }) => {
       try {
         setIsLoading(true);
         const response = await API.post("login", values);
-        console.log("response", response);
-        // await Promise.all([
-        //   AsyncStorage.setItem("token", response.token.plainTextToken),
-        //   AsyncStorage.setItem("user_id", response.user.id),
-        //   AsyncStorage.setItem("name", response.user.name)
-        // ]);
+
+        // Ensure response.user.id is converted to string
+        const userId = response.user.id.toString();
+
         await AsyncStorage.setItem("token", response.token.plainTextToken);
-        // await AsyncStorage.setItem("user_id", response.user.id.toString());
-        // await AsyncStorage.setItem("name", response.user.name);
+        await AsyncStorage.setItem("user_id", userId);
+        await AsyncStorage.setItem("name", response.user.name);
+
+        // Set token for API requests
         API.setToken(response.token.plainTextToken);
+
         setIsLoading(false);
         navigation.replace("Mytabs");
       } catch (error) {

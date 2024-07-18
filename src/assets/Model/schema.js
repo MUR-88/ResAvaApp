@@ -79,6 +79,7 @@ export default mySchema = appSchema({
       name: "master_log_activities",
       columns: [
         { name: "id_master_log_activity", type: "number", isIndexed: true },
+        { name: "user_id", type: "number"},
         { name: "master_company_id", type: "number" },
         { name: "master_sector_id", type: "number" },
         { name: "master_machine_id", type: "number" },

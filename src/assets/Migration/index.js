@@ -51,6 +51,7 @@ export default schemaMigrations({
             { name: "created_at", type: "number" },
             { name: "deleted_at", type: "number" },
             { name: "updated_at", type: "number" },
+            { name: "user_id", type: "number" },
           ],
         }),
         createTable({

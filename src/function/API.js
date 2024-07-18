@@ -1,22 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-//Home IP
-// const API_URL = "http://192.168.80.219:8000/api/";
 
+//Home IP
+// const API_URL = "http://192.168.107.219:8000/api/";
 
 //Url Prod
-// const API_URL = "https://resava.site/api/";
+const API_URL = "https://resava.site/api/";
 
 //Url Dev
-const API_URL = "https://dev.resava.site/api/";
-
-
-// const API_URL = "http://192.168.233.219:8000/api/";
-// const API_URL = "http://192.168.100.78:8000/api/";
-
-
-// Main API                                                                       
-// const API_URL = "http://207.148.67.242:8000/api/";
-// const API_URL = "http://207.148.67.242";
+// const API_URL = "https://dev.resava.site/api/";
 
 class Api {
   token = null;

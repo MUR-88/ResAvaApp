@@ -7,6 +7,7 @@ import InputData from "./InputData";
 import PilihTanggal from "./PilihTanggal";
 import Label from "./Label";
 import CustomAlert from "./Alert";
+import AlertCount from "./AlertCount";
 export {
   Label,
   Text,
@@ -17,4 +18,5 @@ export {
   InputData,
   PilihTanggal,
   CustomAlert,
+  AlertCount,
 };

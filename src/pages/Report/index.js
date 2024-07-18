@@ -4,8 +4,10 @@ import {
   View,
   SafeAreaView,
   StyleSheet,
+  Modal,
   Dimensions,
   StatusBar,
+  Pressable,
 } from "react-native";
 import { Button, DropdownComp } from "../../component";
 import { RefreshControl, ScrollView } from "react-native-gesture-handler";
@@ -24,71 +26,119 @@ import {
   useMasterLog,
 } from "../../hooks";
 import Clipboard from "@react-native-clipboard/clipboard";
+import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// import DatePicker, { getFormatedDate } from "react-native-modern-datepicker";
 
 const Report = ({ navigation }) => {
-  const [isFocus, setIsFocus] = React.useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const today = new Date();
 
-  const copyToClipboard = (selectedCompanyId) => {
+  const startDate = getFormatedDate(today.setDate(today.getDate() - 2));
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isEnable, setIsEnable] = useState(true);
+  const [text, setText] = useState("Computer On Or Off ?");
+  const [isFocus, setIsFocus] = useState(true);
+  const [date, setDate] = useState(undefined);
+
+  const [showAlert, setShowAlert] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState(undefined);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem("user_id");
+        if (storedUserId !== null) {
+          // User ID retrieved successfully
+          console.log("User ID:", storedUserId);
+          setUserId(storedUserId); // Update userId state with retrieved value
+        } else {
+          // No user ID stored yet
+          console.log("No user ID stored");
+          setUserId(null); // or handle accordingly based on your application's logic
+        }
+      } catch (error) {
+        // Error retrieving user ID
+        console.error("Error retrieving user ID:", error.message);
+        setUserId(null); // or handle accordingly based on your application's error handling strategy
+      }
+    };
+
+    fetchUserId();
+  }, []); // Empty dependency array ensures useEffect runs only once on component mount
+
+  const copyToClipboard = async (selectedCompanyId) => {
     console.log("selectedCompanyId", selectedCompanyId);
     let clipboardContent = "";
-    try {
-      if (selectedCompanyId != null) {
-        clipboardContent += `Tanggal : ${dayjs()
-          .subtract(1, "day")
-          .format("DD/MMM/")} - ${dayjs().format("DD/MMM")}\n`;
-        clipboardContent += `Contractor : ${
-          dataCompany.find(
-            (company) => company.id_master_company === selectedCompanyId
-          )?.name || ""
-        }\n\n\n`;
 
-        dataMasterLog
-          .filter((item) => item.master_company_id === selectedCompanyId)
-          .forEach((item, index) => {
-            clipboardContent += `No: ${index + 1}\n`;
-            clipboardContent += `Contractor: ${
-              dataCompany.find(
-                (company) =>
-                  company.id_master_company === item.master_company_id
-              )?.name || ""
-            }\n`;
-            clipboardContent += `Activity: ${
-              dataMainActivity.find(
-                (activity) =>
-                  activity.id_master_main_activities ===
-                  item.master_main_activity_id
-              )?.name || ""
-            }\n`;
-            clipboardContent += `Id Unit: ${
-              dataMachine.find(
-                (machine) =>
-                  machine.master_machine_id === item.master_machine_id
-              )?.machine_id || ""
-            }\n`;
-            clipboardContent += `Sector: ${
-              dataSector.find(
-                (sector) => sector.id_master_sectors === item.master_sector_id
-              )?.name || ""
-            }\n`;
-            clipboardContent += `Compartement: ${item.compartement_id}\n`;
-            clipboardContent += `Hour Meter: ${
-              dataMasterLog.length > 0
-                ? Math.abs(
-                    dataMasterLog[dataMasterLog.length - 1].current_hour_meter -
-                      item.current_hour_meter
-                  )
-                : "No previous hour meter available"
-            }\n`;
-            clipboardContent += `Working Hour: ${item.working_hour}\n`;
-            clipboardContent += `Remark: ${item.keterangan}\n`;
-            clipboardContent += `Create: ${dayjs(item.date)
-              .locale("id")
-              .format(" DD/MM/YYYY ")}\n\n`;
-          });
-      } else {
+    try {
+      // Check if selectedCompanyId is provided
+      if (!selectedCompanyId) {
         alert("Please select a company");
         return;
       }
+
+      console.log("userId", userId); // Ensure userId is logged or used in your logic
+
+      clipboardContent = `Tanggal : ${dayjs()
+        .subtract(1, "day")
+        .format("DD/MMM/")} - ${dayjs().format("DD/MMM")}\n`;
+
+      const selectedCompany = dataCompany.find(
+        (company) => company.id_master_company === selectedCompanyId
+      );
+
+      if (!selectedCompany) {
+        alert("Company details not found.");
+        return;
+      }
+
+      clipboardContent += `Contractor : ${selectedCompany.name}\n\n\n`;
+
+      dataMasterLog
+        .filter((item) => item.master_company_id === selectedCompanyId)
+        .filter(
+          (item) => dayjs(item.date).date() === dayjs(formik.values.date).date()
+        )
+        // .filter((item) => item.user_id === userId)
+        .forEach((item, index) => {
+          clipboardContent += `No: ${index + 1}\n`;
+          clipboardContent += `Contractor: ${selectedCompany.name}\n`;
+          clipboardContent += `Activity: ${
+            dataMainActivity.find(
+              (activity) =>
+                activity.id_master_main_activities ===
+                item.master_main_activity_id
+            )?.name || ""
+          }\n`;
+          clipboardContent += `Id Unit: ${
+            dataMachine.find(
+              (machine) => machine.master_machine_id === item.master_machine_id
+            )?.machine_id || ""
+          }\n`;
+          clipboardContent += `Sector: ${
+            dataSector.find(
+              (sector) => sector.id_master_sectors === item.master_sector_id
+            )?.name || ""
+          }\n`;
+          clipboardContent += `Compartement: ${item.compartement_id}\n`;
+          clipboardContent += `Hour Meter: ${
+            dataMasterLog.length > 0
+              ? Math.abs(
+                  dataMasterLog[dataMasterLog.length - 1].current_hour_meter -
+                    item.current_hour_meter
+                )
+              : "No previous hour meter available"
+          }\n`;
+          clipboardContent += `Working Hour: ${item.working_hour}\n`;
+          clipboardContent += `Remark: ${item.keterangan}\n`;
+          clipboardContent += `Create: ${dayjs(item.date)
+            .locale("id")
+            .format(" DD/MM/YYYY ")}\n\n`;
+        });
 
       // Copy clipboardContent to clipboard
       Clipboard.setString(clipboardContent);
@@ -96,10 +146,10 @@ const Report = ({ navigation }) => {
       console.log("clipboardContent", clipboardContent);
     } catch (error) {
       console.error("Error copying data:", error);
+      // Handle AsyncStorage errors or other errors appropriately
+      alert("Error copying data. Please try again.");
     }
   };
-
-  const today = new Date();
 
   const formik = useFormik({
     initialValues: {
@@ -180,8 +230,8 @@ const Report = ({ navigation }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  // console.log(JSON.stringify(dataMasterLog, null, 2));
-  // console.log("data Log", dataMasterLog.length);
+  console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log("data Log", dataMasterLog.length);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
@@ -202,37 +252,74 @@ const Report = ({ navigation }) => {
             </View>
           </View>
           <View style={{ flex: 1, marginLeft: -1, flexDirection: "row" }}>
-            <Text style={[styles.Judul1, { marginLeft: 10, marginTop: 20 }]}>
-              Date {"         "}: {"        "}
-              {dayjs().subtract(1, "day").format("DD/MMM/")} -{" "}
-              {dayjs().format("DD/MMM")}
-            </Text>
-            <View
-              style={{
-                flex: 1,
-                marginTop: 15,
-                marginLeft: -20,
-                alignItems: "flex-end",
-                marginRight: 30,
-              }}
-            >
-              {/* <Button
-                buttonStyle={{
-                  borderRadius: 20,
+            <View style={{ flex: 1, flexDirection: "row", marginBottom: 10 }}>
+              <Text style={[styles.Judul1, { marginLeft: 10, marginTop: 20 }]}>
+                Date {"         "}:
+              </Text>
+              <View
+                style={{
+                  justifyContent: "center",
+                  marginLeft: 30,
+                  marginTop: 20,
                 }}
-                item={{
-                  title: "Copy Data",
-                  height: 25,
-                  width: "50%",
-                  textcolor: "#007AFF",
-                  justifyContent: "flex-end",
-
-                  backgroundcolor: "#DEEBFF",
-                  // alginSelf: "center",
-                  borderRadius: 20,
-                  onPress: () => copyToClipboard(),
+              >
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={modalVisible}
+                  onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                      <DatePicker
+                        onSelectedChange={(date) => setDate(date)}
+                        mode="calendar"
+                        display="spinner"
+                        // minimumDate={startDate}
+                        selected={date}
+                        onDateChange={(date) => {
+                          formik.setFieldValue("date", date);
+                        }}
+                      />
+                      <Pressable
+                        style={[styles.button, styles.buttonClose]}
+                        onPress={() => setModalVisible(!modalVisible)}
+                      >
+                        <Text style={styles.textStyle}>{}Simpan</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </Modal>
+                <Pressable
+                  // style={[styles.button, styles.buttonOpen]}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Text
+                    style={[
+                      styles.textStyle,
+                      { color: formik.setFieldValue ? "#88888D" : "black" },
+                    ]}
+                  >
+                    {formik.values.date
+                      ? dayjs(formik.values.date)
+                          .locale("id")
+                          .format("DD/MMM/YYYY ")
+                      : "Pilih Tanggal"}
+                  </Text>
+                </Pressable>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  marginTop: 15,
+                  marginLeft: -20,
+                  alignItems: "flex-end",
+                  marginRight: 30,
                 }}
-              /> */}
+              ></View>
             </View>
           </View>
           <View style={{ flex: 1, marginLeft: 30, flexDirection: "row" }}>
@@ -293,8 +380,10 @@ const Report = ({ navigation }) => {
                 item.master_company_id === formik.values.id_master_company
             )
             .filter(
-              (item) => dayjs(item.date) >= today.setDate(today.getDate() - 5)
+              (item) =>
+                dayjs(item.date).date() === dayjs(formik.values.date).date()
             )
+            // .filter((item) => item.user_id === userId)
             .map((item, index) => (
               <View style={[styles.Garis]}>
                 <View style={[styles.Isi]}>
@@ -318,7 +407,7 @@ const Report = ({ navigation }) => {
                     <Text style={[styles.IsiText2]}>Working Hours</Text>
                     <Text style={[styles.IsiText2]}>Remarks</Text>
                     <Text style={[styles.IsiText2]}>Sector</Text>
-
+                    <Text style={[styles.IsiText2]}>User Id</Text>
                     <Text style={[styles.IsiText2]}>Create</Text>
                   </View>
                   <View style={[{ flex: 4 }]}>
@@ -383,6 +472,7 @@ const Report = ({ navigation }) => {
                             return matchedSector.name;
                           })}
                       </Text>
+                      <Text style={[styles.IsiText2]}>{userId}</Text>
                       <Text style={[styles.IsiText2]}>
                         {dayjs(item.date).locale("id").format(" DD/MM/YYYY ")}
                       </Text>
@@ -391,6 +481,11 @@ const Report = ({ navigation }) => {
                 </View>
               </View>
             ))}
+          {dataMasterLog.length === 0 && (
+            <Text style={{ textAlign: "center", marginTop: 20 }}>
+              Silahkan Pilih Tanggal dan Contractor
+            </Text>
+          )}
         </ScrollView>
       </RefreshControl>
     </SafeAreaView>
@@ -488,7 +583,6 @@ const styles = StyleSheet.create({
     height: 100,
     borderColor: "#8888D",
     alignItems: "center",
-    // opacity: 0.4,
   },
   IsiText2: {
     flex: 1,
@@ -508,5 +602,48 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     marginHorizontal: 10,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 35,
+    width: "100%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 10,
+    padding: 10,
+    elevation: 5,
+    height: 45,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  buttonOpen: {
+    backgroundColor: "white",
+  },
+  buttonClose: {
+    backgroundColor: "#007AFF",
+  },
+  textStyle: {
+    textAlign: "center",
+    color: "white",
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
   },
 });

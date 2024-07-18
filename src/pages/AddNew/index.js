@@ -79,6 +79,8 @@ const AddNew = ({ navigation, title }) => {
 
   const [showAlert, setShowAlert] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const handleCancel = () => {
     setShowAlert(false);
   };
@@ -87,7 +89,6 @@ const AddNew = ({ navigation, title }) => {
     setShowAlert(false);
     formik.handleSubmit();
   };
-  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -165,6 +166,21 @@ const AddNew = ({ navigation, title }) => {
       }
     },
   });
+  const [prevData, setPrevData] = useState([]);
+
+  useEffect(() => {
+    try {
+      dataMasterLog.length > 0 &&
+        dataMasterLog.map((item, index, array) => {
+          if (index === array.length - 1) {
+            setPrevData(item);
+            console.log("prevData", item);
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
   useEffect(() => {
     if (formik.values.master_machine_id) {
@@ -188,22 +204,6 @@ const AddNew = ({ navigation, title }) => {
   console.log(formik.errors);
   console.log("value", formik.values);
 
-  // const [hm, setHm] = useState(0);
-
-  // useEffect(() => {
-  //   const hmArray = dataMasterLog
-  //     .filter(
-  //       (item) => item.master_main_activity_id === formik.values.master_machine_id
-  //     )
-  //     .map((item, index, array) =>
-  //       index === array.length - 1 ? item.current_hour_meter : null
-  //   );
-  //   console.log("HM Array", hmArray);
-
-  //   setHm(hmArray.length > 0 ? hmArray[0] : 0);
-  // }, [formik.values.master_machine_id, dataMasterLog]);
-  // console.log("hm", hm);
-
   const [hm, setHm] = useState(0);
 
   useEffect(() => {
@@ -218,7 +218,7 @@ const AddNew = ({ navigation, title }) => {
     // Check if filteredData has items
     if (filteredData.length > 0) {
       // Get the last item in filteredData
-      const lastItem = filteredData[filteredData.length - 1];
+      const lastItem = filteredData[filteredData.length];
       // Assign the current_hour_meter of the last item to latestHm
       latestHm = lastItem.current_hour_meter;
     }
@@ -227,7 +227,7 @@ const AddNew = ({ navigation, title }) => {
     setHm(latestHm);
   }, [formik.values.master_machine_id, dataMasterLog]);
 
-  console.log("hm", hm); // This will log the latest hm after useEffect runs
+  // console.log("hm", hm); // This will log the latest hm after useEffect runs
 
   const {
     data: dataSector,
@@ -268,7 +268,7 @@ const AddNew = ({ navigation, title }) => {
     isLoading: isLoadingLog,
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
-  console.log(JSON.stringify(dataMasterLog, null, 2));
+  // console.log(JSON.stringify(dataMasterLog, null, 2));
   // console.log("data Log", dataMasterLog.length);
 
   return (
@@ -341,7 +341,6 @@ const AddNew = ({ navigation, title }) => {
                         </View>
                       </View>
                     </Modal>
-                    {/* {showTime? } */}
                     <Pressable
                       style={[styles.button, styles.buttonOpen]}
                       onPress={() => setModalVisible(true)}
@@ -376,7 +375,7 @@ const AddNew = ({ navigation, title }) => {
                       onChange: (item) => {
                         setIsFocus(false);
                         formik.setFieldValue("id_master_company", item.value);
-                        console.log(item);
+                        // console.log(item);
                       },
                       Dropdown: {
                         borderWidth: 0.4,
@@ -418,7 +417,7 @@ const AddNew = ({ navigation, title }) => {
                       onChange: (item) => {
                         setIsFocus(false);
                         formik.setFieldValue("id_master_sectors", item.value);
-                        console.log(item);
+                        // console.log(item);
                       },
                       Dropdown: {
                         borderWidth: 0.4,
@@ -517,7 +516,7 @@ const AddNew = ({ navigation, title }) => {
                       onChange: (item) => {
                         setIsFocus(false);
                         formik.setFieldValue("master_machine_id", item.value);
-                        console.log(item);
+                        // console.log(item);
                       },
                       Dropdown: {
                         borderWidth: 0.4,
@@ -723,7 +722,8 @@ const AddNew = ({ navigation, title }) => {
                           </Text>
                         </View>
                       ) : null}
-                      {formik.values.current_hour_meter - hm > 24 &&  hm === "" ? (
+                      {formik.values.current_hour_meter - hm > 24 &&
+                      hm === "" ? (
                         <View style={[styles.Label, { marginBottom: 5 }]}>
                           <Text style={globalStyles.textError}>
                             HM tidak boleh lebih dari 24 jam
@@ -858,11 +858,12 @@ const AddNew = ({ navigation, title }) => {
                   marginHorizontal: 20,
                 }}
               >
-                {formik.values.current_hour_meter - hm <= 24 &&
-                formik.values.current_hour_meter > hm ||
+                {(formik.values.current_hour_meter - hm <= 24 &&
+                  formik.values.current_hour_meter > hm) ||
                 // formik.values.keterangan !== "" &&
-                formik.values.current_hour_meter >= hm &&
-                formik.values.keterangan !== ""|| formik.values.current_hour_meter === "" && hm === "" ? (
+                (formik.values.current_hour_meter >= hm &&
+                  formik.values.keterangan !== "") ||
+                (formik.values.current_hour_meter === "" && hm === "") ? (
                   <Button
                     item={{
                       title: "Submit",

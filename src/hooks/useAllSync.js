@@ -34,7 +34,7 @@ export const useAllSync = ({ isGetData }) => {
           // JSON.stringify(migration)
         )}`;
         const response = await API.get(`allSync?${urlParams}`);
-          console.log("test data", JSON.stringify(response, null, 2));
+          // console.log("test data", JSON.stringify(response, null, 2));
 
         // Check if the request was successful
         

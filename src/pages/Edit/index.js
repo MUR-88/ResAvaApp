@@ -121,7 +121,8 @@ const Edit = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState("");
   const today = new Date();
 
-  const startDate = getFormatedDate(today.setDate(today.getDate(-30)));
+  // const startDate = getFormatedDate(today.setDate(today.getDate(-2)));
+  const startDate = getFormatedDate(today.setDate(today.getDate() - 2));
 
   const [modalVisible, setModalVisible] = useState(false);
   const [open, setOpen] = useState(false);
@@ -301,7 +302,6 @@ const Edit = ({ navigation }) => {
                     </View>
                   </View>
                 </Modal>
-                {/* {showTime? } */}
                 <Pressable
                   style={[styles.button, styles.buttonOpen]}
                   onPress={() => setModalVisible(true)}
@@ -316,7 +316,7 @@ const Edit = ({ navigation }) => {
                       ? dayjs(formik.values.date)
                           .locale("id")
                           .format("DD/MMM/YYYY ")
-                      : "pilih tanggal"}
+                      : "Pilih Tanggal"}
                   </Text>
                 </Pressable>
               </View>
@@ -757,23 +757,23 @@ const Edit = ({ navigation }) => {
               marginHorizontal: 20,
             }}
           >
-           {formik.values.current_hour_meter - hm <= 24 &&
-                formik.values.current_hour_meter > hm ||
-                // formik.values.keterangan !== "" &&
-                formik.values.current_hour_meter >= hm &&
-                formik.values.keterangan !== "" ? (
-                  <Button
-                    item={{
-                      title: "Submit",
-                      backgroundcolor: "#8296FF",
-                      textcolor: "#FFFFFF",
-                      width: "100%",
-                      justifyContent: "center",
-                      // onPress: () => handleSubmit(),
-                      onPress: () => setShowAlert(true),
-                    }}
-                  />
-                ) : null}
+            {(formik.values.current_hour_meter - hm <= 24 &&
+              formik.values.current_hour_meter > hm) ||
+            // formik.values.keterangan !== "" &&
+            (formik.values.current_hour_meter >= hm &&
+              formik.values.keterangan !== "") ? (
+              <Button
+                item={{
+                  title: "Submit",
+                  backgroundcolor: "#8296FF",
+                  textcolor: "#FFFFFF",
+                  width: "100%",
+                  justifyContent: "center",
+                  // onPress: () => handleSubmit(),
+                  onPress: () => setShowAlert(true),
+                }}
+              />
+            ) : null}
             <CustomAlert
               visible={showAlert}
               message="Are you sure you want to submit the form?"
