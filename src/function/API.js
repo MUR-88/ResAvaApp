@@ -1,10 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //Home IP
-// const API_URL = "http://192.168.107.219:8000/api/";
+const API_URL = "http://192.168.107.219:8000/api/";
+
 
 //Url Prod
-const API_URL = "https://resava.site/api/";
+// const API_URL = "https://resava.site/api/";
 
 //Url Dev
 // const API_URL = "https://dev.resava.site/api/";
@@ -18,35 +19,35 @@ class Api {
     }
   }
 
-  // setToken(token) {
-  //   this.token = token;
-  // }
-
-  // resetToken() {
-  //   this.token = null;
-  // }
-
-  // getToken() {
-  //   return this.token;
-  // }
-
-
-  async setToken(token) {
+  setToken(token) {
     this.token = token;
-    await AsyncStorage.setItem('token', token);
   }
 
-  async resetToken() {
+  resetToken() {
     this.token = null;
-    await AsyncStorage.removeItem('token');
   }
 
-  async getToken() {
-    if (!this.token) {
-      this.token = await AsyncStorage.getItem('token');
-    }
+  getToken() {
     return this.token;
   }
+
+
+  // async setToken(token) {
+  //   this.token = token;
+  //   await AsyncStorage.setItem('token', token);
+  // }
+
+  // async resetToken() {
+  //   this.token = null;
+  //   await AsyncStorage.removeItem('token');
+  // }
+
+  // async getToken() {
+  //   if (!this.token) {
+  //     this.token = await AsyncStorage.getItem('token');
+  //   }
+  //   return this.token;
+  // }
 
   
   async request(path, options = {}) {

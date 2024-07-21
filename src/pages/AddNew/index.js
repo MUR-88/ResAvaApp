@@ -79,8 +79,6 @@ const AddNew = ({ navigation, title }) => {
 
   const [showAlert, setShowAlert] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-
   const handleCancel = () => {
     setShowAlert(false);
   };
@@ -89,6 +87,7 @@ const AddNew = ({ navigation, title }) => {
     setShowAlert(false);
     formik.handleSubmit();
   };
+  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -101,87 +100,83 @@ const AddNew = ({ navigation, title }) => {
       id_master_main_activities: "",
       current_hour_meter: "",
       keterangan: "",
+      // id_master_log_activity: "",
       oil: "",
     },
     validationSchema: schema,
+
     onSubmit: async (values) => {
+      if (!formik.isValid) {
+        Toast.show({
+          visibilityTime: 5000,
+          type: "error",
+          text1: "Form is not valid",
+        });
+        return;
+      }
+
       setLoading(true);
+
       try {
-        // Check if data with the same date already exists in dataMasterLog
         const existingLog = dataMasterLog.find(
           (log) =>
             dayjs(log.date).format("YYYY-MM-DD") ===
               dayjs(values.date).format("YYYY-MM-DD") &&
             log.master_machine_id === formik.values.master_machine_id &&
-            log.master_machine_id === formik.values.master_machine_id
+            log.master_company_id === formik.values.id_master_company
         );
 
         if (existingLog) {
           Toast.show({
             visibilityTime: 5000,
             type: "error",
-            text1: "Data Sudah ada",
+            text1: "Data sudah ada",
           });
-        } else {
-          await database.write(async () => {
-            const masterLog = await database
-              .get(MasterLogActivity.table)
-              .create((item) => {
-                item.id_master_log_activity = dataMasterLog.length + 1;
-                item.master_sector_id = values.id_master_sectors;
-                item.master_company_id = values.id_master_company;
-                item.master_machine_id = values.master_machine_id;
-                item.compartement_id = values.compartement_id;
-                item.master_machine_types_id = values.id_master_machine_types;
-                item.master_main_activity_id = values.id_master_main_activities;
-                item.current_hour_meter = parseInt(values.current_hour_meter);
-                item.keterangan = values.keterangan;
-                item.oil = values.oil;
-                item.isSynced = false;
-                item.isConnected = false;
-                item.created_at = dayjs(values.date).unix() * 1000;
-                item.date = dayjs(values.date).unix() * 1000;
-              });
+          return;
+        }
 
-            Toast.show({
-              visibilityTime: 5000,
-              type: "success",
-              text1: "Yeay, Berhasil!",
-              text2: "Data Log Activity Berhasil Ditambahkan",
+        await database.write(async () => {
+          const masterLog = await database
+            .get(MasterLogActivity.table)
+            .create((item) => {
+              item.id_master_log_activity = dataMasterLog.length + 1; // Ensure this ID is unique
+              item.master_sector_id = values.id_master_sectors;
+              item.master_company_id = values.id_master_company;
+              item.master_machine_id = values.master_machine_id;
+              item.compartement_id = values.compartement_id;
+              item.master_machine_types_id = values.id_master_machine_types;
+              item.master_main_activity_id = values.id_master_main_activities;
+              item.current_hour_meter = parseInt(values.current_hour_meter);
+              item.keterangan = values.keterangan;
+              item.oil = values.oil;
+              item.isSynced = false;
+              item.isConnected = false;
+              item.created_at = dayjs(values.date).unix() / 1000;
+              item.updated_at = dayjs(values.date).unix() / 1000;
+              item.date = dayjs(values.date).unix() / 1000;
             });
 
-            navigation.replace("Mytabs");
+          Toast.show({
+            visibilityTime: 5000,
+            type: "success",
+            text1: "Yeay, Berhasil!",
+            text2: "Data Log Activity Berhasil Ditambahkan",
           });
-        }
+
+          navigation.replace("Mytabs");
+        });
       } catch (error) {
         Toast.show({
           visibilityTime: 5000,
           type: "error",
-          text1: error.message,
+          text1: error.message || "Something went wrong",
         });
-        // alert(error.message);
-        console.log(error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
     },
   });
-  const [prevData, setPrevData] = useState([]);
-
-  useEffect(() => {
-    try {
-      dataMasterLog.length > 0 &&
-        dataMasterLog.map((item, index, array) => {
-          if (index === array.length - 1) {
-            setPrevData(item);
-            console.log("prevData", item);
-          }
-        });
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
   useEffect(() => {
     if (formik.values.master_machine_id) {
       // query data machine type  berdasarkan machine id
@@ -204,6 +199,22 @@ const AddNew = ({ navigation, title }) => {
   console.log(formik.errors);
   console.log("value", formik.values);
 
+  // const [hm, setHm] = useState(0);
+
+  // useEffect(() => {
+  //   const hmArray = dataMasterLog
+  //     .filter(
+  //       (item) => item.master_main_activity_id === formik.values.master_machine_id
+  //     )
+  //     .map((item, index, array) =>
+  //       index === array.length - 1 ? item.current_hour_meter : null
+  //   );
+  //   console.log("HM Array", hmArray);
+
+  //   setHm(hmArray.length > 0 ? hmArray[0] : 0);
+  // }, [formik.values.master_machine_id, dataMasterLog]);
+  // console.log("hm", hm);
+
   const [hm, setHm] = useState(0);
 
   useEffect(() => {
@@ -218,7 +229,7 @@ const AddNew = ({ navigation, title }) => {
     // Check if filteredData has items
     if (filteredData.length > 0) {
       // Get the last item in filteredData
-      const lastItem = filteredData[filteredData.length];
+      const lastItem = filteredData[filteredData.length - 2];
       // Assign the current_hour_meter of the last item to latestHm
       latestHm = lastItem.current_hour_meter;
     }
@@ -227,7 +238,7 @@ const AddNew = ({ navigation, title }) => {
     setHm(latestHm);
   }, [formik.values.master_machine_id, dataMasterLog]);
 
-  // console.log("hm", hm); // This will log the latest hm after useEffect runs
+  console.log("hm", hm); // This will log the latest hm after useEffect runs
 
   const {
     data: dataSector,
@@ -341,6 +352,7 @@ const AddNew = ({ navigation, title }) => {
                         </View>
                       </View>
                     </Modal>
+                    {/* {showTime? } */}
                     <Pressable
                       style={[styles.button, styles.buttonOpen]}
                       onPress={() => setModalVisible(true)}
@@ -375,7 +387,7 @@ const AddNew = ({ navigation, title }) => {
                       onChange: (item) => {
                         setIsFocus(false);
                         formik.setFieldValue("id_master_company", item.value);
-                        // console.log(item);
+                        console.log(item);
                       },
                       Dropdown: {
                         borderWidth: 0.4,
@@ -417,7 +429,7 @@ const AddNew = ({ navigation, title }) => {
                       onChange: (item) => {
                         setIsFocus(false);
                         formik.setFieldValue("id_master_sectors", item.value);
-                        // console.log(item);
+                        console.log(item);
                       },
                       Dropdown: {
                         borderWidth: 0.4,
@@ -516,7 +528,7 @@ const AddNew = ({ navigation, title }) => {
                       onChange: (item) => {
                         setIsFocus(false);
                         formik.setFieldValue("master_machine_id", item.value);
-                        // console.log(item);
+                        console.log(item);
                       },
                       Dropdown: {
                         borderWidth: 0.4,
@@ -586,6 +598,7 @@ const AddNew = ({ navigation, title }) => {
                             selected.master_machine_types_id ===
                             formik.values.id_master_machine_types
                           );
+                          // console.log("Values", selected)
                         })
                         .map((mainActivity) => ({
                           label: mainActivity.name,
@@ -678,7 +691,7 @@ const AddNew = ({ navigation, title }) => {
                                     formik.values.master_machine_id
                                 )
                                 .map((item, index, array) => {
-                                  if (index === array.length - 1) {
+                                  if (index === array.length - 2) {
                                     return item.current_hour_meter;
                                   } else {
                                     return null;
@@ -714,29 +727,30 @@ const AddNew = ({ navigation, title }) => {
                           </Text>
                         </View>
                       ) : null}
-                      {formik.values.current_hour_meter - hm > 0 &&
-                      formik.values.current_hour_meter - hm < 5 ? (
+                      {(formik.values.current_hour_meter - hm >= 0 &&
+                        formik.values.current_hour_meter - hm <= 5) ||
+                      (formik.values.current_hour_meter === hm &&
+                        formik.values.keterangan !== "") ? (
                         <View style={[styles.Label, { marginBottom: 5 }]}>
                           <Text style={globalStyles.textError}>
                             Masukkan Justifikasi
                           </Text>
                         </View>
                       ) : null}
-                      {formik.values.current_hour_meter - hm > 24 &&
-                      hm === "" ? (
+                      {formik.values.current_hour_meter - hm > 24 ? (
                         <View style={[styles.Label, { marginBottom: 5 }]}>
                           <Text style={globalStyles.textError}>
                             HM tidak boleh lebih dari 24 jam
                           </Text>
                         </View>
                       ) : null}
-                      {formik.values.current_hour_meter == hm || hm === "" ? (
+                      {/* {formik.values.current_hour_meter === hm ? (
                         <View style={[styles.Label, { marginBottom: 5 }]}>
                           <Text style={globalStyles.textError}>
                             Masukkan Justifikasi
                           </Text>
                         </View>
-                      ) : null}
+                      ) : null} */}
 
                       <View style={[styles.Label, { marginBottom: 5 }]}>
                         <Text
@@ -816,7 +830,7 @@ const AddNew = ({ navigation, title }) => {
                 <View style={[styles.atas, { borderRadius: 10 }]}>
                   <View
                     style={[
-                      styles.containerInput,
+                      styles.containerInput1,
                       { backgroundColor: "#D8D8D8" },
                     ]}
                   >
@@ -829,21 +843,17 @@ const AddNew = ({ navigation, title }) => {
                         Input: {
                           borderWidth: 0.5,
                           borderColor: "#88888D",
-                          marginHorizontal: 10,
+                          marginHorizontal: 20,
                           height: 45,
+                          width: "100%",
                         },
                       }}
                       buttonStyle={{
+                        // backgroundColor:"black",
+                        borderWidth: 0.5,
                         borderColor: "#DDDDDD",
+                        marginHorizontal: 20,
                       }}
-                      // item={{
-                      //   label: "Keterangan",
-                      //   placeholder: "Maintainance to Workshop for Repairment",
-                      //   value: formik.values.keterangan,
-                      //   backgroundColor: "red",
-                      // }}
-                      // value={formik.values.keterangan}
-                      // input={{ backgroundColor: "black" }}
                     />
                   </View>
                 </View>
@@ -859,11 +869,16 @@ const AddNew = ({ navigation, title }) => {
                 }}
               >
                 {(formik.values.current_hour_meter - hm <= 24 &&
-                  formik.values.current_hour_meter > hm) ||
-                // formik.values.keterangan !== "" &&
-                (formik.values.current_hour_meter >= hm &&
+                  formik.values.current_hour_meter > hm &&
+                  formik.values.current_hour_meter === hm &&
+                  formik.values.keterangan === "") ||
+                (formik.values.current_hour_meter - hm <= 5 &&
                   formik.values.keterangan !== "") ||
-                (formik.values.current_hour_meter === "" && hm === "") ? (
+                (formik.values.keterangan &&
+                  ["new", "baru", "New"].includes(
+                    formik.values.keterangan.toLowerCase()
+                  ) &&
+                  formik.values.current_hour_meter > hm) ? (
                   <Button
                     item={{
                       title: "Submit",

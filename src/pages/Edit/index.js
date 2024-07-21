@@ -239,6 +239,7 @@ const Edit = ({ navigation }) => {
     // Update state with the latestHm
     setHm(latestHm);
   }, [formik.values.master_machine_id, dataMasterLog]);
+  console
 
   console.log("hm", hm);
   return (
@@ -620,6 +621,53 @@ const Edit = ({ navigation }) => {
                       >
                         <Text style={{ fontSize: 16, color: "#88888D" }}>
                           {masterLog.current_hour_meter}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flex: 1,
+                      backgroundColor: "white",
+                      borderWidth: 0.4,
+                      borderColor: "#88888D",
+                      borderRadius: 10,
+                      height: 45,
+                      marginLeft: 10,
+                      marginRight: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.container,
+                        {
+                          justifyContent: "center",
+                          backgroundColor: "white",
+                          flex: 1,
+                        },
+                      ]}
+                    >
+                      <Text style={styles.Abu}>Last HM </Text>
+                    </View>
+                    <View
+                      style={[styles.container, { backgroundColor: "white" }]}
+                    >
+                      <View
+                        style={[
+                          styles.container,
+                          {
+                            backgroundColor: "white",
+                            justifyContent: "center",
+                            alignItems: "flex-end",
+                            marginRight: 10,
+                          },
+                        ]}
+                      >
+                        <Text style={{ fontSize: 16, color: "#88888D" }}>
+                          {hm}
                         </Text>
                       </View>
                     </View>

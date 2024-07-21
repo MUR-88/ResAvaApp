@@ -86,7 +86,8 @@ const Home = ({ navigation }) => {
     try {
       setShowAlert(false);
       await deleteAllRecords(item.id);
-      deleteAllRecords;
+      console.log("deleteAllRecords", deleteAllRecords);
+      // deleteAllRecords;
     } catch (error) {
       Toast.show({
         visibilityTime: 5000,
@@ -182,7 +183,7 @@ const Home = ({ navigation }) => {
     connected: connectedMasterLog,
   } = useMasterLog({ isGetData: true });
   console.log("data Log", dataMasterLog.length);
-  // console.log(JSON.stringify(dataMasterLog, null, 2));
+  console.log(JSON.stringify(dataMasterLog, null, 2));
 
   const queryClient = useQueryClient();
   // Queries
@@ -472,27 +473,24 @@ const Home = ({ navigation }) => {
                           justifyContent: "center",
                         }}
                       >
-                        {/* {dayjs(item.created_at)
-                            .locale("id")
-                            .format("DD/MMM/YYYY") <=
-                          dayjs(today)
-                            .subtract(2, "days")
-                            .format("DD/MMM/YYYY") ? ( */}
-                        <Button
-                          buttonStyle={{ borderRadius: 20 }}
-                          item={{
-                            title: "Edit",
-                            textcolor: "#007AFF",
-                            backgroundcolor: "#D6E8FD",
-                            alginSelf: "center",
-                            onPress: () =>
-                              navigation.navigate("Edit", {
-                                masterLog: item,
-                              }),
-                            // onPress: () => setShowAlert(true, item),
-                          }}
-                        />
-                        {/* ) : null} */}
+                        {dayjs(item.created_at/1000)
+                          .locale("id")
+                          .format("DD/MMM/YYYY") >
+                        dayjs().subtract(1, "days").format("DD/MMM/YYYY") ? (
+                          <Button
+                            buttonStyle={{ borderRadius: 20 }}
+                            item={{
+                              title: "Edit",
+                              textcolor: "#007AFF",
+                              backgroundcolor: "#D6E8FD",
+                              alignSelf: "center",
+                              onPress: () =>
+                                navigation.navigate("Edit", {
+                                  masterLog: item,
+                                }),
+                            }}
+                          />
+                        ) : null}
                       </View>
                     </View>
 
